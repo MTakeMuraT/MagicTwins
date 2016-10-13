@@ -15,8 +15,7 @@ namespace basecross{
 	//	用途: プレイヤー
 	//--------------------------------------------------------------------------------------
 	class Player : public GameObject {
-		shared_ptr< StateMachine<Player> >  m_StateMachine;	//ステートマシーン
-															//移動の向きを得る
+		
 		Vector3 GetAngle();
 		//最高速度
 		float m_MaxSpeed;
@@ -30,15 +29,23 @@ namespace basecross{
 		virtual ~Player() {}
 		//初期化
 		virtual void OnCreate() override;
-		//アクセサ
-		shared_ptr< StateMachine<Player> > GetStateMachine() const {
-			return m_StateMachine;
-		}
+		
+		
+		//移動して向きを移動方向にする
+		void MoveRotationMotion();
+		
+
 		//更新
 		virtual void OnUpdate() override;
+		//void OnCollision(const shared_ptr<GameObject>& other);
 		//ターンの最終更新時
 		virtual void OnLastUpdate() override;
+
+
 	};
+
+	
+
 }
 //end basecross
 

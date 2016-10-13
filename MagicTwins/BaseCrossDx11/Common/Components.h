@@ -331,6 +331,7 @@ namespace basecross {
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
+
 		virtual void OnDraw()override {}
 	private:
 		// pImplイディオム

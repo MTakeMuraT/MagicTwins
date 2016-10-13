@@ -33,12 +33,19 @@ namespace basecross {
 
 	//ビューとライトの作成
 	void GameStage::CreateViewLight() {
-		auto PtrView = CreateView<SingleView>();
-		//ビューのカメラの設定
-		auto PtrLookAtCamera = ObjectFactory::Create<LookAtCamera>();
-		PtrView->SetCamera(PtrLookAtCamera);
-		PtrLookAtCamera->SetEye(Vector3(0.0f, 1.0f, -8.0f));
-		PtrLookAtCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+		auto PtrView = CreateView<SingleView>()
+			;
+		//ビューのカメラの設定(右スティックで向きを変えられる)
+		//auto Camera = ObjectFactory::Create<LookAtCamera>();
+		//PtrView->SetCamera(Camera);
+		//Camera->SetEye(Vector3(0.0f, 1.0f, -8.0f));
+		//Camera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+
+		//ビューのカメラの設定(カメラ固定)
+		auto PtrCamera = PtrView->GetCamera();
+		PtrCamera->SetEye(Vector3(0.0f, 5.0f, -5.0f));
+		PtrCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+
 		//シングルライトの作成
 		auto PtrSingleLight = CreateLight<SingleLight>();
 		//ライトの設定

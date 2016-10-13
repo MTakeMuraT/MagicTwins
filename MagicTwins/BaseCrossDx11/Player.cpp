@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross{
+namespace basecross {
 
 	//--------------------------------------------------------------------------------------
 	//	class Player : public GameObject;
@@ -15,8 +15,8 @@ namespace basecross{
 	//構築と破棄
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_MaxSpeed(40.0f),	//最高速度
-		m_Decel(0.95f),	//減速値
+		m_MaxSpeed(5.0f),	//最高速度
+		m_Decel(0.80f),	//減速値
 		m_Mass(1.0f)	//質量
 	{}
 
@@ -27,6 +27,7 @@ namespace basecross{
 		Ptr->SetScale(0.25f, 0.25f, 0.25f);	//直径25センチの球体
 		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
 		Ptr->SetPosition(0, 0.125f, 0);
+
 
 		//Rigidbodyをつける
 		auto PtrRedid = AddComponent<Rigidbody>();
@@ -72,37 +73,24 @@ namespace basecross{
 		//コントローラの取得
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected) {
-			if (CntlVec[0].fThumbLX != 0 || CntlVec[0].fThumbLY != 0) {
-				float MoveLength = 0;	//動いた時のスピード
-				auto PtrTransform = GetComponent<Transform>();
-				auto PtrCamera = GetStage()->GetView()->GetTargetCamera();
-				//進行方向の向きを計算
-				Vector3 Front = PtrTransform->GetPosition() - PtrCamera->GetEye();
-				Front.y = 0;
-				Front.Normalize();
-				//進行方向向きからの角度を算出
-				float FrontAngle = atan2(Front.z, Front.x);
-				//コントローラの向き計算
-				float MoveX = CntlVec[0].fThumbLX;
-				float MoveZ = CntlVec[0].fThumbLY;
-				//コントローラの向きから角度を計算
-				float CntlAngle = atan2(-MoveX, MoveZ);
-				//トータルの角度を算出
-				float TotalAngle = FrontAngle + CntlAngle;
-				//角度からベクトルを作成
-				Angle = Vector3(cos(TotalAngle), 0, sin(TotalAngle));
-				//正規化する
-				Angle.Normalize();
-				//Y軸は変化させない
-				Angle.y = 0;
-			}
+			
 		}
-		return Angle;
+		return Vector3(0,0,0);
 	}
 
 
 	//更新
 	void Player::OnUpdate() {
+		App::GetApp()->GetElapsedTime();
+		float a = App::GetApp()->GetElapsedTime();
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+		auto TranP = GetComponent<Transform>();
+		Vector3 Posi = TranP->GetPosition();
+		inputXY *= a*m_MaxSpeed;
+		Posi.x += inputXY.x;
+		Posi.z += inputXY.y;
+		TranP->SetPosition(Posi);
 	}
 
 	//ターンの最終更新時
@@ -115,6 +103,7 @@ namespace basecross{
 		FPS += L"\n";
 
 
+
 		auto Pos = GetComponent<Transform>()->GetWorldMatrix().PosInMatrix();
 		wstring PositionStr(L"Position:\t");
 		PositionStr += L"X=" + Util::FloatToWStr(Pos.x, 6, Util::FloatModify::Fixed) + L",\t";
@@ -125,7 +114,7 @@ namespace basecross{
 		auto Velocity = GetComponent<Rigidbody>()->GetVelocity();
 		RididStr += L"X=" + Util::FloatToWStr(Velocity.x, 6, Util::FloatModify::Fixed) + L",\t";
 		RididStr += L"Y=" + Util::FloatToWStr(Velocity.y, 6, Util::FloatModify::Fixed) + L",\t";
-		RididStr += L"Z=" + Util::FloatToWStr(Velocity.z, 6, Util::FloatModify::Fixed) + L"\n";
+		//RididStr += L"Z=" + Util::FloatToWStr(Velocity.z, 6, Util::FloatModify::Fixed) + L"\n";
 
 		wstring GravStr(L"Gravity:\t");
 		auto Grav = GetComponent<Gravity>()->GetGravity();
@@ -142,7 +131,56 @@ namespace basecross{
 
 	}
 
+	//---------------------------------------------
+	//モーションを実装する関数群
+	//移動して向きを移動方向にする
+	void Player::MoveRotationMotion() {
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		Vector3 Angle = GetAngle();
+		//Transform
+		auto PtrTransform = GetComponent<Transform>();
+		//Rigidbodyを取り出す
+		auto PtrRedit = GetComponent<Rigidbody>();
+		//現在の速度を取り出す
+		auto Velo = PtrRedit->GetVelocity();
+		//目的地を最高速度を掛けて求める
+		auto Target = Angle * m_MaxSpeed;
+		//目的地に向かうために力のかける方向を計算する
+		//Forceはフォースである
+		auto Force = Target - Velo;
+		//yは0にする
+		Force.y = 0;
+		//加速度を求める
+		auto Accel = Force / m_Mass;
+		//ターン時間を掛けたものを速度に加算する
+		Velo += (Accel * ElapsedTime);
+		//減速する
+		Velo *= m_Decel;
+		//速度を設定する
+		PtrRedit->SetVelocity(Velo);
+		//回転の計算
+		float YRot = PtrTransform->GetRotation().y;
+		Quaternion Qt;
+		Qt.Identity();
+		if (Angle.Length() > 0.0f) {
+			//ベクトルをY軸回転に変換
+			float PlayerAngle = atan2(Angle.x, Angle.z);
+			Qt.RotationRollPitchYaw(0, PlayerAngle, 0);
+			Qt.Normalize();
+		}
+		else {
+			Qt.RotationRollPitchYaw(0, YRot, 0);
+			Qt.Normalize();
+		}
+		//Transform
+		PtrTransform->SetQuaternion(Qt);
+	}
 
+	
+    //--------------------------------------------
+
+	
+	
 }
 //end basecross
 
