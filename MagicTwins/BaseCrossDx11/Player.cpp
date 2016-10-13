@@ -15,9 +15,7 @@ namespace basecross {
 	//構築と破棄
 	Player::Player(const shared_ptr<Stage>& StagePtr) :
 		GameObject(StagePtr),
-		m_MaxSpeed(5.0f),	//最高速度
-		m_Decel(0.80f),	//減速値
-		m_Mass(1.0f)	//質量
+		m_Speed(5.0f)	//速度
 	{}
 
 	//初期化
@@ -67,27 +65,15 @@ namespace basecross {
 		}
 	}
 
-	//移動の向きを得る
-	Vector3 Player::GetAngle() {
-		Vector3 Angle(0, 0, 0);
-		//コントローラの取得
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].bConnected) {
-			
-		}
-		return Vector3(0,0,0);
-	}
-
-
 	//更新
 	void Player::OnUpdate() {
 		App::GetApp()->GetElapsedTime();
-		float a = App::GetApp()->GetElapsedTime();
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
 		auto TranP = GetComponent<Transform>();
 		Vector3 Posi = TranP->GetPosition();
-		inputXY *= a*m_MaxSpeed;
+		inputXY *= ElapsedTime*m_Speed;
 		Posi.x += inputXY.x;
 		Posi.z += inputXY.y;
 		TranP->SetPosition(Posi);
@@ -101,8 +87,6 @@ namespace basecross {
 		wstring FPS(L"FPS: ");
 		FPS += Util::UintToWStr(fps);
 		FPS += L"\n";
-
-
 
 		auto Pos = GetComponent<Transform>()->GetWorldMatrix().PosInMatrix();
 		wstring PositionStr(L"Position:\t");
@@ -129,58 +113,7 @@ namespace basecross {
 		GravityStr += L"Y=" + Util::FloatToWStr(GravityVelocity.y, 6, Util::FloatModify::Fixed) + L",\t";
 		GravityStr += L"Z=" + Util::FloatToWStr(GravityVelocity.z, 6, Util::FloatModify::Fixed) + L"\n";
 
-	}
-
-	//---------------------------------------------
-	//モーションを実装する関数群
-	//移動して向きを移動方向にする
-	void Player::MoveRotationMotion() {
-		float ElapsedTime = App::GetApp()->GetElapsedTime();
-		Vector3 Angle = GetAngle();
-		//Transform
-		auto PtrTransform = GetComponent<Transform>();
-		//Rigidbodyを取り出す
-		auto PtrRedit = GetComponent<Rigidbody>();
-		//現在の速度を取り出す
-		auto Velo = PtrRedit->GetVelocity();
-		//目的地を最高速度を掛けて求める
-		auto Target = Angle * m_MaxSpeed;
-		//目的地に向かうために力のかける方向を計算する
-		//Forceはフォースである
-		auto Force = Target - Velo;
-		//yは0にする
-		Force.y = 0;
-		//加速度を求める
-		auto Accel = Force / m_Mass;
-		//ターン時間を掛けたものを速度に加算する
-		Velo += (Accel * ElapsedTime);
-		//減速する
-		Velo *= m_Decel;
-		//速度を設定する
-		PtrRedit->SetVelocity(Velo);
-		//回転の計算
-		float YRot = PtrTransform->GetRotation().y;
-		Quaternion Qt;
-		Qt.Identity();
-		if (Angle.Length() > 0.0f) {
-			//ベクトルをY軸回転に変換
-			float PlayerAngle = atan2(Angle.x, Angle.z);
-			Qt.RotationRollPitchYaw(0, PlayerAngle, 0);
-			Qt.Normalize();
-		}
-		else {
-			Qt.RotationRollPitchYaw(0, YRot, 0);
-			Qt.Normalize();
-		}
-		//Transform
-		PtrTransform->SetQuaternion(Qt);
-	}
-
-	
-    //--------------------------------------------
-
-	
-	
+	}	
 }
 //end basecross
 
