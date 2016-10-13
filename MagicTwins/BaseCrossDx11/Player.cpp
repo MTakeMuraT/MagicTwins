@@ -13,18 +13,20 @@ namespace basecross {
 	//	用途: プレイヤー
 	//--------------------------------------------------------------------------------------
 	//構築と破棄
-	Player::Player(const shared_ptr<Stage>& StagePtr) :
+	Player::Player(const shared_ptr<Stage>& StagePtr,Vector3 pos , bool Active,string name) :
 		GameObject(StagePtr),
-		m_Speed(5.0f)	//速度
+		m_InitPos(pos),
+		m_myName(name),
+		m_ActiveFlg(Active)
 	{}
 
 	//初期化
 	void Player::OnCreate() {
 		//初期位置などの設定
 		auto Ptr = GetComponent<Transform>();
-		Ptr->SetScale(0.25f, 0.25f, 0.25f);	//直径25センチの球体
-		Ptr->SetRotation(0.0f, 0.0f, 0.0f);
-		Ptr->SetPosition(0, 0.125f, 0);
+		Ptr->SetScale(0.25f, 0.25f, 0.25f);
+		Ptr->SetRotation(0, 0, 0);
+		Ptr->SetPosition(m_InitPos);
 
 
 		//Rigidbodyをつける
@@ -58,25 +60,125 @@ namespace basecross {
 
 		//透明処理
 		SetAlphaActive(true);
+		/*
 		auto PtrCamera = dynamic_pointer_cast<LookAtCamera>(GetStage()->GetView()->GetTargetCamera());
 		if (PtrCamera) {
 			//LookAtCameraに注目するオブジェクト（プレイヤー）の設定
 			PtrCamera->SetTargetObject(GetThis<GameObject>());
-		}
+		}*/
+	
 	}
 
 	//更新
 	void Player::OnUpdate() {
-		App::GetApp()->GetElapsedTime();
-		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		if (m_ActiveFlg)
+		{
+			active();
+		}
+	}
+
+	//操作できる状態
+	void Player::active()
+	{
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
-		auto TranP = GetComponent<Transform>();
-		Vector3 Posi = TranP->GetPosition();
-		inputXY *= ElapsedTime*m_Speed;
-		Posi.x += inputXY.x;
-		Posi.z += inputXY.y;
-		TranP->SetPosition(Posi);
+		if (CntlVec[0].bConnected)
+		{
+			//入力が少しでもあったら
+			if (CntlVec[0].fThumbLX > 0.1f || CntlVec[0].fThumbLX < -0.1f ||
+				CntlVec[0].fThumbLY > 0.1f || CntlVec[0].fThumbLY < -0.1f)
+			{
+				float ElapsedTime = App::GetApp()->GetElapsedTime();
+				//コントローラーの入力XY
+				Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+				auto TranP = GetComponent<Transform>();
+				Vector3 Posi = TranP->GetPosition();
+				inputXY *= ElapsedTime*m_Speed;
+				Posi.x += inputXY.x;
+				Posi.z += inputXY.y;
+				TranP->SetPosition(Posi);
+			}
+
+			//Rトリガーでキャラ切り替え
+			if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_RIGHT_SHOULDER)
+			{
+				ChangeChar();
+			}
+
+		}
+
+	}
+
+
+	//キャラチェンジ
+	void Player::ChangeChar()
+	{
+		//自分がどっちか判定
+		if (m_myName == "Player1")
+		{
+
+			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+
+			//いなかったらエラー終了
+			if (!DPlayer)
+			{
+				throw BaseException(
+					L"Player2いません",L"",L""
+					);
+			}
+			
+			//あっち側起動
+			DPlayer->SetActive(true);
+			//こっち停止
+			m_ActiveFlg = false;
+
+			//カメラ移動
+			auto View = GetStage()->GetView();
+			auto CameraP = View->GetTargetCamera();
+			//カメラ移動
+			CameraP->SetEye(20.0f, 5.0f, -5.0f);
+			CameraP->SetAt(0, 0, 0);
+
+			
+			return;
+		}
+		else if(m_myName == "Player2")
+		{
+			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+			//いなかったらエラー終了
+			if (!DPlayer)
+			{
+				throw BaseException(
+					L"Player1いません", L"", L""
+					);
+			}
+			
+			//あっち側起動
+			DPlayer->SetActive(true);
+			//こっち停止
+			m_ActiveFlg = false;
+
+
+			/*
+			//カメラ移動
+			auto View = GetStage()->GetView();
+			auto CameraP = View->GetTargetCamera();
+			CameraP->SetEye(0.0f, 5.0f, -5.0f);
+			CameraP->SetAt(0,0,0);
+			*/
+			
+			return;
+		}
+
+		throw BaseException(
+			L"交代ミスってます", L"", L""
+			);
+	}
+
+	//操作状態操作
+	void Player::SetActive(bool flg)
+	{
+		m_ActiveFlg = flg;
 	}
 
 	//ターンの最終更新時

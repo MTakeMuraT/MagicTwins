@@ -83,10 +83,19 @@ namespace basecross {
 
 	//プレイヤーの作成
 	void GameStage::CreatePlayer() {
+		
 		//プレーヤーの作成
-		auto PlayerPtr = AddGameObject<Player>();
+		auto PlayerPtr = AddGameObject<Player>(Vector3(0,0.125f,0),true,"Player1");
 		//シェア配列にプレイヤーを追加
-		SetSharedGameObject(L"Player", PlayerPtr);
+		SetSharedGameObject(L"Player1", PlayerPtr);
+		
+		
+		//プレーヤーの作成2体目
+		auto PlayerPtr2 = AddGameObject<Player>(Vector3(10, 0.125f, 0), true, "Player2");
+		//シェア配列にプレイヤーを追加
+		SetSharedGameObject(L"Player2", PlayerPtr2);
+		
+
 	}
 
 	void GameStage::OnCreate() {
