@@ -24,7 +24,7 @@ namespace basecross{
 		string m_myName = "Player1";
 
 		//ちょっと肩ボタンいかれてるから調整
-		bool m_ThumbR = false;
+		bool m_endFrame = false;
 
 		//操作できるかどうか
 		bool m_ActiveFlg = true;
@@ -48,6 +48,7 @@ namespace basecross{
 
 		//操作できるかをセットする関数
 		void SetActive(bool);
+
 	};
 
 	

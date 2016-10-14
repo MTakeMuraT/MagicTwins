@@ -71,6 +71,11 @@ namespace basecross {
 
 	//更新
 	void Player::OnUpdate() {
+		if (m_endFrame)
+		{
+			m_endFrame = false;
+			return;
+		}
 		if (m_ActiveFlg)
 		{
 			active();
@@ -159,13 +164,13 @@ namespace basecross {
 			m_ActiveFlg = false;
 
 
-			/*
+			
 			//カメラ移動
 			auto View = GetStage()->GetView();
 			auto CameraP = View->GetTargetCamera();
 			CameraP->SetEye(0.0f, 5.0f, -5.0f);
 			CameraP->SetAt(0,0,0);
-			*/
+			
 			
 			return;
 		}
@@ -179,6 +184,7 @@ namespace basecross {
 	void Player::SetActive(bool flg)
 	{
 		m_ActiveFlg = flg;
+		m_endFrame = true;
 	}
 
 	//ターンの最終更新時
