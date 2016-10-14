@@ -51,8 +51,23 @@ namespace basecross {
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"TRACE_TX");
+		if (m_myName == "Player1")
+		{
+			//描画するテクスチャを設定
+			PtrDraw->SetTextureResource(L"TRACE_TX");
+		}
+		else if (m_myName == "Player2")
+		{
+			//描画するテクスチャを設定
+			PtrDraw->SetTextureResource(L"TRACE2_TX");
+		}
+		//もし名前違ってる場合
+		else
+		{
+			throw BaseException(
+				L"Playerの名前指定ミスってます", L"", L""
+				);
+		}
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
@@ -137,13 +152,14 @@ namespace basecross {
 			//こっち停止
 			m_ActiveFlg = false;
 
+			
 			//カメラ移動
 			auto View = GetStage()->GetView();
 			auto CameraP = View->GetTargetCamera();
 			//カメラ移動
-			CameraP->SetEye(20.0f, 5.0f, -5.0f);
-			CameraP->SetAt(0, 0, 0);
-
+			CameraP->SetEye(10.0f, 5.0f, -5.0f);
+			CameraP->SetAt(10, 0, 0);
+			
 			
 			return;
 		}
