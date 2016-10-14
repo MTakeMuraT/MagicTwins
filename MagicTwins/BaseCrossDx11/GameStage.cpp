@@ -23,12 +23,8 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"TRACE2_TX", strTexture);
 		strTexture = DataDir + L"sky.jpg";
 		App::GetApp()->RegisterTexture(L"SKY_TX", strTexture);
-		strTexture = DataDir + L"wall.jpg";
-		App::GetApp()->RegisterTexture(L"WALL_TX", strTexture);
-		strTexture = DataDir + L"spark.png";
-		App::GetApp()->RegisterTexture(L"SPARK_TX", strTexture);
-		strTexture = DataDir + L"number.png";
-		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
+		strTexture = DataDir + L"goal.png";
+		App::GetApp()->RegisterTexture(L"GOAL_TX", strTexture);
 	}
 
 
@@ -93,11 +89,27 @@ namespace basecross {
 		
 		
 		//プレーヤーの作成2体目
-		auto PlayerPtr2 = AddGameObject<Player>(Vector3(10, 0.125f, 0), true, "Player2");
+		auto PlayerPtr2 = AddGameObject<Player>(Vector3(10, 0.125f, 0), false, "Player2");
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player2", PlayerPtr2);
 		
 
+	}
+
+	//ゴールの作成
+	void GameStage::CreateGoal()
+	{
+		//ゴール作成
+		auto GoalP = AddGameObject<Goal>(Vector3(-5, 0.5f, 3),Vector3(1,1,1));
+		SetSharedGameObject(L"Goal", GoalP);
+
+	}
+
+	//コリジョンマネージャー作成
+	void GameStage::CreateCollisionManager()
+	{
+		//アタリ判定管理オブジェクト作成
+		auto ColManP = AddGameObject<CollisionManager>();
 	}
 
 	void GameStage::OnCreate() {
@@ -110,6 +122,10 @@ namespace basecross {
 			CreatePlate();
 			//プレーヤーの作成
 			CreatePlayer();
+			//ゴールの作成
+			CreateGoal();
+			//コリジョンマネージャー作成
+			CreateCollisionManager();
 		}
 		catch (...) {
 			throw;

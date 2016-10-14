@@ -20,6 +20,10 @@ namespace basecross {
 		void CreatePlate();
 		//プレイヤーの作成
 		void CreatePlayer();
+		//ゴール作成
+		void CreateGoal();
+		//コリジョンマネージャー作成
+		void CreateCollisionManager();
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}
