@@ -16,6 +16,12 @@
     <Filter Include="Common">
       <UniqueIdentifier>{030aed56-db27-40ca-a09b-2ef0e651bc8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\シーン">
+      <UniqueIdentifier>{86867621-0e15-4a69-8526-2a90256708ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\シーン">
+      <UniqueIdentifier>{7d628686-2b5d-4ca6-8722-64671ee5f226}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -57,9 +63,6 @@
     <ClInclude Include="Common\SharedResources.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="GameStage.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -71,6 +74,15 @@
     </ClInclude>
     <ClInclude Include="CollisionManager.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStage.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="Title.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
+    <ClInclude Include="StageSelect.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +132,6 @@
     <ClCompile Include="Common\SharedResources.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="GameStage.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -131,6 +140,15 @@
     </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStage.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="Title.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
+    </ClCompile>
+    <ClCompile Include="StageSelect.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -17,7 +17,7 @@ namespace basecross{
 		Scene() :SceneBase(){}
 		virtual ~Scene(){}
 		virtual void OnCreate() override;
-
+		virtual void OnEvent(const shared_ptr<Event>& event) override;
 	};
 
 }
