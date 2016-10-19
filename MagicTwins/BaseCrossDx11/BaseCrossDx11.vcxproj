@@ -116,10 +116,12 @@
     <ClInclude Include="Common\Rigidbody.h" />
     <ClInclude Include="Common\SharedResources.h" />
     <ClInclude Include="Common\StringComponents.h" />
+    <ClInclude Include="GameOver.h" />
     <ClInclude Include="GameStage.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Result.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="StageSelect.h" />
     <ClInclude Include="stdafx.h" />
@@ -143,8 +145,10 @@
     <ClCompile Include="Common\Rigidbody.cpp" />
     <ClCompile Include="Common\SharedResources.cpp" />
     <ClCompile Include="Common\StringComponents.cpp" />
+    <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="GameStage.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Result.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="StageSelect.cpp" />
     <ClCompile Include="stdafx.cpp">

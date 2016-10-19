@@ -87,7 +87,7 @@ namespace basecross {
 	void Title::SceneChange()
 	{
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
-		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"StageSelect");
 	}
 
 	void Title::OnCreate() {
@@ -109,7 +109,14 @@ namespace basecross {
 
 	void Title::OnUpdate()
 	{
-		SceneChange();
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+			{
+				SceneChange();
+			}
+		}
 	}
 
 

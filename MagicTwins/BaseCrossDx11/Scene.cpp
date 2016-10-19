@@ -16,9 +16,11 @@ namespace basecross{
 	void Scene::OnCreate(){
 		try {
 			//最初のアクティブステージの設定
-			//ResetActiveStage<GameStage>();
-			ResetActiveStage<Title>();
-
+			ResetActiveStage<GameStage>();
+			//ResetActiveStage<Title>();
+			//ResetActiveStage<StageSelect>();
+			//ResetActiveStage<GameOver>();
+			//ResetActiveStage<Result>();
 		}
 		catch (...) {
 			throw;
@@ -30,12 +32,11 @@ namespace basecross{
 		if (event->m_MsgStr == L"Title")
 		{
 			ResetActiveStage<Title>();
-
 		}
 		//ステージセレクト
 		else if (event->m_MsgStr == L"StageSelect")
 		{
-
+			ResetActiveStage<StageSelect>();
 		}
 		//ゲーム中
 		else if (event->m_MsgStr == L"GameStage")
@@ -45,12 +46,12 @@ namespace basecross{
 		//クリア
 		else if (event->m_MsgStr == L"Clear")
 		{
-
+			//ResetActiveStage<Result>();
 		}
 		//ゲームオーバー
 		else if (event->m_MsgStr == L"GameOver")
 		{
-
+			//ResetActiveStage<GameOver>();
 		}
 
 	}

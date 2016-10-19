@@ -44,9 +44,7 @@ namespace basecross {
 
 	void CollisionManager::PlayerToGoal()
 	{
-		throw BaseException(
-			L"SceneChange‚ÉŽ¸”s‚µ‚Ü‚µ‚½", L"", L""
-			);
+
 	}
 
 	bool CollisionManager::CollisionTest(Vector3 pos1, Vector3 scale1, Vector3 pos2, Vector3 scale2)

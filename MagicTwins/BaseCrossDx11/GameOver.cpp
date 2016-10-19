@@ -1,19 +1,20 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross {
-	void StageSelect::CreateResourses()
+namespace basecross 
+{
+	void GameOver::CreateResourses()
 	{
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"StageSelectLogo.png";
-		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
+		wstring strTexture = DataDir + L"GameOverLogo.png";
+		App::GetApp()->RegisterTexture(L"GAMEOVERLOGO_TX", strTexture);
 		strTexture = DataDir + L"sky.png";
-		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"GAMEOVERBACK_TX", strTexture);
 
 	}
 
-	void StageSelect::CreateViewLight()
+	void GameOver::CreateViewLight()
 	{
 
 		auto PtrView = CreateView<SingleView>();
@@ -31,7 +32,7 @@ namespace basecross {
 
 	}
 
-	void StageSelect::CreateBack()
+	void GameOver::CreateBack()
 	{
 		auto SelectBack = AddGameObject<GameObject>();
 		SelectBack->AddComponent<Transform>();
@@ -43,48 +44,48 @@ namespace basecross {
 
 		//スプライトをつける
 		auto PtrSprite = SelectBack->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"SELECTBACK_TX");
+		PtrSprite->SetTextureResource(L"GAMEOVERBACK_TX");
 
 		//透明度反映
 		SelectBack->SetAlphaActive(true);
 
 		SelectBack->SetDrawLayer(1);
 
-		SetSharedGameObject(L"TiBa", SelectBack);
+		SetSharedGameObject(L"OvBa", SelectBack);
 
 
 	}
 
-	void StageSelect::CreateSelectLogo()
+	void GameOver::CreateOverLogo()
 	{
-		auto SelectLogo = AddGameObject<GameObject>();
-		SelectLogo->AddComponent<Transform>();
-		auto PtrTransform = SelectLogo->GetComponent<Transform>();
+		auto OverLogo = AddGameObject<GameObject>();
+		OverLogo->AddComponent<Transform>();
+		auto PtrTransform = OverLogo->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
 		PtrTransform->SetPosition(0, WindowSize.y / 2.5, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(1000, 200, 1);
 
 		//スプライトをつける
-		auto PtrSprite = SelectLogo->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"STAGESELECTLOGO_TX");
+		auto PtrSprite = OverLogo->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"GAMEOVERLOGO_TX");
 
-		SetSharedGameObject(L"SeLo", SelectLogo);
+		SetSharedGameObject(L"OvLo", OverLogo);
 
-		SelectLogo->SetDrawLayer(2);
+		OverLogo->SetDrawLayer(2);
 
 		//透明度反映
-		SelectLogo->SetAlphaActive(true);
+		OverLogo->SetAlphaActive(true);
 
 	}
 
-	void StageSelect::SceneChange()
+	void GameOver::SceneChange()
 	{
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 	}
 
-	void StageSelect::OnCreate()
+	void GameOver::OnCreate()
 	{
 		try {
 			//リソースの作成
@@ -94,7 +95,7 @@ namespace basecross {
 			//背景作成
 			CreateBack();
 			//ロゴ作成
-			CreateSelectLogo();
+			CreateOverLogo();
 
 		}
 		catch (...) {
@@ -102,7 +103,7 @@ namespace basecross {
 		}
 	}
 
-	void StageSelect::OnUpdate()
+	void GameOver::OnUpdate()
 	{
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)

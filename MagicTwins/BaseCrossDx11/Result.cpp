@@ -1,19 +1,20 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross {
-	void StageSelect::CreateResourses()
+namespace basecross
+{
+	void Result::CreateResourses()
 	{
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"StageSelectLogo.png";
-		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
+		wstring strTexture = DataDir + L"ResultLogo.png";
+		App::GetApp()->RegisterTexture(L"RESULTLOGO_TX", strTexture);
 		strTexture = DataDir + L"sky.png";
-		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"RESULTBACK_TX", strTexture);
 
 	}
 
-	void StageSelect::CreateViewLight()
+	void Result::CreateViewLight()
 	{
 
 		auto PtrView = CreateView<SingleView>();
@@ -31,60 +32,60 @@ namespace basecross {
 
 	}
 
-	void StageSelect::CreateBack()
+	void Result::CreateBack()
 	{
-		auto SelectBack = AddGameObject<GameObject>();
-		SelectBack->AddComponent<Transform>();
-		auto PtrTransform = SelectBack->GetComponent<Transform>();
+		auto ResultBack = AddGameObject<GameObject>();
+		ResultBack->AddComponent<Transform>();
+		auto PtrTransform = ResultBack->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
 		PtrTransform->SetPosition(0, 0, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(WindowSize.x, WindowSize.y, 1);
 
 		//スプライトをつける
-		auto PtrSprite = SelectBack->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"SELECTBACK_TX");
+		auto PtrSprite = ResultBack->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"RESULTBACK_TX");
 
 		//透明度反映
-		SelectBack->SetAlphaActive(true);
+		ResultBack->SetAlphaActive(true);
 
-		SelectBack->SetDrawLayer(1);
+		ResultBack->SetDrawLayer(1);
 
-		SetSharedGameObject(L"TiBa", SelectBack);
+		SetSharedGameObject(L"TiBa", ResultBack);
 
 
 	}
 
-	void StageSelect::CreateSelectLogo()
+	void Result::CreateResultLogo()
 	{
-		auto SelectLogo = AddGameObject<GameObject>();
-		SelectLogo->AddComponent<Transform>();
-		auto PtrTransform = SelectLogo->GetComponent<Transform>();
+		auto ResultLogo = AddGameObject<GameObject>();
+		ResultLogo->AddComponent<Transform>();
+		auto PtrTransform = ResultLogo->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
 		PtrTransform->SetPosition(0, WindowSize.y / 2.5, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(1000, 200, 1);
 
 		//スプライトをつける
-		auto PtrSprite = SelectLogo->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"STAGESELECTLOGO_TX");
+		auto PtrSprite = ResultLogo->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"RESULTLOGO_TX");
 
-		SetSharedGameObject(L"SeLo", SelectLogo);
+		SetSharedGameObject(L"SeLo", ResultLogo);
 
-		SelectLogo->SetDrawLayer(2);
+		ResultLogo->SetDrawLayer(2);
 
 		//透明度反映
-		SelectLogo->SetAlphaActive(true);
+		ResultLogo->SetAlphaActive(true);
 
 	}
 
-	void StageSelect::SceneChange()
+	void Result::SceneChange()
 	{
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 	}
 
-	void StageSelect::OnCreate()
+	void Result::OnCreate()
 	{
 		try {
 			//リソースの作成
@@ -94,7 +95,7 @@ namespace basecross {
 			//背景作成
 			CreateBack();
 			//ロゴ作成
-			CreateSelectLogo();
+			CreateResultLogo();
 
 		}
 		catch (...) {
@@ -102,7 +103,7 @@ namespace basecross {
 		}
 	}
 
-	void StageSelect::OnUpdate()
+	void Result::OnUpdate()
 	{
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
