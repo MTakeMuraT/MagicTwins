@@ -75,13 +75,6 @@ namespace basecross {
 
 		//透明処理
 		SetAlphaActive(true);
-		/*
-		auto PtrCamera = dynamic_pointer_cast<LookAtCamera>(GetStage()->GetView()->GetTargetCamera());
-		if (PtrCamera) {
-			//LookAtCameraに注目するオブジェクト（プレイヤー）の設定
-			PtrCamera->SetTargetObject(GetThis<GameObject>());
-		}*/
-	
 	}
 
 	//更新
@@ -123,21 +116,6 @@ namespace basecross {
 				angle *= -1;
 				TranP->SetRotation(Vector3(0, angle, 0));
 
-				/* if(CntlVec[0].fThumbLX != 0 && CntlVec[0].fThumbLY != 0)
-				{
-					auto PtrTransform = GetComponent<Transform>();
-					Vector3 Posi = PtrTransform->GetRotation();
-					Posi.y = 0;
-					Posi.Normalize();
-					float FrontAngle = atan2(Posi.z, Posi.x);
-					float MoveX = CntlVec[0].fThumbLX;
-					float MoveZ = CntlVec[0].fThumbLY;
-					float CntlAngle = atan2(-MoveX, MoveZ);
-					float TotalAngle = FrontAngle + CntlAngle;
-					Angle = Vector3(cos(TotalAngle), 0, sin(TotalAngle));
-					Angle.Normalize();
-					Angle.y = 0;
-				} */
 				
 			}
 
@@ -229,37 +207,10 @@ namespace basecross {
 	//ターンの最終更新時
 	void Player::OnLastUpdate() {
 
-		//文字列表示
-		auto fps = App::GetApp()->GetStepTimer().GetFramesPerSecond();
-		wstring FPS(L"FPS: ");
-		FPS += Util::UintToWStr(fps);
-		FPS += L"\n";
-
-		auto Pos = GetComponent<Transform>()->GetWorldMatrix().PosInMatrix();
-		wstring PositionStr(L"Position:\t");
-		PositionStr += L"X=" + Util::FloatToWStr(Pos.x, 6, Util::FloatModify::Fixed) + L",\t";
-		PositionStr += L"Y=" + Util::FloatToWStr(Pos.y, 6, Util::FloatModify::Fixed) + L",\t";
-		PositionStr += L"Z=" + Util::FloatToWStr(Pos.z, 6, Util::FloatModify::Fixed) + L"\n";
-
-		wstring RididStr(L"Velocity:\t");
-		auto Velocity = GetComponent<Rigidbody>()->GetVelocity();
-		RididStr += L"X=" + Util::FloatToWStr(Velocity.x, 6, Util::FloatModify::Fixed) + L",\t";
-		RididStr += L"Y=" + Util::FloatToWStr(Velocity.y, 6, Util::FloatModify::Fixed) + L",\t";
-		//RididStr += L"Z=" + Util::FloatToWStr(Velocity.z, 6, Util::FloatModify::Fixed) + L"\n";
-
-		wstring GravStr(L"Gravity:\t");
-		auto Grav = GetComponent<Gravity>()->GetGravity();
-		GravStr += L"X=" + Util::FloatToWStr(Grav.x, 6, Util::FloatModify::Fixed) + L",\t";
-		GravStr += L"Y=" + Util::FloatToWStr(Grav.y, 6, Util::FloatModify::Fixed) + L",\t";
-		GravStr += L"Z=" + Util::FloatToWStr(Grav.z, 6, Util::FloatModify::Fixed) + L"\n";
-
-
-		wstring GravityStr(L"GravityVelocity:\t");
-		auto GravityVelocity = GetComponent<Gravity>()->GetGravityVelocity();
-		GravityStr += L"X=" + Util::FloatToWStr(GravityVelocity.x, 6, Util::FloatModify::Fixed) + L",\t";
-		GravityStr += L"Y=" + Util::FloatToWStr(GravityVelocity.y, 6, Util::FloatModify::Fixed) + L",\t";
-		GravityStr += L"Z=" + Util::FloatToWStr(GravityVelocity.z, 6, Util::FloatModify::Fixed) + L"\n";
-
+		//wstring txt;
+		//auto TranP = GetComponent<Transform>();
+		//txt = Util::FloatToWStr(TranP->GetRotation().y * 180/3.14159265f);
+		//GetComponent<StringSprite>()->SetText(txt);
 	}	
 }
 //end basecross

@@ -16,8 +16,8 @@ namespace basecross{
 	void Scene::OnCreate(){
 		try {
 			//最初のアクティブステージの設定
-			//ResetActiveStage<GameStage>();
-			ResetActiveStage<Title>();
+			ResetActiveStage<GameStage>();
+			//ResetActiveStage<Title>();
 			//ResetActiveStage<StageSelect>();
 			//ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
