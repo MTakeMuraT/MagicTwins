@@ -100,6 +100,7 @@ namespace basecross {
 	//ëÄçÏÇ≈Ç´ÇÈèÛë‘
 	void Player::active()
 	{
+		
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -116,6 +117,28 @@ namespace basecross {
 				Posi.x += inputXY.x;
 				Posi.z += inputXY.y;
 				TranP->SetPosition(Posi);
+
+				//å¸Ç´ÇìæÇÈ				
+				float angle = atan2(inputXY.y,inputXY.x);
+				angle *= -1;
+				TranP->SetRotation(Vector3(0, angle, 0));
+
+				/* if(CntlVec[0].fThumbLX != 0 && CntlVec[0].fThumbLY != 0)
+				{
+					auto PtrTransform = GetComponent<Transform>();
+					Vector3 Posi = PtrTransform->GetRotation();
+					Posi.y = 0;
+					Posi.Normalize();
+					float FrontAngle = atan2(Posi.z, Posi.x);
+					float MoveX = CntlVec[0].fThumbLX;
+					float MoveZ = CntlVec[0].fThumbLY;
+					float CntlAngle = atan2(-MoveX, MoveZ);
+					float TotalAngle = FrontAngle + CntlAngle;
+					Angle = Vector3(cos(TotalAngle), 0, sin(TotalAngle));
+					Angle.Normalize();
+					Angle.y = 0;
+				} */
+				
 			}
 
 			//RÉgÉäÉKÅ[Ç≈ÉLÉÉÉâêÿÇËë÷Ç¶
@@ -125,7 +148,7 @@ namespace basecross {
 			}
 
 		}
-
+         
 	}
 
 
