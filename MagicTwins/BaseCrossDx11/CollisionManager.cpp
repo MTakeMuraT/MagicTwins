@@ -44,6 +44,8 @@ namespace basecross {
 
 	void CollisionManager::PlayerToGoal()
 	{
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Result");
 
 	}
 
