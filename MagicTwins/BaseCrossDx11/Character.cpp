@@ -185,5 +185,37 @@ namespace basecross{
 	{
 		return GetComponent<Transform>()->GetScale();
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class LimitTime : public GameObject;
+	//	ópìr: êßå¿éûä‘
+	//--------------------------------------------------------------------------------------
+	LimitTime::LimitTime(const shared_ptr<Stage>& StagePtr,float LimitTime):
+		GameObject(StagePtr),
+		m_LimitTime(LimitTime)
+	{}
+	
+	void LimitTime::OnCreate()
+	{
+		//ï∂éöóÒÇÇ¬ÇØÇÈ
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(512.0f, 16.0f, 1024.0f, 960.0f));
+		PtrString->SetFont(L"", 100);
+		m_nowTime = m_LimitTime;
+	}
+
+	void LimitTime::OnUpdate()
+	{
+		m_nowTime += -App::GetApp()->GetElapsedTime();
+		wstring txt = L"TIME:" + Util::IntToWStr((int)m_nowTime);
+		GetComponent<StringSprite>()->SetText(txt);
+
+		if (m_nowTime < 1)
+		{
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+		}
+	}
 }
 //end basecross

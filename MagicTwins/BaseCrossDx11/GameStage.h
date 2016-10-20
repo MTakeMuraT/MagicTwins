@@ -24,6 +24,8 @@ namespace basecross {
 		void CreateMagicBook();
 		//ゴール作成
 		void CreateGoal();
+		//制限時間作成
+		void CreateLimitTime();
 		//コリジョンマネージャー作成
 		void CreateCollisionManager();
 	public:

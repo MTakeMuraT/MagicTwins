@@ -123,6 +123,13 @@ namespace basecross {
 
 	}
 
+	//制限時間作成
+	void GameStage::CreateLimitTime()
+	{
+		auto LTP = AddGameObject<LimitTime>(10);
+		SetSharedGameObject(L"LimitTime", LTP);
+	}
+
 	//コリジョンマネージャー作成
 	void GameStage::CreateCollisionManager()
 	{
@@ -144,6 +151,8 @@ namespace basecross {
 			CreateMagicBook();
 			//ゴールの作成
 			CreateGoal();
+			//制限時間の作成
+			CreateLimitTime();
 			//コリジョンマネージャー作成
 			CreateCollisionManager();
 		}
