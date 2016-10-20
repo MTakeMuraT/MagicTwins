@@ -104,5 +104,86 @@ namespace basecross{
 	{
 		return m_EndFlg;
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class MagicBook : public GameObject;
+	//	用途: 魔導書
+	//--------------------------------------------------------------------------------------
+	MagicBook::MagicBook(const shared_ptr<Stage>& StagePtr, Vector3 pos, MagicType magic) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_MagicContent(magic)
+	{}
+
+	void MagicBook::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetScale(0.5f, 0.5f, 0.5f);
+		Ptr->SetRotation(0, 0, 0);
+		Ptr->SetPosition(m_InitPos);
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//メッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+
+		//テクスチャを設定
+		PtrDraw->SetTextureResource(L"MAGICBOOKFIRE_TX");
+
+		switch (m_MagicContent)
+		{
+		case Fire:
+			PtrDraw->SetTextureResource(L"MAGICBOOKFIRE_TX");
+			break;
+		case IceFog :
+			PtrDraw->SetTextureResource(L"MAGICBOOKICEFOG_TX");
+			break;
+		default:
+			break;
+		}
+
+		//透明処理
+		SetAlphaActive(true);
+
+		SetUpdateActive(false);
+	}
+
+	void MagicBook::OnUpdate()
+	{
+		m_ElaTime += App::GetApp()->GetElapsedTime();
+		if (m_ElaTime >= m_LimitTime)
+		{
+			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+			m_ElaTime = 0;
+			SetUpdateActive(false);
+			m_ActiveFlg = true;
+		}
+	}
+
+	//とったとき
+	void MagicBook::GetPlayer()
+	{
+		if (m_ActiveFlg)
+		{
+			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(m_MagicContent);
+			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 0.1f));
+			SetUpdateActive(true);
+			m_ActiveFlg = false;
+		}
+	}
+
+	Vector3 MagicBook::GetPos()
+	{
+		return GetComponent<Transform>()->GetPosition();
+	}
+
+	Vector3 MagicBook::GetScale()
+	{
+		return GetComponent<Transform>()->GetScale();
+	}
 }
 //end basecross

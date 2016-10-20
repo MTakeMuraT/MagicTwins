@@ -43,5 +43,32 @@ namespace basecross{
 		bool GetBlackFinish();
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class MagicBook : public GameObject;
+	//	用途: 魔導書
+	//--------------------------------------------------------------------------------------
+	class MagicBook : public GameObject
+	{
+	private :
+		MagicType m_MagicContent = None;
+		Vector3 m_InitPos;
+		//スポーン時間
+		bool m_ActiveFlg = true;
+		//経過時間
+		float m_ElaTime=0;
+		//再出現時間
+		const float m_LimitTime = 3.0f;
+	public :
+		MagicBook(const shared_ptr<Stage>& StagePtr, Vector3 initPos,MagicType Magic);
+		void OnCreate();
+		void OnUpdate();
+		//拾った
+		void GetPlayer();
+
+
+		//アクセサー
+		Vector3 GetPos();
+		Vector3 GetScale();
+	};
 }
 //end basecross

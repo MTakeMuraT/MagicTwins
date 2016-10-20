@@ -61,7 +61,7 @@ namespace basecross {
 		SelectLogo->AddComponent<Transform>();
 		auto PtrTransform = SelectLogo->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(0, WindowSize.y / 2.5, 0);
+		PtrTransform->SetPosition(0, WindowSize.y / 2.5f, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(1000, 200, 1);
 

@@ -20,6 +20,8 @@ namespace basecross {
 		void CreatePlate();
 		//プレイヤーの作成
 		void CreatePlayer();
+		//魔導書作成
+		void CreateMagicBook();
 		//ゴール作成
 		void CreateGoal();
 		//コリジョンマネージャー作成

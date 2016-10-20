@@ -5,23 +5,53 @@ namespace basecross {
 	CollisionManager::CollisionManager(const shared_ptr<Stage>& StagePtr):
 		GameObject(StagePtr)
 	{}
+	void CollisionManager::OnCreate()
+	{
+		//文字列をつける
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 64.0f, 640.0f, 480.0f));
+		PtrString->SetFont(L"", 40);
+
+		//**************************//
+		//動かないオブジェクトの情報取得
+		//ゴールの座標持ってくる
+		GetGoal();
+		//魔導書の情報持ってくる
+		GetMagicBook();
+		//**************************//
+
+	}
 
 	void CollisionManager::OnUpdate()
 	{
-		//情報取得
+		//情報取得動くオブジェクト
 		//プレイヤーの座標持ってくる
 		GetPlayer();
-		//ゴールの座標持ってくる
-		GetGoal();
 
-		//プレイヤーとゴール
+		//プレイヤーとゴール判定
 		if (CollisionTest(PlayerPos1, PlayerScale1, GoalPos, GoalScale) ||
 			CollisionTest(PlayerPos2, PlayerScale2, GoalPos, GoalScale))
 		{
 			PlayerToGoal();
 		}
+
+		int count = 0;
+
+		//プレイヤーと魔導書の判定
+		for (auto v : MagicBooksPos)
+		{	
+			if (CollisionTest(PlayerPos1, PlayerScale1, MagicBooksPos[count],MagicBooksScale[count] ) ||
+				CollisionTest(PlayerPos2, PlayerScale2, MagicBooksPos[count], MagicBooksScale[count]))
+			{
+				PlayerToMagicBook(count);
+			}
+			count++;
+		}
+		count = 0;
 	}
 
+	//プレイヤーの情報持ってくる
 	void CollisionManager::GetPlayer()
 	{
 		auto PlayerP = GetStage()->GetSharedGameObject<Player>(L"Player1",false);
@@ -35,6 +65,7 @@ namespace basecross {
 
 	}
 
+	//ゴールの情報持ってくる
 	void CollisionManager::GetGoal()
 	{
 		auto GoalP = GetStage()->GetSharedGameObject<Goal>(L"Goal", false);
@@ -42,6 +73,23 @@ namespace basecross {
 		GoalScale = GoalP->GetComponent<Transform>()->GetScale();
 	}
 
+	//魔導書の情報持ってくる
+	void CollisionManager::GetMagicBook()
+	{
+		auto MBGroup = GetStage()->GetSharedObjectGroup(L"MagicBook");
+		auto MBGVec = MBGroup->GetGroupVector();
+		for (auto Ptr : MBGVec)
+		{
+			if (!Ptr.expired())
+			{
+				auto MBP = dynamic_pointer_cast<MagicBook>(Ptr.lock());
+				MagicBooksPos.push_back(MBP->GetPos());
+				MagicBooksScale.push_back(MBP->GetScale() * 0.8f);
+			}
+		}
+	}
+
+	//プレイヤーとゴールが当たった処理
 	void CollisionManager::PlayerToGoal()
 	{
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
@@ -49,6 +97,15 @@ namespace basecross {
 
 	}
 
+	//プレイヤーと魔導書の当たった処理
+	void CollisionManager::PlayerToMagicBook(int count)
+	{
+		auto MBGroup = GetStage()->GetSharedObjectGroup(L"MagicBook");
+		auto MBGVec = MBGroup->GetGroupVector();
+		dynamic_pointer_cast<MagicBook>(MBGVec[count].lock())->GetPlayer();
+	}
+
+	//アタリ判定関数
 	bool CollisionManager::CollisionTest(Vector3 pos1, Vector3 scale1, Vector3 pos2, Vector3 scale2)
 	{
 		float dx = pos2.x - pos1.x;

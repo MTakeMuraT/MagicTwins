@@ -11,6 +11,15 @@
 // Windows ヘッダー ファイル:
 #include <windows.h>
 
+//魔法の種類
+enum MagicType
+{
+	None,
+	Fire,
+	IceFog
+};
+
+
 // C ランタイム ヘッダー ファイル
 #include <stdio.h>
 #include <stdlib.h>

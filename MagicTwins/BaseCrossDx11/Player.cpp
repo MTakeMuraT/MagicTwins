@@ -13,7 +13,7 @@ namespace basecross {
 	//	用途: プレイヤー
 	//--------------------------------------------------------------------------------------
 	//構築と破棄
-	Player::Player(const shared_ptr<Stage>& StagePtr,Vector3 pos , bool Active,string name) :
+	Player::Player(const shared_ptr<Stage>& StagePtr, Vector3 pos, bool Active, string name) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
 		m_myName(name),
@@ -72,6 +72,7 @@ namespace basecross {
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		PtrString->SetFont(L"", 40);
 
 		//透明処理
 		SetAlphaActive(true);
@@ -93,7 +94,7 @@ namespace basecross {
 	//操作できる状態
 	void Player::active()
 	{
-		
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -112,11 +113,11 @@ namespace basecross {
 				TranP->SetPosition(Posi);
 
 				//向きを得る				
-				float angle = atan2(inputXY.y,inputXY.x);
+				float angle = atan2(inputXY.y, inputXY.x);
 				angle *= -1;
 				TranP->SetRotation(Vector3(0, angle, 0));
 
-				
+
 			}
 
 			//Rトリガーでキャラ切り替え
@@ -126,7 +127,7 @@ namespace basecross {
 			}
 
 		}
-         
+
 	}
 
 
@@ -144,27 +145,27 @@ namespace basecross {
 			if (!DPlayer)
 			{
 				throw BaseException(
-					L"Player2いません",L"",L""
+					L"Player2いません", L"", L""
 					);
 			}
-			
+
 			//あっち側起動
 			DPlayer->SetActive(true);
 			//こっち停止
 			m_ActiveFlg = false;
 
-			
+
 			//カメラ移動
 			auto View = GetStage()->GetView();
 			auto CameraP = View->GetTargetCamera();
 			//カメラ移動
 			CameraP->SetEye(10.0f, 5.0f, -5.0f);
 			CameraP->SetAt(10, 0, 0);
-			
-			
+
+
 			return;
 		}
-		else if(m_myName == "Player2")
+		else if (m_myName == "Player2")
 		{
 			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
 			//いなかったらエラー終了
@@ -174,21 +175,21 @@ namespace basecross {
 					L"Player1いません", L"", L""
 					);
 			}
-			
+
 			//あっち側起動
 			DPlayer->SetActive(true);
 			//こっち停止
 			m_ActiveFlg = false;
 
 
-			
+
 			//カメラ移動
 			auto View = GetStage()->GetView();
 			auto CameraP = View->GetTargetCamera();
 			CameraP->SetEye(0.0f, 5.0f, -5.0f);
-			CameraP->SetAt(0,0,0);
-			
-			
+			CameraP->SetAt(0, 0, 0);
+
+
 			return;
 		}
 
@@ -204,14 +205,54 @@ namespace basecross {
 		m_endFrame = true;
 	}
 
+	//魔法を記憶する
+	void Player::SetMagic(MagicType MT)
+	{
+		if (m_myName == "Player1")
+		{
+			m_Magic = MT;
+			GetStage()->GetSharedGameObject<Player>(L"Player2", false)->SetMagic(MT);
+		}
+		else if (m_myName == "Player2")
+		{
+			m_Magic = MT;
+		}
+		else
+		{
+			throw BaseException(
+				L"誰やお前", L"PlayerのmyNameが", L"リスト外やねん"
+				);
+		}
+	}
+
 	//ターンの最終更新時
 	void Player::OnLastUpdate() {
 
-		//wstring txt;
+		wstring txt;
+		//回転とってるけど表示おかしいのかな？
 		//auto TranP = GetComponent<Transform>();
 		//txt = Util::FloatToWStr(TranP->GetRotation().y * 180/3.14159265f);
-		//GetComponent<StringSprite>()->SetText(txt);
-	}	
+
+		
+		switch (m_Magic)
+		{
+		case None:
+			txt += L"None";
+			break;
+		case Fire:
+			txt += L"Fire";
+			break;
+		case IceFog:
+			txt += L"IceFog";
+			break;
+		default:
+			break;
+		}
+		GetComponent<StringSprite>()->SetText(txt);
+		
+	}
+
+
 }
 //end basecross
 

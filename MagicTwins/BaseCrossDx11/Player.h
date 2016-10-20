@@ -32,6 +32,15 @@ namespace basecross{
 		void active();
 		//キャラ切り替え関数
 		void ChangeChar();
+
+		//魔法のリスト
+		//*********************************//
+		//MagicTypeはenum型、stdafx.hに書いてある
+		//Fire:炎の玉
+		//IceFog:氷の霧
+		//*********************************//
+		MagicType m_Magic = None;
+
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))
@@ -48,6 +57,9 @@ namespace basecross{
 
 		//操作できるかをセットする関数
 		void SetActive(bool);
+
+		//魔法を覚える関数
+		void SetMagic(MagicType);
 
 	};
 

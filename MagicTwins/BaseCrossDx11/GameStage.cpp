@@ -25,6 +25,11 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"SKY_TX", strTexture);
 		strTexture = DataDir + L"goal.png";
 		App::GetApp()->RegisterTexture(L"GOAL_TX", strTexture);
+		strTexture = DataDir + L"MagicBookFire.png";
+		App::GetApp()->RegisterTexture(L"MAGICBOOKFIRE_TX", strTexture);
+		strTexture = DataDir + L"MagicBookIceFog.png";
+		App::GetApp()->RegisterTexture(L"MAGICBOOKICEFOG_TX", strTexture);
+
 	}
 
 
@@ -96,6 +101,19 @@ namespace basecross {
 
 	}
 
+	//魔導書作成
+	void GameStage::CreateMagicBook()
+	{
+		auto MBGroup = CreateSharedObjectGroup(L"MagicBook");
+
+		auto MagBooP = AddGameObject<MagicBook>(Vector3(2, 0.3f, 2), Fire);
+		MBGroup->IntoGroup(MagBooP);
+
+		MagBooP = AddGameObject<MagicBook>(Vector3(0, 0.3f, 2), IceFog);
+		MBGroup->IntoGroup(MagBooP);
+
+	}
+
 	//ゴールの作成
 	void GameStage::CreateGoal()
 	{
@@ -122,6 +140,8 @@ namespace basecross {
 			CreatePlate();
 			//プレーヤーの作成
 			CreatePlayer();
+			//魔導書作成
+			CreateMagicBook();
 			//ゴールの作成
 			CreateGoal();
 			//コリジョンマネージャー作成
