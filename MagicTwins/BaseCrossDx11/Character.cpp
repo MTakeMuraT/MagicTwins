@@ -185,5 +185,44 @@ namespace basecross{
 	{
 		return GetComponent<Transform>()->GetScale();
 	}
+
+	//-----------------------------------
+	//§ŒÀŠÔ
+	//-----------------------------------
+	LimitTime::LimitTime(const shared_ptr<Stage>& StagePtr) :
+		GameObject(StagePtr)
+	{
+	}
+
+	/*float LimitTime::GetApp()
+	{
+	App::GetApp()->GetElapsedTime;
+	}*/
+
+	void LimitTime::OnCreate()
+	{
+		//•¶š—ñ‚ğ‚Â‚¯‚é
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(512.0f, 16.0f, 640.0f, 480.0f));
+		PtrString->SetFont(L"", 40);
+
+		//auto  Countdown = 
+	}
+
+	void LimitTime::OnUpdate()
+	{
+		//ƒ^ƒCƒ€•\¦
+		int time = (int)limitTime;
+		wstring txt = Util::IntToWStr(time);
+		GetComponent<StringSprite>()->SetText(txt);
+
+		limitTime += -App::GetApp()->GetElapsedTime();
+		if (limitTime < 0)
+		{
+
+		}
+	}
+
 }
 //end basecross

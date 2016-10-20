@@ -146,6 +146,8 @@ namespace basecross {
 			CreateGoal();
 			//コリジョンマネージャー作成
 			CreateCollisionManager();
+			//タイム表示
+			AddGameObject<LimitTime>();
 		}
 		catch (...) {
 			throw;

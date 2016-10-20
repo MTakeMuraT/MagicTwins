@@ -70,5 +70,21 @@ namespace basecross{
 		Vector3 GetPos();
 		Vector3 GetScale();
 	};
+
+	//---------------------------------------------------
+	//êßå¿éûä‘
+	//---------------------------------------------------
+	class LimitTime : public GameObject
+	{
+	private:
+		float limitTime = 5;
+		bool TimeState = false;
+		bool TimeOver = false;
+	public:
+		LimitTime(const shared_ptr<Stage>& StagePtr);
+		void OnCreate() override;
+		void OnUpdate() override;
+	};
+
 }
 //end basecross
