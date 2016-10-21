@@ -10,6 +10,9 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
 		strTexture = DataDir + L"sky.png";
 		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
+		//StegeSelect画像(仮)
+		strTexture = DataDir + L"StageSelect.png";
+		App::GetApp()->RegisterTexture(L"STAGESELECT_TX", strTexture);
 
 	}
 
@@ -84,6 +87,31 @@ namespace basecross {
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 	}
 
+	//ステージセレクト画像(仮)
+	void StageSelect::CreaateStageSelect()
+	{
+		auto StageSelect = AddGameObject<GameObject>();
+		StageSelect->AddComponent<Transform>();
+		auto PtrTransform = StageSelect->GetComponent<Transform>();
+		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
+		PtrTransform->SetPosition(600, -400, 0);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetScale(500, 200, 1);
+
+		//スプライトを付ける
+		auto PtrSprite = StageSelect->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"STAGESELECT_TX");
+
+		SetSharedGameObject(L"StageSelect", StageSelect);
+
+		StageSelect->SetDrawLayer(2);
+
+		//透明度反映
+		StageSelect->SetAlphaActive(true);
+
+	}
+
+
 	void StageSelect::OnCreate()
 	{
 		try {
@@ -95,7 +123,9 @@ namespace basecross {
 			CreateBack();
 			//ロゴ作成
 			CreateSelectLogo();
-
+			//ステージセレクト(仮)
+			CreaateStageSelect();
+			
 		}
 		catch (...) {
 			throw;

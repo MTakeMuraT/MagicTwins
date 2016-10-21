@@ -14,6 +14,8 @@ namespace basecross {
 		void CreateBack();
 		//セレクトロゴ
 		void CreateSelectLogo();
+		//ステージセレクト画像(仮)
+		void CreaateStageSelect();
 
 		//シーン遷移
 		void SceneChange();
