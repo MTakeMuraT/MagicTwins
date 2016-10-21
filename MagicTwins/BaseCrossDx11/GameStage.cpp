@@ -30,6 +30,10 @@ namespace basecross {
 		strTexture = DataDir + L"MagicBookIceFog.png";
 		App::GetApp()->RegisterTexture(L"MAGICBOOKICEFOG_TX", strTexture);
 
+		//アニメーション？
+		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
+		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);
+
 	}
 
 

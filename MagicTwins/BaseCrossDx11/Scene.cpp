@@ -16,8 +16,8 @@ namespace basecross{
 	void Scene::OnCreate(){
 		try {
 			//最初のアクティブステージの設定
-			ResetActiveStage<GameStage>();
-			//ResetActiveStage<Title>();
+			//ResetActiveStage<GameStage>();
+			ResetActiveStage<Title>();
 			//ResetActiveStage<StageSelect>();
 			//ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
@@ -25,6 +25,10 @@ namespace basecross{
 		catch (...) {
 			throw;
 		}
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char/Character_01.bmf");
+		App::GetApp()->RegisterResource(L"Player_Model", ModelMesh);
 	}
 
 	void Scene::OnEvent(const shared_ptr<Event>& event) {

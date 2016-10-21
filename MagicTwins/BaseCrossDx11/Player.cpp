@@ -43,31 +43,49 @@ namespace basecross {
 		//横部分のみ反発
 		PtrCol->SetIsHitAction(IsHitAction::AutoOnObjectRepel);
 
+
+
+		// モデルとトランスフォームの間の差分行列
+		float angle = -90 * (3.14159265f /180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(0.0f, angle, 0.0f),
+			Vector3(0.0f, -0.5f, 0.0f)
+			);
+
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		ShadowPtr->SetMeshResource(L"Player_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+		
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		if (m_myName == "Player1")
-		{
-			//描画するテクスチャを設定
-			PtrDraw->SetTextureResource(L"TRACE_TX");
-		}
-		else if (m_myName == "Player2")
-		{
-			//描画するテクスチャを設定
-			PtrDraw->SetTextureResource(L"TRACE2_TX");
-		}
+		PtrDraw->SetMeshResource(L"Player_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+
+		//if (m_myName == "Player1")
+		//{
+		//	//描画するテクスチャを設定
+		//	PtrDraw->SetTextureResource(L"TRACE_TX");
+		//}
+		//else if (m_myName == "Player2")
+		//{
+		//	//描画するテクスチャを設定
+		//	PtrDraw->SetTextureResource(L"TRACE2_TX");
+		//}
 		//もし名前違ってる場合
-		else
-		{
-			throw BaseException(
-				L"Playerの名前指定ミスってます", L"", L""
-				);
-		}
+		//else
+		//{
+		//	throw BaseException(
+		//		L"Playerの名前指定ミスってます", L"", L""
+		//		);
+		//}
+
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
