@@ -1233,6 +1233,50 @@ namespace basecross {
 		unique_ptr<Impl> pImpl;
 	};
 
+	//--------------------------------------------------------------------------------------
+	///	PTStatic描画コンポーネント
+	//--------------------------------------------------------------------------------------
+	class PTStaticDraw : public StaticBaseDraw, public TextureDrawInterface {
+	public:
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		@param[in]	GameObjectPtr	ゲームオブジェクト
+		*/
+		//--------------------------------------------------------------------------------------
+		explicit PTStaticDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	デストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual ~PTStaticDraw();
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	OnCreate処理
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnCreate()override {}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	OnUpdate処理（空関数）
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnUpdate()override {}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	OnDraw処理
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		virtual void OnDraw()override;
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
 
 
 	//--------------------------------------------------------------------------------------
@@ -1363,7 +1407,7 @@ namespace basecross {
 		void DrawWithShadow();
 		void DrawNotShadow();
 	public:
-		PNTStaticModelDraw(const shared_ptr<GameObject>& GameObjectPtr);
+		explicit PNTStaticModelDraw(const shared_ptr<GameObject>& GameObjectPtr);
 		virtual ~PNTStaticModelDraw();
 		shared_ptr<MeshResource> GetMeshResource() const;
 		void SetMeshResource(const shared_ptr<MeshResource>& MeshRes);

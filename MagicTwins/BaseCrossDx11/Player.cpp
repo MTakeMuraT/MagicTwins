@@ -51,7 +51,7 @@ namespace basecross {
 		SpanMat.DefTransformation(
 			Vector3(1.0f, 1.0f, 1.0f),
 			Vector3(0.0f, angle, 0.0f),
-			Vector3(0.0f, -0.5f, 0.0f)
+			Vector3(-1.0f, -2.5f, 3.0f)
 			);
 
 		//影をつける（シャドウマップを描画する）
@@ -94,6 +94,14 @@ namespace basecross {
 
 		//透明処理
 		SetAlphaActive(true);
+
+		//カメラ関連
+		//向いてるとこ記憶
+		m_CameraTargetVec = GetComponent<Transform>()->GetPosition();
+		//座標記憶
+		auto View = GetStage()->GetView();
+		auto CameraP = View->GetTargetCamera();
+		m_CameraPos = CameraP->GetEye();
 	}
 
 	//更新
@@ -105,6 +113,7 @@ namespace basecross {
 		}
 		if (m_ActiveFlg)
 		{
+			CameraTarget();
 			active();
 		}
 	}
@@ -112,7 +121,6 @@ namespace basecross {
 	//操作できる状態
 	void Player::active()
 	{
-
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -148,6 +156,61 @@ namespace basecross {
 
 	}
 
+	void Player::CameraTarget()
+	{			
+		//カメラ追従
+		auto View = GetStage()->GetView();
+		auto CameraP = View->GetTargetCamera();
+		//カメラ移動
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		//カメラとプレイヤーの差を計算
+		pos.z += -5.0f;
+		Vector3 Direction = pos - m_CameraPos;
+		//横の判定
+		if (abs(Direction.x) > m_CameraMove)
+		{
+			//マイナス(左側)
+			if (Direction.x < 0)
+			{
+				Direction.x += m_CameraMove;
+				//ずれてる分ずらす　
+				m_CameraPos.x += Direction.x;
+				m_CameraTargetVec.x += Direction.x;
+			}
+			//プラス(右側)
+			else
+			{
+				Direction.x += -m_CameraMove;
+				//ずれてる分ずらす　
+				m_CameraPos.x += Direction.x;
+				m_CameraTargetVec.x += Direction.x;
+			}
+		}
+
+		//奥行方向(縦？)
+		if (abs(Direction.z) > m_CameraMove)
+		{
+			//マイナス(左側)
+			if (Direction.z < 0)
+			{
+				Direction.z += m_CameraMove;
+				//ずれてる分ずらす　
+				m_CameraPos.z += Direction.z;
+				m_CameraTargetVec.z += Direction.z;
+			}
+			//プラス(右側)
+			else
+			{
+				Direction.z += -m_CameraMove;
+				//ずれてる分ずらす　
+				m_CameraPos.z += Direction.z;
+				m_CameraTargetVec.z += Direction.z;
+			}
+		}
+		CameraP->SetAt(m_CameraTargetVec);
+		CameraP->SetEye(m_CameraPos);
+	}
+
 
 	//キャラチェンジ
 	void Player::ChangeChar()
@@ -176,10 +239,15 @@ namespace basecross {
 			//カメラ移動
 			auto View = GetStage()->GetView();
 			auto CameraP = View->GetTargetCamera();
-			//カメラ移動
-			CameraP->SetEye(10.0f, 5.0f, -5.0f);
-			CameraP->SetAt(10, 0, 0);
 
+			Vector3 At = DPlayer->GetComponent<Transform>()->GetPosition();
+			Vector3 pos = At;
+
+			//カメラ移動するために情報送る
+			pos.y += 5.0f;
+			pos.z += -5.0f;
+
+			DPlayer->SetCamera(At, pos);
 
 			return;
 		}
@@ -204,10 +272,15 @@ namespace basecross {
 			//カメラ移動
 			auto View = GetStage()->GetView();
 			auto CameraP = View->GetTargetCamera();
-			CameraP->SetEye(0.0f, 5.0f, -5.0f);
-			CameraP->SetAt(0, 0, 0);
 
+			Vector3 At = DPlayer->GetComponent<Transform>()->GetPosition();
+			Vector3 pos = At;
 
+			//カメラ移動するために情報送る
+			pos.y += 5.0f;
+			pos.z += -5.0f;
+
+			DPlayer->SetCamera(At, pos);
 			return;
 		}
 
@@ -241,6 +314,13 @@ namespace basecross {
 				L"誰やお前", L"PlayerのmyNameが", L"リスト外やねん"
 				);
 		}
+	}
+
+	//カメラ固定
+	void Player::SetCamera(Vector3 At, Vector3 pos)
+	{
+		m_CameraPos = pos;
+		m_CameraTargetVec = At;
 	}
 
 	//ターンの最終更新時

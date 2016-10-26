@@ -32,6 +32,17 @@ namespace basecross{
 		void active();
 		//キャラ切り替え関数
 		void ChangeChar();
+		//カメラ追従処理
+		void CameraTarget();
+		//カメラの座標
+		Vector3 m_CameraPos;
+		//カメラの向いてる方向
+		Vector3 m_CameraTargetVec;
+		//カメラ移動始める範囲
+		const float m_CameraMove = 3.0f;
+
+
+
 
 		//魔法のリスト
 		//*********************************//
@@ -61,6 +72,8 @@ namespace basecross{
 		//魔法を覚える関数
 		void SetMagic(MagicType);
 
+		//カメラ固定？
+		void SetCamera(Vector3 At,Vector3 pos);
 	};
 
 	

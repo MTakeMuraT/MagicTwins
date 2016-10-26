@@ -79,7 +79,7 @@ namespace basecross {
 	//	用途: コンポーネントImplクラス
 	//--------------------------------------------------------------------------------------
 	struct Transform::Impl {
-		bool m_Init{ false };//初期化済みかどうか（1回目のUpdateで、Beforeに値を入れる）
+		bool m_Init{ false };	//初期化済みかどうか（1回目のUpdateで、Beforeに値を入れる）
 		//1つ前の変数
 		Vector3 m_BeforeScale;
 		Vector3 m_BeforePivot;
@@ -225,6 +225,7 @@ namespace basecross {
 			pImpl->m_Init = true;
 		}
 	}
+
 
 
 }
