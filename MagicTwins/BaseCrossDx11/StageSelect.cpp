@@ -55,6 +55,11 @@ namespace basecross {
 
 		SetSharedGameObject(L"TiBa", SelectBack);
 
+		//文字列を付ける(仮)
+		auto Stp = SelectBack->AddComponent<StringSprite>();
+		Stp->SetText(L"");
+		Stp->SetTextRect(Rect2D<float>(512.0f, 16.0f, 1024.0f, 960.0f));
+		Stp->SetFont(L"", 100);
 
 	}
 
@@ -108,6 +113,8 @@ namespace basecross {
 
 		//透明度反映
 		StageSelect->SetAlphaActive(true);
+		GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
+
 
 	}
 
@@ -125,15 +132,31 @@ namespace basecross {
 			CreateSelectLogo();
 			//ステージセレクト(仮)
 			CreaateStageSelect();
-			
+
+			//左右シーン遷移(仮)
+			m_SceneNum = 0;
+			m_flag = true;
+
 		}
 		catch (...) {
 			throw;
 		}
+
+		
+
+		
 	}
 
 	void StageSelect::OnUpdate()
 	{
+
+
+		//左右でシーン遷移(仮)
+		auto ShareObject = GetSharedGameObject<GameObject>(L"TiBa", false);
+		auto ShareString = ShareObject->GetComponent<StringSprite>();
+
+		wstring sceneNum(L"");
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -141,8 +164,30 @@ namespace basecross {
 			{
 				SceneChange();
 			}
+			//左右シーン遷移(仮)
+			if (CntlVec[0].fThumbLX>0&&m_flag)
+			{
+
+				m_SceneNum++;
+				m_flag=false;
+				
+			}
+			if (CntlVec[0].fThumbLX < 0 && m_flag)
+			{
+				//m_SceneNum--;
+				//m_flag = false;
+			}
+			if (CntlVec[0].fThumbLX == 0)
+			{
+				m_flag = true;
+			}
+
 		}
+		sceneNum +=  Util::IntToWStr(m_SceneNum);
+		ShareString->SetText(sceneNum);
+		
+	
+	}
 
 	}
 
-}

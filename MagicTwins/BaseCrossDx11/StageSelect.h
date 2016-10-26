@@ -16,15 +16,19 @@ namespace basecross {
 		void CreateSelectLogo();
 		//ステージセレクト画像(仮)
 		void CreaateStageSelect();
-
 		//シーン遷移
 		void SceneChange();
+		
+
+		int m_SceneNum;
+
+		bool m_flag;
+
 	public:
 		//構築と破棄
 		StageSelect() :Stage() {}
 		virtual void OnCreate()override;
 		virtual void OnUpdate()override;
 	};
-
 
 }
