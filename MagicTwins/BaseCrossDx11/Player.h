@@ -41,7 +41,8 @@ namespace basecross{
 		//カメラ移動始める範囲
 		const float m_CameraMove = 3.0f;
 
-
+		//魔法打つ関数
+		void ShotMagic();
 
 
 		//魔法のリスト
@@ -76,7 +77,49 @@ namespace basecross{
 		void SetCamera(Vector3 At,Vector3 pos);
 	};
 
-	
+	//--------------------------------------------------------------------------------------
+	//	class MagicBoal : public GameObject;
+	//	用途: 魔法
+	//--------------------------------------------------------------------------------------
+	class MagicBoal : public GameObject
+	{
+	private :
+		//移動量
+		Vector2 m_velocity;
+		//座標
+		Vector3 m_pos;
+		//生きてるかどうか
+		bool m_ActiveFlg = false;
+		//速度
+		float m_speed = 5.0f;
+		//自分の番号
+		int m_mynumber;
+		//生存時間
+		float m_lifeTime;
+		const float m_LifeTimeLimit = 2.0f;
+
+		//消滅フラグ
+		bool m_DeleteFlg = false;
+		//自分の属性
+		MagicType m_MagicType;
+
+	public :
+		MagicBoal(const shared_ptr<Stage>& StagePtr, Vector3 pos,int m);
+		virtual void OnCreate() override;
+		virtual void OnUpdate() override;
+
+		//発射する
+		void SetActive(bool,MagicType);
+
+		//移動量算出
+		void SetVelo();
+
+		//座標持ってくる
+		Vector3 GetPos();
+		
+		//属性持ってくる
+		MagicType GetMagicType();
+	};
 
 }
 //end basecross

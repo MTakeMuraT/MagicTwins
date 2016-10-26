@@ -1,10 +1,10 @@
+
 //--------------------------------------------------------------------------------------
-// File: VSPVTStaticShadow.hlsl
+// File: VSPVTStatic.hlsl
 //
 //--------------------------------------------------------------------------------------
 
 #include "INCStructs.hlsli"
-
 
 cbuffer SimpleConstantBuffer : register(b0)
 {
@@ -14,17 +14,12 @@ cbuffer SimpleConstantBuffer : register(b0)
 	float4 LightDir	: packoffset(c12);
 	float4 Emissive : packoffset(c13);
 	float4 Diffuse	: packoffset(c14);
-	float4 LightPos	: packoffset(c15);
-	float4 EyePos	: packoffset(c16);
-	uint4 Activeflags	: packoffset(c17);			//フラグ
-	float4x4 LightView	: packoffset(c18);
-	float4x4 LightProjection	: packoffset(c22);
 };
 
 
-PSPNTInputShadow main(VSPNTInput input)
+PSPNInput main(VSPNInput input)
 {
-	PSPNTInputShadow result;
+	PSPNInput result;
 	//頂点の位置を変換
 	float4 pos = float4(input.position.xyz, 1.0f);
 	//ワールド変換
@@ -38,26 +33,5 @@ PSPNTInputShadow main(VSPNTInput input)
 	//ライティング
 	result.norm = mul(input.norm, (float3x3)World);
 	result.norm = normalize(result.norm);
-	//テクスチャUV
-	result.tex = input.tex;
-	//影のための変数
-	float4 LightModelPos = float4(input.position.xyz, 1.0f);
-	//ワールド変換
-	LightModelPos = mul(LightModelPos, World);
-	
-	float4 LightSpacePos = mul(LightModelPos, LightView);
-	LightSpacePos = mul(LightSpacePos, LightProjection);
-	result.lightSpacePos = LightSpacePos;
-
-	// Light ray
-	result.lightRay = LightPos.xyz - LightModelPos.xyz;
-	//View
-	result.lightView = EyePos.xyz - LightModelPos.xyz;
-
-
-
-
 	return result;
 }
-
-

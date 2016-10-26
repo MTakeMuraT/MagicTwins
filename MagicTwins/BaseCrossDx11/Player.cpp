@@ -68,23 +68,17 @@ namespace basecross {
 		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 
-		//if (m_myName == "Player1")
-		//{
-		//	//描画するテクスチャを設定
-		//	PtrDraw->SetTextureResource(L"TRACE_TX");
-		//}
-		//else if (m_myName == "Player2")
-		//{
-		//	//描画するテクスチャを設定
-		//	PtrDraw->SetTextureResource(L"TRACE2_TX");
-		//}
-		//もし名前違ってる場合
-		//else
-		//{
-		//	throw BaseException(
-		//		L"Playerの名前指定ミスってます", L"", L""
-		//		);
-		//}
+		if (m_myName == "Player1")
+		{
+			//魔法作成
+			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(0, -5.0f, 0),1));
+		}
+		else if (m_myName == "Player2")
+		{
+			//魔法作成
+			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(0, -5.0f, 0),2));
+		}
+
 
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
@@ -152,6 +146,11 @@ namespace basecross {
 				ChangeChar();
 			}
 
+			//Xボタン押したら魔法発射
+			if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_X)
+			{
+				ShotMagic();
+			}
 		}
 
 	}
@@ -188,12 +187,12 @@ namespace basecross {
 		}
 
 		//奥行方向(縦？)
-		if (abs(Direction.z) > m_CameraMove)
+		if (abs(Direction.z) > m_CameraMove-1.0f)
 		{
 			//マイナス(左側)
 			if (Direction.z < 0)
 			{
-				Direction.z += m_CameraMove;
+				Direction.z += m_CameraMove-1.0f;
 				//ずれてる分ずらす　
 				m_CameraPos.z += Direction.z;
 				m_CameraTargetVec.z += Direction.z;
@@ -201,7 +200,7 @@ namespace basecross {
 			//プラス(右側)
 			else
 			{
-				Direction.z += -m_CameraMove;
+				Direction.z += -m_CameraMove + 1.0f;
 				//ずれてる分ずらす　
 				m_CameraPos.z += Direction.z;
 				m_CameraTargetVec.z += Direction.z;
@@ -316,6 +315,20 @@ namespace basecross {
 		}
 	}
 
+	//魔法を発射する
+	void Player::ShotMagic()
+	{
+		if (m_myName == "Player1")
+		{
+			GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal1", false)->SetActive(true,m_Magic);
+		}
+		else if (m_myName == "Player2")
+		{
+			GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false)->SetActive(true,m_Magic);
+
+		}
+	}
+
 	//カメラ固定
 	void Player::SetCamera(Vector3 At, Vector3 pos)
 	{
@@ -349,8 +362,153 @@ namespace basecross {
 		GetComponent<StringSprite>()->SetText(txt);
 		
 	}
+	//--------------------------------------------------------------------------------------
+	//	class MagicBoal : public GameObject;
+	//	用途: 魔法
+	//--------------------------------------------------------------------------------------
 
+	MagicBoal::MagicBoal(const shared_ptr<Stage>& StagePtr, Vector3 pos,int m) :
+		GameObject(StagePtr),
+		m_pos(pos),
+		m_mynumber(m)
+	{}
 
+	void MagicBoal::OnCreate()
+	{
+		//初期位置などの設定
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetScale(0.25f, 0.25f, 0.25f);
+		Ptr->SetRotation(0, 0, 0);
+		Ptr->SetPosition(m_pos);
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//メッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		//テクスチャを設定
+		PtrDraw->SetTextureResource(L"MAGICBOOKFIRE_TX");
+
+		//透明化
+		SetAlphaActive(true);
+
+		//文字列をつける
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 320.0f, 640.0f, 480.0f));
+		PtrString->SetFont(L"", 60);
+
+	}
+
+	void MagicBoal::OnUpdate()
+	{
+		if (m_ActiveFlg)
+		{
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			float Elapsed = App::GetApp()->GetElapsedTime();
+			pos += Vector3(m_velocity.x*Elapsed, 0, m_velocity.y*Elapsed);
+			GetComponent<Transform>()->SetPosition(pos);
+			//生存時間計算
+			m_lifeTime += App::GetApp()->GetElapsedTime();
+			if (m_lifeTime > m_LifeTimeLimit)
+			{
+				m_lifeTime = 0;
+				m_DeleteFlg = true;
+				m_ActiveFlg = false;
+			}
+		}
+		else if (m_DeleteFlg)
+		{
+			Vector3 scale = GetComponent<Transform>()->GetScale();
+			scale *= 0.95f;
+			GetComponent<Transform>()->SetScale(scale);
+			if (scale.x < 0)
+			{
+				SetDrawActive(false);
+				m_DeleteFlg = false;
+
+			}
+		}
+	}
+
+	//状態操作
+	void MagicBoal::SetActive(bool flg,MagicType mT)
+	{
+		if (!m_ActiveFlg && flg == true)
+		{
+			m_ActiveFlg = flg;
+			m_MagicType = mT;
+			switch (m_MagicType)
+			{
+			case None:
+				break;
+			case Fire:
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKFIRE_TX");
+				break;
+			case IceFog:
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKICEFOG_TX");
+				break;
+			default:
+				break;
+			}
+			SetVelo();
+
+		}
+		m_ActiveFlg = flg;
+
+	}
+
+	//向き、移動量計算
+	void MagicBoal::SetVelo()
+	{
+		GetComponent<Transform>()->SetScale(0.25f, 0.25f, 0.25f);
+		SetDrawActive(true);
+
+		if (m_mynumber == 1)
+		{
+			auto PlayerP = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+			Vector3 pos = PlayerP->GetComponent<Transform>()->GetPosition();
+			pos.y += 0.5f;
+			float angle = PlayerP->GetComponent<Transform>()->GetRotation().y;
+			
+			//移動量算出
+			angle *= -1;
+			m_velocity.x = cos(angle);
+			m_velocity.y = sin(angle);
+			m_velocity *= m_speed;
+
+			GetComponent<Transform>()->SetPosition(pos);
+		}
+		else if(m_mynumber == 2)
+		{
+			auto PlayerP = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+			Vector3 pos = PlayerP->GetComponent<Transform>()->GetPosition();
+			pos.y += 0.5f;
+			float angle = PlayerP->GetComponent<Transform>()->GetRotation().y;
+
+			//移動量算出
+			angle *= -1;
+			m_velocity.x = cos(angle);
+			m_velocity.y = sin(angle);
+			m_velocity *= m_speed;
+
+			GetComponent<Transform>()->SetPosition(pos);
+
+		}
+	}
+
+	Vector3 MagicBoal::GetPos()
+	{
+		return GetComponent<Transform>()->GetPosition();
+	}
+
+	MagicType MagicBoal::GetMagicType()
+	{
+		return m_MagicType;
+	}
 }
 //end basecross
 
