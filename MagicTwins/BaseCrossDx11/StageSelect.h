@@ -14,17 +14,20 @@ namespace basecross {
 		void CreateBack();
 		//セレクトロゴ
 		void CreateSelectLogo();
-		//ボタン説明
-		void ButtomInfo();
+		//ステージセレクト画像(仮)
+		void CreaateStageSelect();
 		//シーン遷移
 		void SceneChange();
-		
-		//ステージ番号
-		unsigned int m_StageNum;
-		//スティック判定
-		bool m_Conflg;
-		//文字列つけるオブジェクト
-		shared_ptr<GameObject> StringObj;
+		//左矢印(仮)
+		void Left();
+		//右矢印(仮)
+		void Right();
+
+		unsigned int m_MaxNum = 5;
+		int m_SceneNum;
+
+		bool m_flag;
+
 	public:
 		//構築と破棄
 		StageSelect() :Stage() {}
