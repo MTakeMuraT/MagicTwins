@@ -89,5 +89,25 @@ namespace basecross{
 
 		void TimeOver();
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick1 : public GameObject;
+	//	—p“r: •XB‰Š‚Ì–‚–@[Fire]‚Å—n‚©‚¹‚é
+	//--------------------------------------------------------------------------------------
+	class Gimmick1 : public GameObject
+	{
+	private :
+		//‰ŠúˆÊ’u
+		Vector3 m_InitPos;
+		//‘å‚«‚³
+		Vector3 m_Scale;
+		//¶‚«‚Ä‚é‚©‚Ç‚¤‚©
+		bool m_ActiveFlg = false;
+	public :
+		Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale);
+		void OnCreate() override;
+
+		void Delete(MagicType MT);
+	};
 }
 //end basecross

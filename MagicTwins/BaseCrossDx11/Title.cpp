@@ -143,6 +143,16 @@ namespace basecross {
 	{
 		if (m_ConFlg)
 		{
+
+			//*テスト用
+			auto key = App::GetApp()->GetInputDevice().GetKeyState();
+			if (key.m_bPressedKeyTbl[VK_SPACE])
+			{
+				m_ConFlg = false;
+				GetSharedGameObject<Black>(L"Black", false)->StartBlack();
+			}
+			//*テスト用
+
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			if (CntlVec[0].bConnected)
 			{

@@ -105,6 +105,15 @@ namespace basecross
 
 	void Result::OnUpdate()
 	{
+		//*テスト用
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		if (key.m_bPressedKeyTbl[VK_SPACE])
+		{
+			SceneChange();
+		}
+		//*テスト用
+
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{

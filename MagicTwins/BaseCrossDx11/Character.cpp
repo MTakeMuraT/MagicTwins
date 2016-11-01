@@ -25,9 +25,9 @@ namespace basecross{
 		Ptr->SetRotation(0, 0, 0);
 
 		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionSphere>();
+		auto PtrCol = AddComponent<CollisionObb>();
 		//横部分のみ反発
-		PtrCol->SetIsHitAction(IsHitAction::AutoOnObjectRepel);
+		//PtrCol->SetIsHitAction(IsHitAction::Stop);
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
@@ -215,6 +215,52 @@ namespace basecross{
 		{
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick1 : public GameObject;
+	//	用途: 氷。炎の魔法[Fire]で溶かせる
+	//--------------------------------------------------------------------------------------
+	Gimmick1::Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale)
+	{}
+
+	void Gimmick1::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionSphere>();
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"GIMMICK1_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+
+	void Gimmick1::Delete(MagicType MT)
+	{
+		if (MT == Fire)
+		{
+			m_ActiveFlg = false;
+			SetDrawActive(false);
+			GetComponent<Transform>()->SetPosition(0, -10, 0);
 		}
 	}
 }

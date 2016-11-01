@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Project.h"
 
-namespace basecross 
+namespace basecross
 {
 	void GameOver::CreateResourses()
 	{
@@ -105,6 +105,15 @@ namespace basecross
 
 	void GameOver::OnUpdate()
 	{
+		//*テスト用
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		if (key.m_bPressedKeyTbl[VK_SPACE])
+		{
+			SceneChange();
+		}
+		//*テスト用
+
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{

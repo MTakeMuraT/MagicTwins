@@ -28,6 +28,7 @@ namespace basecross {
 		//情報取得動くオブジェクト
 		//プレイヤーの座標持ってくる
 		GetPlayer();
+		GetMagicBoal();
 
 		//プレイヤーとゴール判定
 		if (CollisionTest(PlayerPos1, PlayerScale1, GoalPos, GoalScale) ||
@@ -49,6 +50,27 @@ namespace basecross {
 			count++;
 		}
 		count = 0;
+
+		//魔法とオブジェクトのアタリ判定
+		auto Objects = GetStage()->GetSharedObjectGroup(L"MagicObjects")->GetGroupVector();
+		for (auto v : Objects)
+		{
+			auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
+			Vector3 PPos = Ptr->GetComponent<Transform>()->GetPosition();
+			Vector3 PScale = Ptr->GetComponent<Transform>()->GetScale();
+
+			//一個目の魔法当たる
+			if (CollisionTest(MagicPos1, MagicScale1, PPos, PScale))
+			{
+				MagicToObj(1,shared_ptr<GameObject>(v));
+			}
+			//二個目の魔法当たる
+			if (CollisionTest(MagicPos2, MagicScale2, PPos, PScale))
+			{
+				MagicToObj(2, shared_ptr<GameObject>(v));
+			}
+
+		}
 	}
 
 	//プレイヤーの情報持ってくる
@@ -89,6 +111,21 @@ namespace basecross {
 		}
 	}
 
+	//魔法の情報持ってくる
+	void CollisionManager::GetMagicBoal()
+	{
+		auto Magic1 = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal1", false);
+		auto Magic2 = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false);
+
+		MagicPos1 = Magic1->GetComponent<Transform>()->GetPosition();
+		MagicScale1 = Magic1->GetComponent<Transform>()->GetScale();
+		MagicFlg1 = Magic1->GetActive();
+
+		MagicPos2 = Magic2->GetComponent<Transform>()->GetPosition();
+		MagicScale2 = Magic2->GetComponent<Transform>()->GetScale();
+		MagicFlg2 = Magic2->GetActive();
+	}
+
 	//プレイヤーとゴールが当たった処理
 	void CollisionManager::PlayerToGoal()
 	{
@@ -105,15 +142,41 @@ namespace basecross {
 		dynamic_pointer_cast<MagicBook>(MBGVec[count].lock())->GetPlayer();
 	}
 
+	//魔法とオブジェクトの当たった処理
+	void CollisionManager::MagicToObj(int num,shared_ptr<GameObject> otherObj)
+	{
+		if (num == 1)
+		{
+			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal1", false);
+			MaBo->SetActive(false,None);
+			//もし氷のギミックだったら
+			if (dynamic_pointer_cast<Gimmick1>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
+				Ptr->Delete(MaBo->GetMagicType());
+			}
+		}
+		else if (num == 2)
+		{
+			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false);
+			MaBo->SetActive(false, None);
+			//もし氷のギミックだったら
+			if (dynamic_pointer_cast<Gimmick1>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
+				Ptr->Delete(MaBo->GetMagicType());
+			}
+		}
+	}
+
 	//アタリ判定関数
 	bool CollisionManager::CollisionTest(Vector3 pos1, Vector3 scale1, Vector3 pos2, Vector3 scale2)
 	{
 		float dx = pos2.x - pos1.x;
 		float dy = pos2.y - pos1.y;
 		float dz = pos2.z - pos1.z;
-		float dhalf = scale1.x + scale2.x;
-		//ちょっと調整
-		dhalf *= 0.7f;
+		float dhalf = (scale1.x + scale2.x)/2;
+		dhalf *= 1.2f;
 		if ((dx*dx + dy*dy + dz*dz) < dhalf*dhalf)
 		{
 			return true;

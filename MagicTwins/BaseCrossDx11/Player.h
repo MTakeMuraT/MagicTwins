@@ -101,7 +101,7 @@ namespace basecross{
 		//消滅フラグ
 		bool m_DeleteFlg = false;
 		//自分の属性
-		MagicType m_MagicType;
+		MagicType m_MagicType = None;
 
 	public :
 		MagicBoal(const shared_ptr<Stage>& StagePtr, Vector3 pos,int m);
@@ -114,11 +114,11 @@ namespace basecross{
 		//移動量算出
 		void SetVelo();
 
-		//座標持ってくる
-		Vector3 GetPos();
-		
 		//属性持ってくる
 		MagicType GetMagicType();
+
+		//生存情報持ってくる
+		bool GetActive();
 	};
 
 }

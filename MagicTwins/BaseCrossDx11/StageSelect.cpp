@@ -11,8 +11,8 @@ namespace basecross {
 		strTexture = DataDir + L"sky.png";
 		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
 		//StegeSelect画像(仮)
-		strTexture = DataDir + L"StageSelect.png";
-		App::GetApp()->RegisterTexture(L"STAGESELECT_TX", strTexture);
+		strTexture = DataDir + L"BButtom.png";
+		App::GetApp()->RegisterTexture(L"BBUTTOM_TX", strTexture);
 
 	}
 
@@ -54,13 +54,6 @@ namespace basecross {
 		SelectBack->SetDrawLayer(1);
 
 		SetSharedGameObject(L"TiBa", SelectBack);
-
-		//文字列を付ける(仮)
-		auto Stp = SelectBack->AddComponent<StringSprite>();
-		Stp->SetText(L"");
-		Stp->SetTextRect(Rect2D<float>(512.0f, 16.0f, 1024.0f, 960.0f));
-		Stp->SetFont(L"", 100);
-
 	}
 
 	void StageSelect::CreateSelectLogo()
@@ -93,27 +86,26 @@ namespace basecross {
 	}
 
 	//ステージセレクト画像(仮)
-	void StageSelect::CreaateStageSelect()
+	void StageSelect::ButtomInfo()
 	{
-		auto StageSelect = AddGameObject<GameObject>();
-		StageSelect->AddComponent<Transform>();
-		auto PtrTransform = StageSelect->GetComponent<Transform>();
+		auto BButtom = AddGameObject<GameObject>();
+		BButtom->AddComponent<Transform>();
+		auto PtrTransform = BButtom->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
 		PtrTransform->SetPosition(600, -400, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(500, 200, 1);
 
 		//スプライトを付ける
-		auto PtrSprite = StageSelect->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"STAGESELECT_TX");
+		auto PtrSprite = BButtom->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"BBUTTOM_TX");
 
-		SetSharedGameObject(L"StageSelect", StageSelect);
+		SetSharedGameObject(L"BButtom", BButtom);
 
-		StageSelect->SetDrawLayer(2);
+		BButtom->SetDrawLayer(2);
 
 		//透明度反映
-		StageSelect->SetAlphaActive(true);
-		GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
+		BButtom->SetAlphaActive(true);
 
 
 	}
@@ -130,32 +122,36 @@ namespace basecross {
 			CreateBack();
 			//ロゴ作成
 			CreateSelectLogo();
-			//ステージセレクト(仮)
-			CreaateStageSelect();
+			//ボタン説明
+			ButtomInfo();
 
-			//左右シーン遷移(仮)
-			m_SceneNum = 0;
-			m_flag = true;
+			//文字列を付ける
+			StringObj = AddGameObject<GameObject>();
+			StringObj->SetDrawLayer(3);
+			auto SoSt = StringObj->AddComponent<StringSprite>();
+			SoSt->SetText(L"");
+			SoSt->SetTextRect(Rect2D<float>(512.0f, 128.0f, 1024.0f, 960.0f));
+			SoSt->SetFont(L"", 100);
 
 		}
 		catch (...) {
 			throw;
 		}
 
-		
 
-		
+
+
 	}
 
 	void StageSelect::OnUpdate()
 	{
-
-
-		//左右でシーン遷移(仮)
-		auto ShareObject = GetSharedGameObject<GameObject>(L"TiBa", false);
-		auto ShareString = ShareObject->GetComponent<StringSprite>();
-
-		wstring sceneNum(L"");
+		//*テスト用
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		if (key.m_bPressedKeyTbl[VK_SPACE])
+		{
+			SceneChange();
+		}
+		//*テスト用
 
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
@@ -164,30 +160,31 @@ namespace basecross {
 			{
 				SceneChange();
 			}
-			//左右シーン遷移(仮)
-			if (CntlVec[0].fThumbLX>0&&m_flag)
-			{
 
-				m_SceneNum++;
-				m_flag=false;
-				
-			}
-			if (CntlVec[0].fThumbLX < 0 && m_flag)
+			//ステージセレクト数字弄る
+			if (CntlVec[0].fThumbLX > 0.5f && m_Conflg)
 			{
-				//m_SceneNum--;
-				//m_flag = false;
+				m_StageNum++;
+				m_Conflg = false;
+
 			}
-			if (CntlVec[0].fThumbLX == 0)
+			if (CntlVec[0].fThumbLX < -0.5f && m_Conflg)
 			{
-				m_flag = true;
+				if (m_StageNum != 0)
+				{
+					m_StageNum--;
+					m_Conflg = false;
+				}
+			}
+			if (abs(CntlVec[0].fThumbLX) < 0.2f)
+			{
+				m_Conflg = true;
 			}
 
 		}
-		sceneNum +=  Util::IntToWStr(m_SceneNum);
-		ShareString->SetText(sceneNum);
-		
-	
-	}
 
+		//数字表示
+		StringObj->GetComponent<StringSprite>()->SetText(Util::IntToWStr(m_StageNum));
 	}
+}
 

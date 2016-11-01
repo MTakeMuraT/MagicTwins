@@ -29,6 +29,8 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"MAGICBOOKFIRE_TX", strTexture);
 		strTexture = DataDir + L"MagicBookIceFog.png";
 		App::GetApp()->RegisterTexture(L"MAGICBOOKICEFOG_TX", strTexture);
+		strTexture = DataDir + L"Gimmick1.png";
+		App::GetApp()->RegisterTexture(L"GIMMICK1_TX", strTexture);
 
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
@@ -96,7 +98,6 @@ namespace basecross {
 		//シェア配列にプレイヤーを追加
 		SetSharedGameObject(L"Player1", PlayerPtr);
 		
-		
 		//プレーヤーの作成2体目
 		auto PlayerPtr2 = AddGameObject<Player>(Vector3(10, 0.125f, 0), false, "Player2");
 		//シェア配列にプレイヤーを追加
@@ -113,7 +114,7 @@ namespace basecross {
 		auto MagBooP = AddGameObject<MagicBook>(Vector3(2, 0.3f, 2), Fire);
 		MBGroup->IntoGroup(MagBooP);
 
-		MagBooP = AddGameObject<MagicBook>(Vector3(0, 0.3f, 2), IceFog);
+		MagBooP = AddGameObject<MagicBook>(Vector3(10, 0.3f, 2), IceFog);
 		MBGroup->IntoGroup(MagBooP);
 
 	}
@@ -124,7 +125,7 @@ namespace basecross {
 		//ゴール作成
 		auto GoalP = AddGameObject<Goal>(Vector3(-5, 0.5f, 3),Vector3(1,1,1));
 		SetSharedGameObject(L"Goal", GoalP);
-
+		GetSharedObjectGroup(L"MagicObjects")->IntoGroup(GoalP);
 	}
 
 	//制限時間作成
@@ -143,6 +144,9 @@ namespace basecross {
 
 	void GameStage::OnCreate() {
 		try {
+			//魔法が当たって消えるオブジェクトグループ
+			CreateSharedObjectGroup(L"MagicObjects");
+
 			//リソースの作成
 			CreateResourses();
 			//ビューとライトの作成
@@ -159,6 +163,10 @@ namespace basecross {
 			CreateLimitTime();
 			//コリジョンマネージャー作成
 			CreateCollisionManager();
+
+			//ギミック作成
+			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick1>(Vector3(2, 0.5f, 0), Vector3(1, 1, 1)));
+
 		}
 		catch (...) {
 			throw;

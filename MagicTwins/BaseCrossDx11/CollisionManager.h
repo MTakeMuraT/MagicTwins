@@ -22,6 +22,14 @@ namespace basecross {
 		//魔導書
 		vector<Vector3> MagicBooksPos;
 		vector<Vector3> MagicBooksScale;
+		//魔法1
+		Vector3 MagicPos1;
+		Vector3 MagicScale1;
+		bool MagicFlg1;
+		//魔法2
+		Vector3 MagicPos2;
+		Vector3 MagicScale2;
+		bool MagicFlg2;
 	public :
 		CollisionManager(const shared_ptr<Stage>& StagePtr);
 		virtual void OnCreate() override;
@@ -32,11 +40,15 @@ namespace basecross {
 		void GetGoal();
 		//魔導書の情報持ってくる
 		void GetMagicBook();
+		//魔法の情報持ってくる
+		void GetMagicBoal();
 
 		//プレイヤーとゴールの当たった処理
 		void PlayerToGoal();
 		//プレイヤーと魔導書の当たった処理
 		void PlayerToMagicBook(int count);
+		//魔法とオブジェクトの当たった処理
+		void MagicToObj(int num,shared_ptr<GameObject> otherObj);
 
 		//アタリ判定計算関数(球体)
 		bool CollisionTest(Vector3 pos1, Vector3 scale1, Vector3 pos2, Vector3 scale2);

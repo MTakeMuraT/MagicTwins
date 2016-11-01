@@ -40,10 +40,6 @@ namespace basecross {
 		PtrGravity->SetBaseY(0.125f);
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionSphere>();
-		//横部分のみ反発
-		PtrCol->SetIsHitAction(IsHitAction::AutoOnObjectRepel);
-
-
 
 		// モデルとトランスフォームの間の差分行列
 		float angle = -90 * (3.14159265f /180);
@@ -71,12 +67,12 @@ namespace basecross {
 		if (m_myName == "Player1")
 		{
 			//魔法作成
-			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(0, -5.0f, 0),1));
+			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),1));
 		}
 		else if (m_myName == "Player2")
 		{
 			//魔法作成
-			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(0, -5.0f, 0),2));
+			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),2));
 		}
 
 
@@ -115,6 +111,57 @@ namespace basecross {
 	//操作できる状態
 	void Player::active()
 	{
+		//*テスト用
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		Vector2 velocity;
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		bool flg = false;
+		if (key.m_bPushKeyTbl[VK_RIGHT])
+		{
+			velocity.x = 1 * m_Speed * ElapsedTime;
+			flg = true;
+		}
+		if (key.m_bPushKeyTbl[VK_LEFT])
+		{
+			velocity.x = -1 * m_Speed * ElapsedTime;		
+			flg = true;
+		}
+		if (key.m_bPushKeyTbl[VK_UP])
+		{
+			velocity.y = 1 * m_Speed * ElapsedTime;
+			flg = true;
+		}
+		if (key.m_bPushKeyTbl[VK_DOWN])
+		{
+			velocity.y = -1 * m_Speed * ElapsedTime;
+			flg = true;
+		}
+		//コントローラーの入力XY
+		auto TranP = GetComponent<Transform>();
+		Vector3 Posi = TranP->GetPosition();
+		Posi.x += velocity.x;
+		Posi.z += velocity.y;
+		TranP->SetPosition(Posi);
+
+		if (flg)
+		{
+			//向きを得る				
+			float angle = atan2(velocity.y, velocity.x);
+			angle *= -1;
+			TranP->SetRotation(Vector3(0, angle, 0));
+		}
+
+		if (key.m_bPressedKeyTbl[VK_TAB])
+		{
+			ChangeChar();
+		}
+
+		if (key.m_bPressedKeyTbl['S'])
+		{
+			ShotMagic();
+		}
+		//*テスト用
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -206,6 +253,8 @@ namespace basecross {
 				m_CameraTargetVec.z += Direction.z;
 			}
 		}
+		m_CameraTargetVec.y = GetComponent<Transform>()->GetPosition().y;
+		m_CameraPos.y = m_CameraTargetVec.y + 5.0f;
 		CameraP->SetAt(m_CameraTargetVec);
 		CameraP->SetEye(m_CameraPos);
 	}
@@ -340,11 +389,10 @@ namespace basecross {
 	void Player::OnLastUpdate() {
 
 		wstring txt;
-		//回転とってるけど表示おかしいのかな？
+		//回転とってる
 		//auto TranP = GetComponent<Transform>();
 		//txt = Util::FloatToWStr(TranP->GetRotation().y * 180/3.14159265f);
 
-		
 		switch (m_Magic)
 		{
 		case None:
@@ -444,6 +492,7 @@ namespace basecross {
 			switch (m_MagicType)
 			{
 			case None:
+				return;
 				break;
 			case Fire:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKFIRE_TX");
@@ -457,6 +506,13 @@ namespace basecross {
 			SetVelo();
 
 		}
+		//生きてるときにフラグおられたら
+		if (m_ActiveFlg && flg == false)
+		{
+			m_DeleteFlg = true;
+			m_ActiveFlg = false;
+		}
+
 		m_ActiveFlg = flg;
 
 	}
@@ -500,14 +556,14 @@ namespace basecross {
 		}
 	}
 
-	Vector3 MagicBoal::GetPos()
-	{
-		return GetComponent<Transform>()->GetPosition();
-	}
-
 	MagicType MagicBoal::GetMagicType()
 	{
 		return m_MagicType;
+	}
+
+	bool MagicBoal::GetActive()
+	{
+		return m_ActiveFlg;
 	}
 }
 //end basecross
