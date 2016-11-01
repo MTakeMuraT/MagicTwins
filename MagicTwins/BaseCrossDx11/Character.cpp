@@ -219,6 +219,41 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class TransBlock : public GameObject;
+	//	用途: 氷。炎の魔法[Fire]で溶かせる
+	//--------------------------------------------------------------------------------------
+	TransBlock::TransBlock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale)
+	{}
+
+	void TransBlock::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+		Ptr->SetRotation(0, 0, 0);
+
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"SKY_TX");
+
+
+	}
+
+	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる
 	//--------------------------------------------------------------------------------------
@@ -263,5 +298,52 @@ namespace basecross{
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
 		}
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick2 : public GameObject;
+	//	用途: 氷。炎の魔法[Fire]で溶かせる
+	//--------------------------------------------------------------------------------------
+	Gimmick2::Gimmick2(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale)
+	{}
+
+	void Gimmick2::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"GIMMICK2_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+
+	void Gimmick2::Delete(MagicType MT)
+	{
+		if (MT == Fire)
+		{
+			m_ActiveFlg = false;
+			SetDrawActive(false);
+			GetComponent<Transform>()->SetPosition(0, -10, 0);
+		}
+	}
+
 }
 //end basecross

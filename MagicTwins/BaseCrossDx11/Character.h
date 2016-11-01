@@ -91,6 +91,22 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class TransBlock : public GameObject;
+	//	用途: 氷。炎の魔法[Fire]で溶かせる
+	//--------------------------------------------------------------------------------------
+	class TransBlock : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_Scale;
+	public :
+		TransBlock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate() override;
+	};
+
+	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる
 	//--------------------------------------------------------------------------------------
@@ -109,5 +125,26 @@ namespace basecross{
 
 		void Delete(MagicType MT);
 	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick2 : public GameObject;
+	//	用途: 風車。炎の魔法[Fire]で燃える　燭台と組み合わせれば羽動かして水門開けたりしめたりできる
+	//--------------------------------------------------------------------------------------
+	class Gimmick2 : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_Scale;
+		//生きてるかどうか
+		bool m_ActiveFlg = false;
+	public:
+		Gimmick2(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate() override;
+
+		void Delete(MagicType MT);
+	};
+
 }
 //end basecross

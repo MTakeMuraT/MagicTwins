@@ -11,8 +11,8 @@ namespace basecross {
 		strTexture = DataDir + L"sky.png";
 		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
 		//StegeSelect画像(仮)
-		strTexture = DataDir + L"StageSelect.png";
-		App::GetApp()->RegisterTexture(L"STAGESELECT_TX", strTexture);
+		strTexture = DataDir + L"BButton.png";
+		App::GetApp()->RegisterTexture(L"BBUTTON_TX", strTexture);
 		//左矢印画像(仮)
 		strTexture = DataDir + L"Left.png";
 		App::GetApp()->RegisterTexture(L"LEFT_TX", strTexture);
@@ -98,7 +98,7 @@ namespace basecross {
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 	}
 
-	//ステージセレクト画像(仮)
+	//ボタン説明
 	void StageSelect::CreaateStageSelect()
 	{
 		auto StageSelect = AddGameObject<GameObject>();
@@ -111,7 +111,7 @@ namespace basecross {
 
 		//スプライトを付ける
 		auto PtrSprite = StageSelect->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"STAGESELECT_TX");
+		PtrSprite->SetTextureResource(L"BBUTTON_TX");
 
 		SetSharedGameObject(L"StageSelect", StageSelect);
 
@@ -230,6 +230,15 @@ namespace basecross {
 		auto ShareString = ShareObject->GetComponent<StringSprite>();
 
 		wstring sceneNum(L"");
+
+
+		//*テスト用
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		if (key.m_bPressedKeyTbl[VK_SPACE])
+		{
+			SceneChange();
+		}
+		//*テスト用
 
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
