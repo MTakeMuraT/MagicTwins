@@ -155,6 +155,12 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
 				Ptr->Delete(MaBo->GetMagicType());
 			}
+			//•—ŽÔ
+			else if (dynamic_pointer_cast<Gimmick2>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
+				Ptr->Delete(MaBo->GetMagicType());
+			}
 		}
 		else if (num == 2)
 		{
@@ -166,6 +172,13 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
 				Ptr->Delete(MaBo->GetMagicType());
 			}
+			//•—ŽÔ
+			else if (dynamic_pointer_cast<Gimmick2>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
+				Ptr->Delete(MaBo->GetMagicType());
+			}
+
 		}
 	}
 

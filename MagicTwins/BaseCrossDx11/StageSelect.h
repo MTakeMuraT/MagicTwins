@@ -14,7 +14,7 @@ namespace basecross {
 		void CreateBack();
 		//セレクトロゴ
 		void CreateSelectLogo();
-		//ステージセレクト画像(仮)
+		//ボタン説明
 		void CreaateStageSelect();
 		//シーン遷移
 		void SceneChange();
@@ -23,7 +23,9 @@ namespace basecross {
 		//右矢印(仮)
 		void Right();
 
+		//最大値
 		unsigned int m_MaxNum = 5;
+		//現在選択中の数字
 		int m_SceneNum;
 
 		bool m_flag;

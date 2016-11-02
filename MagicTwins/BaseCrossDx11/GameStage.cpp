@@ -31,6 +31,8 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"MAGICBOOKICEFOG_TX", strTexture);
 		strTexture = DataDir + L"Gimmick1.png";
 		App::GetApp()->RegisterTexture(L"GIMMICK1_TX", strTexture);
+		strTexture = DataDir + L"Gimmick2.png";
+		App::GetApp()->RegisterTexture(L"GIMMICK2_TX", strTexture);
 
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
@@ -114,7 +116,7 @@ namespace basecross {
 		auto MagBooP = AddGameObject<MagicBook>(Vector3(2, 0.3f, 2), Fire);
 		MBGroup->IntoGroup(MagBooP);
 
-		MagBooP = AddGameObject<MagicBook>(Vector3(10, 0.3f, 2), IceFog);
+		MagBooP = AddGameObject<MagicBook>(Vector3(8, 0.3f, 4), IceFog);
 		MBGroup->IntoGroup(MagBooP);
 
 	}
@@ -165,8 +167,14 @@ namespace basecross {
 			CreateCollisionManager();
 
 			//ギミック作成
+			//氷
 			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick1>(Vector3(2, 0.5f, 0), Vector3(1, 1, 1)));
+			//風車
+			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick2>(Vector3(9, 0, 3), Vector3(1, 3, 1)));
 
+
+			//透明ブロック作成のちのちCSVでなんとか作る
+			AddGameObject<TransBlock>(Vector3(-6,0.5f,0), Vector3(1,1,10));
 		}
 		catch (...) {
 			throw;
