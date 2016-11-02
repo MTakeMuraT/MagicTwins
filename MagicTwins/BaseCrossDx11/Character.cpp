@@ -296,6 +296,8 @@ namespace basecross{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
+			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+			
 		}
 	}
 
@@ -317,18 +319,31 @@ namespace basecross{
 		Ptr->SetRotation(0, 0, 0);
 
 		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionObb>();
+		auto PtrCol = AddComponent<CollisionSphere>();
+
+		// モデルとトランスフォームの間の差分行列
+		float angle = (-90) * (3.14159265f / 180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(angle, angle, 0.0f),
+			Vector3(-4.0f, 0, 3.0f)
+			);
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//ShadowPtr->SetMeshResource(L"Windmill_Model");
+		ShadowPtr->SetMeshResource(L"Player_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"GIMMICK2_TX");
+		//PtrDraw->SetMeshResource(L"Windmill_Model");
+		PtrDraw->SetMeshResource(L"Player_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 		//透明処理
 		SetAlphaActive(true);
@@ -342,6 +357,8 @@ namespace basecross{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
+			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+
 		}
 	}
 
