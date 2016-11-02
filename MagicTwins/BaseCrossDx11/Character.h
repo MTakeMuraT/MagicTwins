@@ -146,5 +146,93 @@ namespace basecross{
 		void Delete(MagicType MT);
 	};
 
+
+	//--------------------------------------------------------------------------------------
+	//	class Water : public GameObject;
+	//	用途: 水。コア部分以外
+	//--------------------------------------------------------------------------------------
+	class Water : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_InitScale;
+		//凍ってるかどうか
+		bool m_FreezeFlg = false;
+		//流れてるかどうか
+		bool m_FlowFlg = true;
+		//アタリ判定用箱
+		shared_ptr<GameObject> m_HitBox;
+	public :
+		Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate() override;
+
+		//凍らす
+		void Freeze();
+		//溶かす
+		void Melt();
+		//止める
+		void Stop();
+		//流す
+		void Flow();
+
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick3 : public GameObject;
+	//	用途: 川。のコア部分。凍らせると水部分を凍らせる
+	//--------------------------------------------------------------------------------------
+	class Gimmick3 : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_InitScale;
+		//凍ってるかどうか
+		bool m_FreezeFlg = false;
+		//流れてるかどうか
+		bool m_FlowFlg = true;
+		//自分が影響を与える水の情報
+		vector<shared_ptr<Water>> m_waters;
+	public:
+		Gimmick3(const shared_ptr<Stage>& StagePtr, Vector3 pos,Vector3 scale);
+		void OnCreate() override;
+
+		void InputWaterInfo(vector<Water>);
+
+		//魔法が当たった時
+		void HitMagic(MagicType MT);
+		//凍らす
+		void Freeze();
+		//溶かす
+		void Melt();
+		//止める
+		void Stop();
+		//流す
+		void Flow();
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick5 : public GameObject;
+	//	用途: 炎。氷の魔法[Icefog]で消せる
+	//--------------------------------------------------------------------------------------
+	class Gimmick5 : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_Scale;
+		//生きてるかどうか
+		bool m_ActiveFlg = false;
+	public:
+		Gimmick5(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate() override;
+
+		void Delete(MagicType MT);
+	};
+
 }
 //end basecross

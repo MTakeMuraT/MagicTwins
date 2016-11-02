@@ -17,8 +17,8 @@ namespace basecross{
 		try {
 			//最初のアクティブステージの設定
 			//ResetActiveStage<GameStage>();
-			ResetActiveStage<Title>();
-			//ResetActiveStage<StageSelect>();
+			//ResetActiveStage<Title>();
+			ResetActiveStage<StageSelect>();
 			//ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
 		}
@@ -30,8 +30,8 @@ namespace basecross{
 		App::GetApp()->GetDataDirectory(DataDir);
 		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char/Character_01.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", ModelMesh);
-		//ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/FUSYA.bmf");
-		//App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
+		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
 
 	}
 
