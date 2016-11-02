@@ -25,10 +25,14 @@ namespace basecross{
 		catch (...) {
 			throw;
 		}
+		//モデル読み込み。なんかゲームステージでやったらミスった希ガス
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
 		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char/Character_01.bmf");
 		App::GetApp()->RegisterResource(L"Player_Model", ModelMesh);
+		//ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/FUSYA.bmf");
+		//App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
+
 	}
 
 	void Scene::OnEvent(const shared_ptr<Event>& event) {

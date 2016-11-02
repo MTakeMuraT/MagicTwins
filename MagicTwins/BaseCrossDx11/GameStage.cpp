@@ -21,7 +21,7 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"TRACE_TX", strTexture);
 		strTexture = DataDir + L"trace2.png";
 		App::GetApp()->RegisterTexture(L"TRACE2_TX", strTexture);
-		strTexture = DataDir + L"sky.png";
+		strTexture = DataDir + L"MapChip/Leaf.png";
 		App::GetApp()->RegisterTexture(L"SKY_TX", strTexture);
 		strTexture = DataDir + L"goal.png";
 		App::GetApp()->RegisterTexture(L"GOAL_TX", strTexture);

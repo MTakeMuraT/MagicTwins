@@ -73,6 +73,8 @@ namespace basecross {
 		}
 	}
 
+//------------------------------------------------------------------------------------------------
+
 	//プレイヤーの情報持ってくる
 	void CollisionManager::GetPlayer()
 	{
@@ -148,8 +150,7 @@ namespace basecross {
 		if (num == 1)
 		{
 			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal1", false);
-			MaBo->SetActive(false,None);
-			//もし氷のギミックだったら
+			//氷のギミック
 			if (dynamic_pointer_cast<Gimmick1>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
@@ -161,12 +162,12 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
 				Ptr->Delete(MaBo->GetMagicType());
 			}
+			MaBo->SetActive(false, None);
 		}
 		else if (num == 2)
 		{
 			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false);
-			MaBo->SetActive(false, None);
-			//もし氷のギミックだったら
+			//氷のギミック
 			if (dynamic_pointer_cast<Gimmick1>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
@@ -178,6 +179,7 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
 				Ptr->Delete(MaBo->GetMagicType());
 			}
+			MaBo->SetActive(false, None);
 
 		}
 	}
