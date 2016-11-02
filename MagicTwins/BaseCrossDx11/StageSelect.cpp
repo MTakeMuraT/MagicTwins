@@ -268,9 +268,9 @@ namespace basecross {
 		}
 		sceneNum += Util::IntToWStr(m_SceneNum);
 		ShareString->SetText(sceneNum);
-			auto Left = GetSharedGameObject<GameObject>(L"Right");
+			auto Left = GetSharedGameObject<GameObject>(L"Left");
 
-		if (m_SceneNum != 5)
+		if (m_SceneNum != 0)
 		{
 			Left->SetDrawActive(true);
 		}
@@ -283,7 +283,7 @@ namespace basecross {
 			}*/
 			Left->SetDrawActive(false);
 		}
-		auto Right = GetSharedGameObject<GameObject>(L"Left");
+		auto Right = GetSharedGameObject<GameObject>(L"Right");
 		if (m_SceneNum != m_MaxNum)
 		{
 			Right->SetDrawActive(true);
