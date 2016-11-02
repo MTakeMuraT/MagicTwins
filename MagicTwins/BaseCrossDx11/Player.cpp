@@ -344,7 +344,7 @@ namespace basecross {
 		m_endFrame = true;
 	}
 
-	//魔法を記憶する
+	//魔法を記憶するこれ常に1のほう呼ばれる
 	void Player::SetMagic(MagicType MT)
 	{
 		if (m_myName == "Player1")

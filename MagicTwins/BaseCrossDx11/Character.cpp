@@ -203,6 +203,7 @@ namespace basecross{
 		PtrString->SetTextRect(Rect2D<float>(512.0f, 16.0f, 1024.0f, 960.0f));
 		PtrString->SetFont(L"", 100);
 		m_nowTime = m_LimitTime;
+		SetDrawLayer(5);
 	}
 
 	void LimitTime::OnUpdate()
@@ -248,7 +249,7 @@ namespace basecross{
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
 		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"SKY_TX");
+		PtrDraw->SetTextureResource(L"TRACE2_TX");
 
 
 	}
@@ -325,16 +326,16 @@ namespace basecross{
 		float angle = (-90) * (3.14159265f / 180);
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
-			Vector3(1.0f, 1.0f, 1.0f),
-			Vector3(angle, angle, 0.0f),
-			Vector3(-4.0f, 0, 3.0f)
+			Vector3(1.0f, 0.3f, 1.0f),
+			Vector3(0,angle, 0),
+			Vector3(0, 0, 0)
 			);
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
 		//ShadowPtr->SetMeshResource(L"Windmill_Model");
-		ShadowPtr->SetMeshResource(L"Player_Model");
+		ShadowPtr->SetMeshResource(L"Windmill_Model");
 		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
 
@@ -342,7 +343,7 @@ namespace basecross{
 		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
 		//PtrDraw->SetMeshResource(L"Windmill_Model");
-		PtrDraw->SetMeshResource(L"Player_Model");
+		PtrDraw->SetMeshResource(L"Windmill_Model");
 		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 		//透明処理
@@ -362,5 +363,212 @@ namespace basecross{
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class Water : public GameObject;
+	//	用途: 水。コア部分以外
+	//--------------------------------------------------------------------------------------
+	Water::Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale)
+	{}
+
+	void Water::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_InitScale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"WATER_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+
+	//凍らす
+	void Water::Freeze()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(false);
+		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+
+	}
+	//溶かす
+	void Water::Melt()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
+		GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+
+	}
+	//止める
+	void Water::Stop()
+	{
+
+	}
+	//流す
+	void Water::Flow()
+	{
+
+	}
+
+
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick3 : public GameObject;
+	//	用途: 川。のコア部分。凍らせると水部分を凍らせる
+	//--------------------------------------------------------------------------------------
+	Gimmick3::Gimmick3(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale)
+	{}
+
+	void Gimmick3::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_InitScale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"WATER_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(2, 0, 2), Vector3(7, 1, 1)));
+		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(-3, 0, -1.5f), Vector3(1, 1, 8)));
+		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(12.5f, 0, 2), Vector3(6, 1, 1)));
+		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(7.5f, 0, 2), Vector3(2, 1, 1)));
+
+	}
+
+	void Gimmick3::InputWaterInfo(vector<Water>)
+	{
+
+	}
+
+	//魔法が当たった時
+	void Gimmick3::HitMagic(MagicType MT)
+	{
+		//凍ってたら溶かす
+		if (m_FreezeFlg && MT == Fire)
+		{
+			Melt();
+			m_FreezeFlg = false;
+		}
+
+		//凍ってなかったら凍らせる
+		if (!m_FreezeFlg && MT == IceFog)
+		{
+			Freeze();	
+			m_FreezeFlg = true;
+		}
+	}
+
+	//凍らす
+	void Gimmick3::Freeze()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(false);
+		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+		for (auto v : m_waters)
+		{
+			v->Freeze();
+		}
+	}
+
+	//溶かす
+	void Gimmick3::Melt()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
+		GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+		for (auto v : m_waters)
+		{
+			v->Melt();
+		}
+	}
+
+	//止める
+	void Gimmick3::Stop()
+	{
+
+	}
+
+	//流す
+	void Gimmick3::Flow()
+	{
+
+	}
+
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick5 : public GameObject;
+	//	用途: 炎。氷の魔法[Icefog]で消せる
+	//--------------------------------------------------------------------------------------
+
+	Gimmick5::Gimmick5(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale)
+	{}
+
+	void Gimmick5::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionSphere>();
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"GIMMICK5_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+	}
+
+	void Gimmick5::Delete(MagicType MT)
+	{
+		if (MT == IceFog)
+		{
+			m_ActiveFlg = false;
+			SetDrawActive(false);
+			GetComponent<Transform>()->SetPosition(0, -10, 0);
+			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+
+		}
+	}
 }
 //end basecross

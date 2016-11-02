@@ -163,7 +163,7 @@ namespace basecross{
 		//—¬‚ê‚Ä‚é‚©‚Ç‚¤‚©
 		bool m_FlowFlg = true;
 		//ƒAƒ^ƒŠ”»’è—p” 
-		shared_ptr<GameObject> m_HitBox;
+		//shared_ptr<GameObject> m_HitBox;
 	public :
 		Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
