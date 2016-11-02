@@ -13,6 +13,13 @@ namespace basecross
 		void CreateBack();
 		//ゲームオーバー文字
 		void CreateOverLogo();
+		//リトライの作成
+		void CreateRetry();
+		//ステージセレクトの作成
+		void CreateStageSelect();
+		//タイトルの作成
+		void CreateTitle();
+		//
 
 		//シーン遷移
 		void SceneChange();
