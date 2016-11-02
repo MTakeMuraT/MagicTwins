@@ -162,6 +162,18 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
 				Ptr->Delete(MaBo->GetMagicType());
 			}
+			//炎
+			else if (dynamic_pointer_cast<Gimmick5>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick5>(otherObj);
+				Ptr->Delete(MaBo->GetMagicType());
+			}
+			//川のコア
+			else if (dynamic_pointer_cast<Gimmick3>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick3>(otherObj);
+				Ptr->HitMagic(MaBo->GetMagicType());
+			}
 			MaBo->SetActive(false, None);
 		}
 		else if (num == 2)
@@ -179,6 +191,19 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
 				Ptr->Delete(MaBo->GetMagicType());
 			}
+			//炎
+			else if (dynamic_pointer_cast<Gimmick5>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick5>(otherObj);
+				Ptr->Delete(MaBo->GetMagicType());
+			}
+			//川のコア
+			else if (dynamic_pointer_cast<Gimmick3>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Gimmick3>(otherObj);
+				Ptr->HitMagic(MaBo->GetMagicType());
+			}
+
 			MaBo->SetActive(false, None);
 
 		}

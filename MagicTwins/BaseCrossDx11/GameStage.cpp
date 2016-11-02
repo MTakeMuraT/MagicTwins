@@ -33,6 +33,12 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"GIMMICK1_TX", strTexture);
 		strTexture = DataDir + L"Gimmick2.png";
 		App::GetApp()->RegisterTexture(L"GIMMICK2_TX", strTexture);
+		strTexture = DataDir + L"water.png";
+		App::GetApp()->RegisterTexture(L"WATER_TX", strTexture);
+		strTexture = DataDir + L"Ice.png";
+		App::GetApp()->RegisterTexture(L"ICE_TX", strTexture);
+		strTexture = DataDir + L"Gimmick5.png";
+		App::GetApp()->RegisterTexture(L"GIMMICK5_TX", strTexture);
 
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
@@ -113,7 +119,7 @@ namespace basecross {
 	{
 		auto MBGroup = CreateSharedObjectGroup(L"MagicBook");
 
-		auto MagBooP = AddGameObject<MagicBook>(Vector3(2, 0.3f, 2), Fire);
+		auto MagBooP = AddGameObject<MagicBook>(Vector3(2, 0.3f, -2), Fire);
 		MBGroup->IntoGroup(MagBooP);
 
 		MagBooP = AddGameObject<MagicBook>(Vector3(8, 0.3f, 4), IceFog);
@@ -125,7 +131,7 @@ namespace basecross {
 	void GameStage::CreateGoal()
 	{
 		//ゴール作成
-		auto GoalP = AddGameObject<Goal>(Vector3(-5, 0.5f, 3),Vector3(1,1,1));
+		auto GoalP = AddGameObject<Goal>(Vector3(-4, 0.5f, 5),Vector3(1,1,1));
 		SetSharedGameObject(L"Goal", GoalP);
 		GetSharedObjectGroup(L"MagicObjects")->IntoGroup(GoalP);
 	}
@@ -142,6 +148,31 @@ namespace basecross {
 	{
 		//アタリ判定管理オブジェクト作成
 		auto ColManP = AddGameObject<CollisionManager>();
+	}
+
+	void GameStage::OnUpdate()
+	{
+		//*テスト用
+		auto key = App::GetApp()->GetInputDevice().GetKeyState();
+		if (key.m_bPressedKeyTbl[VK_SPACE])
+		{
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+
+		}
+		//*テスト用
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		if (CntlVec[0].bConnected)
+		{
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_BACK)
+			{
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+
+			}
+		}
+
+
 	}
 
 	void GameStage::OnCreate() {
@@ -167,14 +198,30 @@ namespace basecross {
 			CreateCollisionManager();
 
 			//ギミック作成
-			//氷
-			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick1>(Vector3(2, 0.5f, 0), Vector3(1, 1, 1)));
+			//炎
+			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick5>(Vector3(-4, 0.5f, 4), Vector3(1, 1, 1)));
 			//風車
-			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick2>(Vector3(9, 0, 3), Vector3(1, 3, 1)));
+			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick2>(Vector3(9, 0, 2), Vector3(1, 3, 1)));
+			//川のコア
+			GetSharedObjectGroup(L"MagicObjects")->IntoGroup(AddGameObject<Gimmick3>(Vector3(-2, 0, 2), Vector3(1, 1, 1)));
 
 
 			//透明ブロック作成のちのちCSVでなんとか作る
-			AddGameObject<TransBlock>(Vector3(-6,0.5f,0), Vector3(1,1,10));
+			//左壁
+			AddGameObject<TransBlock>(Vector3(-6,0,0), Vector3(1,1,13));
+			AddGameObject<TransBlock>(Vector3(6, 0, 0), Vector3(1, 1, 13));
+			AddGameObject<TransBlock>(Vector3(0, 0, 6), Vector3(13, 1, 1));
+			AddGameObject<TransBlock>(Vector3(0, 0, -6), Vector3(13, 1, 1));
+
+			//右壁
+			AddGameObject<TransBlock>(Vector3(16, 0, 0), Vector3(1, 1, 13));
+			AddGameObject<TransBlock>(Vector3(10, 0, 6), Vector3(13, 1, 1));
+			AddGameObject<TransBlock>(Vector3(10, 0, -6), Vector3(13, 1, 1));
+
+			//左
+			AddGameObject<TransBlock>(Vector3(1, 0, 4), Vector3(9, 1, 1));
+			AddGameObject<TransBlock>(Vector3(-5, 0, 4), Vector3(1, 1, 1));
+
 		}
 		catch (...) {
 			throw;

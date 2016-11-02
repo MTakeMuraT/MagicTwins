@@ -96,7 +96,7 @@ namespace basecross{
 		int m_mynumber;
 		//¶‘¶ŠÔ
 		float m_lifeTime;
-		const float m_LifeTimeLimit = 2.0f;
+		const float m_LifeTimeLimit = 1.0f;
 
 		//Á–Åƒtƒ‰ƒO
 		bool m_DeleteFlg = false;
