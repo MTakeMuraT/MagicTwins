@@ -9,8 +9,14 @@ namespace basecross
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring strTexture = DataDir + L"GameOverLogo.png";
 		App::GetApp()->RegisterTexture(L"GAMEOVERLOGO_TX", strTexture);
-		strTexture = DataDir + L"sky.png";
+		strTexture = DataDir + L"OverBack.png";
 		App::GetApp()->RegisterTexture(L"GAMEOVERBACK_TX", strTexture);
+		strTexture = DataDir + L"RetryLogo.png";
+		App::GetApp()->RegisterTexture(L"RETRYLOGO_TX", strTexture);
+		strTexture = DataDir + L"StageSelectLogo.png";
+		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX",strTexture);
+		strTexture = DataDir + L"Title.png";
+		App::GetApp()->RegisterTexture(L"TITLE_TX", strTexture);
 
 	}
 
@@ -62,9 +68,9 @@ namespace basecross
 		OverLogo->AddComponent<Transform>();
 		auto PtrTransform = OverLogo->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(0, WindowSize.y / 2.5f, 0);
+		PtrTransform->SetPosition(350, WindowSize.y / 2.5f, 0);
 		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(1000, 200, 1);
+		PtrTransform->SetScale(1100, 300, 1);
 
 		//スプライトをつける
 		auto PtrSprite = OverLogo->AddComponent<PCTSpriteDraw>();
@@ -77,6 +83,75 @@ namespace basecross
 		//透明度反映
 		OverLogo->SetAlphaActive(true);
 
+	}
+
+	//リトライロゴ作成
+	void GameOver::CreateRetry()
+	{
+		auto RetryLogo = AddGameObject<GameObject>();
+		RetryLogo->AddComponent<Transform>();
+		auto PtrTransform = RetryLogo->GetComponent<Transform>();
+		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
+		PtrTransform->SetPosition(-600, WindowSize.y / 3.5f, 0);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetScale(500, 150, 1);
+
+		//スプライトをつける
+		auto PtrSprite = RetryLogo->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"RETRYLOGO_TX");
+
+		SetSharedGameObject(L"RetryLogo", RetryLogo);
+
+		RetryLogo->SetDrawLayer(2);
+
+		//透明度反映
+		RetryLogo->SetAlphaActive(true);
+	}
+
+	//ステージセレクトロゴ作成
+	void GameOver::CreateStageSelect()
+	{
+		auto StageSelectLogo = AddGameObject<GameObject>();
+		StageSelectLogo->AddComponent<Transform>();
+		auto PtrTransform = StageSelectLogo->GetComponent<Transform>();
+		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
+		PtrTransform->SetPosition(-600, WindowSize.y / 9.5f, 0);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetScale(500, 150, 1);
+
+		//スプライトをつける
+		auto PtrSprite = StageSelectLogo->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"STAGESELECTLOGO_TX");
+
+		SetSharedGameObject(L"StageSelectLogo", StageSelectLogo);
+
+		StageSelectLogo->SetDrawLayer(2);
+
+		//透明度反映
+		StageSelectLogo->SetAlphaActive(true);
+	}
+
+	//タイトルロゴ作成
+	void GameOver::CreateTitle()
+	{
+		auto TitleLogo = AddGameObject<GameObject>();
+		TitleLogo->AddComponent<Transform>();
+		auto PtrTransform = TitleLogo->GetComponent<Transform>();
+		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
+		PtrTransform->SetPosition(-600,-30, 0);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetScale(600, 200, 1);
+
+		//スプライトをつける
+		auto PtrSprite = TitleLogo->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"TITLE_TX");
+
+		SetSharedGameObject(L"TitleLogo", TitleLogo);
+
+		TitleLogo->SetDrawLayer(2);
+
+		//透明度反映
+		TitleLogo->SetAlphaActive(true);
 	}
 
 	void GameOver::SceneChange()
@@ -96,6 +171,12 @@ namespace basecross
 			CreateBack();
 			//ロゴ作成
 			CreateOverLogo();
+			//リトライロゴ作成
+			CreateRetry();
+			//ステージセレクトロゴ作成
+			CreateStageSelect();
+			//タイトルロゴ作成
+			CreateTitle();
 
 		}
 		catch (...) {
