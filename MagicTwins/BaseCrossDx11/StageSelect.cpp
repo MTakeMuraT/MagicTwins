@@ -208,7 +208,7 @@ namespace basecross {
 			//右矢印(仮)
 			Right();
 			//左右シーン遷移(仮)
-			m_SceneNum = 5;
+			m_SceneNum = 0;
 			m_flag = true;
 
 		}

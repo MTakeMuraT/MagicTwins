@@ -97,6 +97,56 @@ namespace basecross
 			//ロゴ作成
 			CreateResultLogo();
 
+
+			//文字表示テスト用
+			auto obj = AddGameObject<GameObject>();
+			auto st = obj->AddComponent<StringSprite>();
+			st->SetTextRect(Rect2D<float>(16.0f, 16.0f, 320.0f, 240.0f));
+			st->SetFont(L"", 40);
+			st->SetText(L"B:Stage\nA:Title\nX:Select");
+			obj->SetDrawLayer(10);
+			SetSharedGameObject(L"StringObj", obj);
+
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			int num = ScenePtr->GetClearTime();
+
+			wstring txt;
+
+			auto obj1 = AddGameObject<GameObject>();
+			auto st1 = obj1->AddComponent<StringSprite>();
+			st1->SetTextRect(Rect2D<float>(900.0f, 200.0f, 1920.0f, 480.0f));
+			st1->SetFontColor(Color4(1, 1, 0, 1));
+			st1->SetFont(L"", 200);
+			if (num < 10)
+			{
+				txt = L"S";
+			}
+			else if (num < 20)
+			{
+				txt = L"A";
+			}
+			else if (num < 40)
+			{
+				txt = L"B";
+			}
+			else
+			{
+				txt = L"C";
+			}
+			st1->SetText(txt);
+			obj1->SetDrawLayer(10);
+
+
+			auto obj2 = AddGameObject<GameObject>();
+			auto st2 = obj2->AddComponent<StringSprite>();
+			st2->SetTextRect(Rect2D<float>(400.0f, 512.0f, 1920.0f, 480.0f));
+			st2->SetFontColor(Color4(0, 0, 0, 1));
+			st2->SetFont(L"", 100);
+			txt = L"CLEARTIME : " + Util::IntToWStr(num);
+			txt += L" Seconds";
+			st2->SetText(txt);
+			obj2->SetDrawLayer(10);
+
 		}
 		catch (...) {
 			throw;
@@ -120,6 +170,17 @@ namespace basecross
 			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
 			{
 				SceneChange();
+			}
+			//テスト用、シーン切り替え先変更
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
+			{
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
+			}
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_X)
+			{
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"StageSelect");
 			}
 		}
 

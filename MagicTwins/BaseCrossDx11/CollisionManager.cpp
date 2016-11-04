@@ -132,6 +132,8 @@ namespace basecross {
 	void CollisionManager::PlayerToGoal()
 	{
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		auto num = GetStage()->GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetClearTime();
+		ScenePtr->SetClearTime(num);
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Result");
 
 	}

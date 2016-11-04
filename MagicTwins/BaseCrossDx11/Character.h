@@ -80,7 +80,7 @@ namespace basecross{
 	private :
 		//カウント時間
 		float m_nowTime=0;
-		//リミット時間
+		//リミット時間引数で初期値決める
 		float m_LimitTime = 60.0f;
 	public :
 		LimitTime(const shared_ptr<Stage>& StagePtr,float LimitTime);
@@ -88,6 +88,8 @@ namespace basecross{
 		void OnUpdate() override;
 
 		void TimeOver();
+
+		int GetClearTime() { return m_LimitTime - m_nowTime; }
 	};
 
 	//--------------------------------------------------------------------------------------
