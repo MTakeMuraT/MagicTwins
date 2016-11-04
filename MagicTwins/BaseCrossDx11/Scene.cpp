@@ -14,6 +14,25 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 
 	void Scene::OnCreate(){
+		//モデル読み込み。なんかゲームステージでやったらミスった希ガス
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char1/Character_01.bmf");
+		App::GetApp()->RegisterResource(L"Player1_Model", ModelMesh);
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char2/Character_02.bmf");
+		App::GetApp()->RegisterResource(L"Player2_Model", ModelMesh);
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
+		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBook/magicbook2.bmf");
+		App::GetApp()->RegisterResource(L"MagicBook_Model", ModelMesh);
+
+		//曲
+		/*
+		wstring BGMWav = App::GetApp()->m_wstrRelativeDataPath + L"bgm/gamebgm.wav";
+		App::GetApp()->RegisterWav(L"GAMEBGM", BGMWav);
+		BGMWav = App::GetApp()->m_wstrRelativeDataPath + L"bgm/titlebgm.wav";
+		App::GetApp()->RegisterWav(L"TITLEBGM", BGMWav);
+		*/
 		try {
 			//最初のアクティブステージの設定
 			//ResetActiveStage<GameStage>();
@@ -21,18 +40,25 @@ namespace basecross{
 			//ResetActiveStage<StageSelect>();
 			//ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
+
+			//曲再生
+			/*
+			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioObjectPtr->AddAudioResource(L"TITLEBGM");
+			m_AudioObjectPtr->Start(L"TITLEBGM", XAUDIO2_LOOP_INFINITE, 1.0f);
+			*/
 		}
 		catch (...) {
 			throw;
 		}
-		//モデル読み込み。なんかゲームステージでやったらミスった希ガス
-		wstring DataDir;
-		App::GetApp()->GetDataDirectory(DataDir);
-		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char/Character_01.bmf");
-		App::GetApp()->RegisterResource(L"Player_Model", ModelMesh);
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
-		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
 
+		/*
+		//オーディオの初期化
+		//曲
+		m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
+		m_AudioObjectPtr->AddAudioResource(L"TITLEBGM");
+		m_AudioObjectPtr->Start(L"TITLEBGM", XAUDIO2_LOOP_INFINITE, 1.0f);
+		*/
 	}
 
 	void Scene::OnEvent(const shared_ptr<Event>& event) {

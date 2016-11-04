@@ -146,6 +146,48 @@ namespace basecross{
 			break;
 		}
 
+
+		/*//モデル版
+		// モデルとトランスフォームの間の差分行列
+		float angle = (-90) * (3.14159265f / 180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+		Vector3(1.0f, 0.3f, 1.0f),
+		Vector3(0, 0, 0),
+		Vector3(0, 0, 0)
+		);
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"MagicBook_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"MagicBook_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+		//色変える用だけどモデル読み込みだからちょっとやり方変える
+		switch (m_MagicContent)
+		{
+		case Fire:
+		//PtrDraw->SetTextureResource(L"MAGICBOOKFIRE_TX");
+		PtrDraw->SetDiffuse(Color4(1, 1, 1, 1));
+		break;
+		case IceFog :
+		//PtrDraw->SetTextureResource(L"MAGICBOOKICEFOG_TX");
+		PtrDraw->SetDiffuse(Color4(0, 0, 1, 1));
+		break;
+		default:
+		break;
+		}
+
+
+
+		*/
 		//透明処理
 		SetAlphaActive(true);
 

@@ -45,32 +45,55 @@ namespace basecross {
 		float angle = -90 * (3.14159265f /180);
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
-			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(4.0f, 4.0f, 4.0f),
 			Vector3(0.0f, angle, 0.0f),
-			Vector3(-1.0f, -2.5f, 3.0f)
+			Vector3(0.0f, 1.0f, 0.0f)
 			);
 
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"Player_Model");
-		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
-
-		
-		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
-		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"Player_Model");
-		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 
 		if (m_myName == "Player1")
 		{
+			// モデルとトランスフォームの間の差分行列
+			angle = -90 * (3.14159265f / 180);
+			SpanMat;
+			SpanMat.DefTransformation(
+				Vector3(2.0f, 2.0f, 2.0f),
+				Vector3(0.0f, angle, 0.0f),
+				Vector3(0.0f, 1.0f, 0.0f)
+				);
+
+			//影をつける（シャドウマップを描画する）
+			auto ShadowPtr = AddComponent<Shadowmap>();
+			//影の形（メッシュ）を設定
+			ShadowPtr->SetMeshResource(L"Player1_Model");
+			ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
+			//描画コンポーネントの設定
+			auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+			//描画するメッシュを設定
+			PtrDraw->SetMeshResource(L"Player1_Model");
+			PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
 			//魔法作成
 			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),1));
 		}
 		else if (m_myName == "Player2")
 		{
+			//影をつける（シャドウマップを描画する）
+			auto ShadowPtr = AddComponent<Shadowmap>();
+			//影の形（メッシュ）を設定
+			ShadowPtr->SetMeshResource(L"Player2_Model");
+			ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
+			//描画コンポーネントの設定
+			auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+			//描画するメッシュを設定
+			PtrDraw->SetMeshResource(L"Player2_Model");
+			PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
 			//魔法作成
 			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),2));
 		}

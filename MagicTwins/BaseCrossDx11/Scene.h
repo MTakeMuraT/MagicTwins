@@ -15,6 +15,9 @@ namespace basecross{
 	{
 	private:
 		unsigned int m_clearTime = 0;
+		//‹È
+		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
+
 	public:
 		Scene() :SceneBase(){}
 		virtual ~Scene(){}
