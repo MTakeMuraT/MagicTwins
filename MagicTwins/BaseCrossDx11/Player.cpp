@@ -220,7 +220,7 @@ namespace basecross {
 				TranP->SetPosition(Posi);
 				*/
 
-				m_velocity += inputXY * m_Speed * ElapsedTime;
+				m_velocity += inputXY * m_Speed;
 
 				//Œü‚«‚ð“¾‚é				
 				float angle = atan2(inputXY.y, inputXY.x);

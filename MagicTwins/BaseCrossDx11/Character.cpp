@@ -44,6 +44,46 @@ namespace basecross{
 		SetAlphaActive(true);
 
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Box : public GameObject;
+	//	用途: 箱
+	//--------------------------------------------------------------------------------------
+
+	Box::Box(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,Vector3 rot) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_InitRot(rot)
+	{}
+	void Box::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_InitScale);
+		Ptr->SetRotation(m_InitRot);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+		//横部分のみ反発
+		//PtrCol->SetIsHitAction(IsHitAction::Stop);
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"BOX_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+
 	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	用途: 暗転用黒
@@ -262,41 +302,6 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class TransBlock : public GameObject;
-	//	用途: 氷。炎の魔法[Fire]で溶かせる
-	//--------------------------------------------------------------------------------------
-	TransBlock::TransBlock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
-		GameObject(StagePtr),
-		m_InitPos(pos),
-		m_Scale(scale)
-	{}
-
-	void TransBlock::OnCreate()
-	{
-		auto Ptr = GetComponent<Transform>();
-		Ptr->SetPosition(m_InitPos);
-		Ptr->SetScale(m_Scale);
-		Ptr->SetRotation(0, 0, 0);
-
-
-		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionObb>();
-
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
-		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"TRACE2_TX");
-
-
-	}
-
-	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる
 	//--------------------------------------------------------------------------------------
@@ -314,7 +319,7 @@ namespace basecross{
 		Ptr->SetRotation(0, 0, 0);
 
 		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionSphere>();
+		auto PtrCol = AddComponent<CollisionObb>();
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
@@ -339,14 +344,14 @@ namespace basecross{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
-			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+			GetComponent<CollisionObb>()->SetUpdateActive(false);
 			
 		}
 	}
 
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick2 : public GameObject;
-	//	用途: 氷。炎の魔法[Fire]で溶かせる
+	//	用途: 風車、炎で消せる
 	//--------------------------------------------------------------------------------------
 	Gimmick2::Gimmick2(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
 		GameObject(StagePtr),
@@ -362,7 +367,7 @@ namespace basecross{
 		Ptr->SetRotation(0, 0, 0);
 
 		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionSphere>();
+		auto PtrCol = AddComponent<CollisionObb>();
 
 		// モデルとトランスフォームの間の差分行列
 		float angle = (-90) * (3.14159265f / 180);
@@ -400,7 +405,7 @@ namespace basecross{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
-			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+			GetComponent<CollisionObb>()->SetUpdateActive(false);
 
 		}
 	}
@@ -409,10 +414,11 @@ namespace basecross{
 	//	class Water : public GameObject;
 	//	用途: 水。コア部分以外
 	//--------------------------------------------------------------------------------------
-	Water::Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
+	Water::Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int num) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
-		m_InitScale(scale)
+		m_InitScale(scale),
+		m_myNum(num)
 	{}
 
 	void Water::OnCreate()
@@ -499,18 +505,8 @@ namespace basecross{
 
 		//透明処理
 		SetAlphaActive(true);
-
-		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(2, 0, 2), Vector3(7, 1, 1)));
-		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(-3, 0, -1.5f), Vector3(1, 1, 8)));
-		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(12.5f, 0, 2), Vector3(6, 1, 1)));
-		m_waters.push_back(GetStage()->AddGameObject<Water>(Vector3(7.5f, 0, 2), Vector3(2, 1, 1)));
-
 	}
 
-	void Gimmick3::InputWaterInfo(vector<Water>)
-	{
-
-	}
 
 	//魔法が当たった時
 	void Gimmick3::HitMagic(MagicType MT)
@@ -584,7 +580,7 @@ namespace basecross{
 		Ptr->SetRotation(0, 0, 0);
 
 		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionSphere>();
+		auto PtrCol = AddComponent<CollisionObb>();
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
@@ -608,7 +604,7 @@ namespace basecross{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
-			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+			GetComponent<CollisionObb>()->SetUpdateActive(false);
 
 		}
 	}

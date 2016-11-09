@@ -22,6 +22,21 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class Box : public GameObject;
+	//	ópìr: î†
+	//--------------------------------------------------------------------------------------
+	class Box : public GameObject
+	{
+	private:
+		Vector3 m_InitPos;
+		Vector3 m_InitScale;
+		Vector3 m_InitRot;
+	public:
+		Box(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,Vector3 rot);
+		void OnCreate() override;
+	};
+
+	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	ópìr: à√ì]ópçïîwåi
 	//--------------------------------------------------------------------------------------
@@ -89,23 +104,7 @@ namespace basecross{
 
 		void TimeOver();
 
-		int GetClearTime() { return m_LimitTime - m_nowTime; }
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	class TransBlock : public GameObject;
-	//	ópìr: ïXÅBâäÇÃñÇñ@[Fire]Ç≈ónÇ©ÇπÇÈ
-	//--------------------------------------------------------------------------------------
-	class TransBlock : public GameObject
-	{
-	private:
-		//èâä˙à íu
-		Vector3 m_InitPos;
-		//ëÂÇ´Ç≥
-		Vector3 m_Scale;
-	public :
-		TransBlock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
-		void OnCreate() override;
+		int GetClearTime() { return (int)(m_LimitTime - m_nowTime); }
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -164,11 +163,16 @@ namespace basecross{
 		bool m_FreezeFlg = false;
 		//ó¨ÇÍÇƒÇÈÇ©Ç«Ç§Ç©
 		bool m_FlowFlg = true;
+		//îwî‘çÜ
+		int m_myNum;
 		//ÉAÉ^ÉäîªíËópî†
 		//shared_ptr<GameObject> m_HitBox;
 	public :
-		Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int num);
 		void OnCreate() override;
+
+		//î‘çÜéÊìæ
+		int GetmyNum() { return m_myNum; }
 
 		//ìÄÇÁÇ∑
 		void Freeze();
@@ -202,8 +206,6 @@ namespace basecross{
 		Gimmick3(const shared_ptr<Stage>& StagePtr, Vector3 pos,Vector3 scale);
 		void OnCreate() override;
 
-		void InputWaterInfo(vector<Water>);
-
 		//ñÇñ@Ç™ìñÇΩÇ¡ÇΩéû
 		void HitMagic(MagicType MT);
 		//ìÄÇÁÇ∑
@@ -214,6 +216,8 @@ namespace basecross{
 		void Stop();
 		//ó¨Ç∑
 		void Flow();
+
+		void SetWaters(vector<shared_ptr<Water>> waters) { m_waters = waters; }
 	};
 
 	//--------------------------------------------------------------------------------------

@@ -24,10 +24,11 @@ namespace basecross {
 		void Right();
 
 		//Å‘å’l
-		unsigned int m_MaxNum = 5;
+		unsigned int m_MaxStageNum = 5;
 		//Œ»İ‘I‘ğ’†‚Ì”š
-		int m_SceneNum;
+		unsigned int m_StageNum = 1;
 
+		//‘I‘ğ‚·‚é‚Æ‚«‚Ì’²®
 		bool m_flag;
 
 	public:

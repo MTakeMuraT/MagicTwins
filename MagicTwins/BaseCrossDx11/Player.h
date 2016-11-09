@@ -17,7 +17,7 @@ namespace basecross{
 	class Player : public GameObject {
 	private :
 		//‘¬“x
-		float m_Speed = 150.0f;
+		float m_Speed = 3.0f;
 		//‰ŠúÀ•W
 		Vector3 m_InitPos;
 		//©•ª‚Ì–¼‘O

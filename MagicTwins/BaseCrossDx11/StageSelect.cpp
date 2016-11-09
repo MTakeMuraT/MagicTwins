@@ -95,6 +95,7 @@ namespace basecross {
 	void StageSelect::SceneChange()
 	{
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		ScenePtr->SetStageNum(m_StageNum);
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 	}
 
@@ -164,11 +165,6 @@ namespace basecross {
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(150, 150, 1);
 
-		if (m_SceneNum < 0)
-		{
-
-		}
-
 		//スプライトを付ける
 		auto PtrSprite = Right->AddComponent<PCTSpriteDraw>();
 		PtrSprite->SetTextureResource(L"RIGHT_TX");
@@ -208,7 +204,7 @@ namespace basecross {
 			//右矢印(仮)
 			Right();
 			//左右シーン遷移(仮)
-			m_SceneNum = 0;
+			m_StageNum = 1;
 			m_flag = true;
 
 		}
@@ -248,16 +244,16 @@ namespace basecross {
 				SceneChange();
 			}
 			//左右シーン遷移(仮)
-			if (CntlVec[0].fThumbLX > 0 && m_flag&&m_SceneNum<5)
+			if (CntlVec[0].fThumbLX > 0 && m_flag&&m_StageNum<m_MaxStageNum)
 			{
 
-				m_SceneNum++;
+				m_StageNum++;
 				m_flag = false;
 
 			}
-			if (CntlVec[0].fThumbLX < 0 && m_flag&&m_SceneNum>0)
+			if (CntlVec[0].fThumbLX < 0 && m_flag&&m_StageNum>0)
 			{
-				m_SceneNum--;
+				m_StageNum--;
 				m_flag = false;
 			}
 			if (CntlVec[0].fThumbLX == 0)
@@ -266,11 +262,11 @@ namespace basecross {
 			}
 
 		}
-		sceneNum += Util::IntToWStr(m_SceneNum);
+		sceneNum += Util::IntToWStr(m_StageNum);
 		ShareString->SetText(sceneNum);
 			auto Left = GetSharedGameObject<GameObject>(L"Left");
 
-		if (m_SceneNum != 0)
+		if (m_StageNum != 0)
 		{
 			Left->SetDrawActive(true);
 		}
@@ -284,7 +280,7 @@ namespace basecross {
 			Left->SetDrawActive(false);
 		}
 		auto Right = GetSharedGameObject<GameObject>(L"Right");
-		if (m_SceneNum != m_MaxNum)
+		if (m_StageNum != m_MaxStageNum)
 		{
 			Right->SetDrawActive(true);
 		}
