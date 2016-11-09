@@ -17,7 +17,7 @@ namespace basecross{
 	class Player : public GameObject {
 	private :
 		//速度
-		float m_Speed = 5.0f;
+		float m_Speed = 150.0f;
 		//初期座標
 		Vector3 m_InitPos;
 		//自分の名前
@@ -40,6 +40,9 @@ namespace basecross{
 		Vector3 m_CameraTargetVec;
 		//カメラ移動始める範囲
 		const float m_CameraMove = 3.0f;
+
+		//速度
+		Vector2 m_velocity;
 
 		//魔法打つ関数
 		void ShotMagic();

@@ -159,6 +159,7 @@ namespace basecross {
 			velocity.y = -1 * m_Speed * ElapsedTime;
 			flg = true;
 		}
+
 		//コントローラーの入力XY
 		auto TranP = GetComponent<Transform>();
 		Vector3 Posi = TranP->GetPosition();
@@ -185,6 +186,21 @@ namespace basecross {
 		}
 		//*テスト用
 
+		//速度減衰
+		if (m_velocity.x < 0.1f || m_velocity.x > -0.1f || m_velocity.y < 0.1f || m_velocity.y > -0.1f)
+		{
+			if (m_velocity.x != 0 && m_velocity.y != 0)
+			{
+				m_velocity.x = 0;
+				m_velocity.y = 0;
+			}
+		}
+		else
+		{
+			m_velocity *= 0.98f;
+		}
+		
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -196,11 +212,15 @@ namespace basecross {
 				//コントローラーの入力XY
 				Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
 				auto TranP = GetComponent<Transform>();
-				Vector3 Posi = TranP->GetPosition();
+				//座標直接弄る
+				/*Vector3 Posi = TranP->GetPosition();
 				inputXY *= ElapsedTime*m_Speed;
 				Posi.x += inputXY.x;
 				Posi.z += inputXY.y;
 				TranP->SetPosition(Posi);
+				*/
+
+				m_velocity += inputXY * m_Speed * ElapsedTime;
 
 				//向きを得る				
 				float angle = atan2(inputXY.y, inputXY.x);
@@ -222,6 +242,10 @@ namespace basecross {
 				ShotMagic();
 			}
 		}
+
+		//コンポーネントにやってもらう座標移動
+		GetComponent<Rigidbody>()->SetVelocity(Vector3(m_velocity.x,0,m_velocity.y));
+
 
 	}
 
@@ -286,6 +310,8 @@ namespace basecross {
 	//キャラチェンジ
 	void Player::ChangeChar()
 	{
+		m_velocity = Vector2(0, 0);
+		GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
 		//自分がどっちか判定
 		if (m_myName == "Player1")
 		{
