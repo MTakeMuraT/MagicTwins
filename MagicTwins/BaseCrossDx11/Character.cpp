@@ -68,10 +68,6 @@ namespace basecross{
 		//横部分のみ反発
 		PtrCol->SetIsHitAction(IsHitAction::Stop);
 
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 		//描画コンポーネントの設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//描画するメッシュを設定
@@ -431,18 +427,32 @@ namespace basecross{
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
 		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
+		//auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
 		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"WATER_TX");
+		//PtrDraw->SetTextureResource(L"WATER_TX");
 
 		//透明処理
-		SetAlphaActive(true);
+		//SetAlphaActive(true);
+
+		auto ObjPtr = GetStage()->AddGameObject<GameObject>();
+		auto OPT = ObjPtr->AddComponent<Transform>();
+		Vector3 ObPos = m_InitPos;
+		ObPos.y += -m_InitScale.y / 2.5f;
+		OPT->SetPosition(ObPos);
+		OPT->SetScale(m_InitScale);
+		OPT->SetRotation(0, 0, 0);
+		auto OPD = ObjPtr->AddComponent<PNTStaticDraw>();
+		OPD->SetMeshResource(L"DEFAULT_CUBE");
+		OPD->SetTextureResource(L"WATER_TX");
+
+		m_waterunder = ObjPtr;
+
 
 	}
 
@@ -450,14 +460,14 @@ namespace basecross{
 	void Water::Freeze()
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(false);
-		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
 
 	}
 	//溶かす
 	void Water::Melt()
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
-		GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
 
 	}
 	//止める
@@ -493,18 +503,31 @@ namespace basecross{
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
 		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
+		//auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		//ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
 		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"WATER_TX");
+		//PtrDraw->SetTextureResource(L"WATER_TX");
 
 		//透明処理
-		SetAlphaActive(true);
+		//SetAlphaActive(true);
+
+		auto ObjPtr = GetStage()->AddGameObject<GameObject>();
+		auto OPT = ObjPtr->AddComponent<Transform>();
+		Vector3 ObPos = m_InitPos;
+		ObPos.y += -m_InitScale.y / 2.5f;
+		OPT->SetPosition(ObPos);
+		OPT->SetScale(m_InitScale);
+		OPT->SetRotation(0, 0, 0);
+		auto OPD = ObjPtr->AddComponent<PNTStaticDraw>();
+		OPD->SetMeshResource(L"DEFAULT_CUBE");
+		OPD->SetTextureResource(L"WATER_TX");
+
+		m_waterunder = ObjPtr;
 	}
 
 
@@ -530,7 +553,7 @@ namespace basecross{
 	void Gimmick3::Freeze()
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(false);
-		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
 		for (auto v : m_waters)
 		{
 			v->Freeze();
@@ -541,7 +564,7 @@ namespace basecross{
 	void Gimmick3::Melt()
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
-		GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
 		for (auto v : m_waters)
 		{
 			v->Melt();

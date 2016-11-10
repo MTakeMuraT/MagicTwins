@@ -165,8 +165,8 @@ namespace basecross{
 		bool m_FlowFlg = true;
 		//背番号
 		int m_myNum;
-		//アタリ判定用箱
-		//shared_ptr<GameObject> m_HitBox;
+		//見た目の部分
+		shared_ptr<GameObject> m_waterunder;
 	public :
 		Water(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int num);
 		void OnCreate() override;
@@ -188,6 +188,7 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick3 : public GameObject;
 	//	用途: 川。のコア部分。凍らせると水部分を凍らせる
+	//	本体は水の上の透明な部分で下の水は見た目だけ
 	//--------------------------------------------------------------------------------------
 	class Gimmick3 : public GameObject
 	{
@@ -202,6 +203,8 @@ namespace basecross{
 		bool m_FlowFlg = true;
 		//自分が影響を与える水の情報
 		vector<shared_ptr<Water>> m_waters;
+		//見た目の部分
+		shared_ptr<GameObject> m_waterunder;
 	public:
 		Gimmick3(const shared_ptr<Stage>& StagePtr, Vector3 pos,Vector3 scale);
 		void OnCreate() override;
