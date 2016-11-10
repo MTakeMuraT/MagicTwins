@@ -58,6 +58,9 @@ namespace basecross
 		//プレイヤー
 		Vector3 Player1Pos;
 		Vector3 Player2Pos;
+		//エネミー
+		vector<Vector3> Enemypos;
+		vector<Vector3> EnemyScale;
 		//魔導書
 		Vector3 FirePos;
 		Vector3 IceFogPos;
@@ -126,6 +129,14 @@ namespace basecross
 			{
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Player2Pos = pos;
+			}
+			//エネミー
+			if (StageMapVec[0] == L"Enemy")
+			{
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				Enemypos.push_back(pos);
+				EnemyScale.push_back(scale);
 			}
 			//ギミック１
 			if (StageMapVec[0] == L"Gimmick1")
@@ -227,6 +238,18 @@ namespace basecross
 		//プレイヤー作成
 		st->SetSharedGameObject(L"Player1",st->AddGameObject<Player>(Player1Pos, true, "Player1"));
 		st->SetSharedGameObject(L"Player2",st->AddGameObject<Player>(Player2Pos, false, "Player2"));
+		//エネミー作成
+		auto EG = GetStage()->CreateSharedObjectGroup(L"Enemy");
+		for (auto v : Enemypos)
+		{
+			//スケールは別で持ってくる
+			Vector3 scale = RockScale[count];
+			auto EPt = st->AddGameObject<Enemy>(v, scale);
+			EG->IntoGroup(EPt);
+			MOG->IntoGroup(EPt);
+			count++;
+		}
+		count = 0;
 		//ゴール作成
 		st->SetSharedGameObject(L"Goal",st->AddGameObject<Goal>(GoalPos, GoalScale));
 		//魔導書作成

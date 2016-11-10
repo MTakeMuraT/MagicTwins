@@ -45,6 +45,16 @@ namespace basecross {
 		//地面
 		strTexture = DataDir + L"panel.png";
 		App::GetApp()->RegisterTexture(L"PANEL_TX", strTexture);
+		//エネミー
+		strTexture = DataDir + L"enemy.png";
+		App::GetApp()->RegisterTexture(L"ENEMY_TX", strTexture);
+		//ライフ
+		strTexture = DataDir + L"Life1.png";
+		App::GetApp()->RegisterTexture(L"LIFE1_TX", strTexture);
+		strTexture = DataDir + L"Life2.png";
+		App::GetApp()->RegisterTexture(L"LIFE2_TX", strTexture);
+		strTexture = DataDir + L"Life3.png";
+		App::GetApp()->RegisterTexture(L"LIFE3_TX", strTexture);
 
 
 		//アニメーション？

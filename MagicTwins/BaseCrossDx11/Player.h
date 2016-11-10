@@ -18,6 +18,8 @@ namespace basecross{
 	private :
 		//速度
 		float m_Speed = 3.0f;
+		//体力
+		int m_life = 3;
 		//初期座標
 		Vector3 m_InitPos;
 		//自分の名前
@@ -40,6 +42,9 @@ namespace basecross{
 		Vector3 m_CameraTargetVec;
 		//カメラ移動始める範囲
 		const float m_CameraMove = 3.0f;
+
+		//体力表示
+		vector<shared_ptr<GameObject>> m_LifeSprite;
 
 		//速度
 		Vector2 m_velocity;
@@ -73,11 +78,16 @@ namespace basecross{
 		//操作できるかをセットする関数
 		void SetActive(bool);
 
+		bool GetActive() { return m_ActiveFlg; };
+
 		//魔法を覚える関数
 		void SetMagic(MagicType);
 
 		//カメラ固定？
 		void SetCamera(Vector3 At,Vector3 pos);
+
+		//ダメージ処理
+		void PlayerDamege();
 	};
 
 	//--------------------------------------------------------------------------------------

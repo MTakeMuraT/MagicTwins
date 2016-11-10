@@ -51,6 +51,27 @@ namespace basecross {
 		}
 		count = 0;
 
+		//プレイヤーとエネミーのあたり判定
+		auto EG = GetStage()->GetSharedObjectGroup(L"Enemy", false);
+		auto EGV = EG->GetGroupVector();
+		for (auto v : EGV)
+		{
+			auto Ptr = dynamic_pointer_cast<Enemy>(v.lock());
+			Vector3 PPos = Ptr->GetComponent<Transform>()->GetPosition();
+			Vector3 PScale = Ptr->GetComponent<Transform>()->GetScale();
+			//プレイヤー１が当たる
+			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale))
+			{
+				PlayerToEnemy(1);
+				Ptr->ResetPos();
+			}
+			//プレイヤー２が当たる
+			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale))
+			{
+				PlayerToEnemy(2);
+				Ptr->ResetPos();
+			}
+		}
 		//魔法とオブジェクトのアタリ判定
 		auto Objects = GetStage()->GetSharedObjectGroup(L"MagicObjects")->GetGroupVector();
 		for (auto v : Objects)
@@ -146,6 +167,19 @@ namespace basecross {
 		dynamic_pointer_cast<MagicBook>(MBGVec[count].lock())->GetPlayer();
 	}
 
+	//プレイヤーとエネミーが当たった処理
+	void CollisionManager::PlayerToEnemy(int Playernum)
+	{
+		if (Playernum == 1)
+		{
+			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->PlayerDamege();
+		}
+		else if (Playernum == 2)
+		{
+			GetStage()->GetSharedGameObject<Player>(L"Player2", false)->PlayerDamege();
+		}
+	}
+
 	//魔法とオブジェクトの当たった処理
 	void CollisionManager::MagicToObj(int num,shared_ptr<GameObject> otherObj)
 	{
@@ -176,6 +210,12 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick3>(otherObj);
 				Ptr->HitMagic(MaBo->GetMagicType());
 			}
+			//エネミー
+			else if (dynamic_pointer_cast<Enemy>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Enemy>(otherObj);
+				Ptr->ResetPos();
+			}
 			MaBo->SetActive(false, None);
 		}
 		else if (num == 2)
@@ -205,7 +245,12 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<Gimmick3>(otherObj);
 				Ptr->HitMagic(MaBo->GetMagicType());
 			}
-
+			//エネミー
+			else if (dynamic_pointer_cast<Enemy>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<Enemy>(otherObj);
+				Ptr->ResetPos();
+			}
 			MaBo->SetActive(false, None);
 
 		}
@@ -218,7 +263,7 @@ namespace basecross {
 		float dy = pos2.y - pos1.y;
 		float dz = pos2.z - pos1.z;
 		float dhalf = (scale1.x + scale2.x)/2;
-		dhalf *= 1.2f;
+		dhalf *= 1.3f;
 		if ((dx*dx + dy*dy + dz*dz) < dhalf*dhalf)
 		{
 			return true;

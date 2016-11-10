@@ -33,6 +33,7 @@ namespace basecross {
 		auto PtrRedid = AddComponent<Rigidbody>();
 		//反発係数は0.5（半分）
 		PtrRedid->SetReflection(0.5f);
+
 		//重力をつける
 		auto PtrGravity = AddComponent<Gravity>();
 
@@ -40,6 +41,7 @@ namespace basecross {
 		PtrGravity->SetBaseY(0.0f);
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionSphere>();
+		PtrCol->SetIsHitAction(IsHitAction::AutoOnObjectRepel);
 
 		// モデルとトランスフォームの間の差分行列
 		float angle = -90 * (3.14159265f /180);
@@ -78,6 +80,24 @@ namespace basecross {
 
 			//魔法作成
 			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),1));
+
+			//ライフ表示
+			for (int i = 1; i <= 3; i++)
+			{
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+				wstring txt = L"LIFE";
+				txt += Util::IntToWStr(i) + L"_TX";
+				objDraw->SetTextureResource(txt);
+
+				auto objtrans = obj->AddComponent<Transform>();
+				//1920,1080
+				//960,540
+				objtrans->SetPosition(-500 - (i*100), 420, 0);
+				objtrans->SetRotation(0, 0, 0);
+				objtrans->SetScale(100, 50, 1);
+				m_LifeSprite.push_back(obj);
+			}
 		}
 		else if (m_myName == "Player2")
 		{
@@ -96,6 +116,23 @@ namespace basecross {
 
 			//魔法作成
 			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),2));
+			//ライフ表示
+			for (int i = 1; i <= 3; i++)
+			{
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+				wstring txt = L"LIFE";
+				txt += Util::IntToWStr(i) + L"_TX";
+				objDraw->SetTextureResource(txt);
+
+				auto objtrans = obj->AddComponent<Transform>();
+				//1920,1080
+				//960,540
+				objtrans->SetPosition(900 - (i * 100), 420, 0);
+				objtrans->SetRotation(0, 0, 0);
+				objtrans->SetScale(100, 50, 1);
+				m_LifeSprite.push_back(obj);
+			}
 		}
 
 
@@ -459,6 +496,31 @@ namespace basecross {
 		GetComponent<StringSprite>()->SetText(txt);
 		
 	}
+
+	void Player::PlayerDamege()
+	{
+		m_life--;
+		GetComponent<Rigidbody>()->SetVelocity(0, 10, 0);
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+
+		switch (m_life)
+		{
+		case 0:
+			//しんだ
+			m_LifeSprite[2]->SetDrawActive(false);
+			//ゲームオーバーに遷移
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+
+			break;
+		case 1:
+			m_LifeSprite[1]->SetDrawActive(false);
+			break;
+		case 2:
+			m_LifeSprite[0]->SetDrawActive(false);
+			break;
+		}
+	}
+
 	//--------------------------------------------------------------------------------------
 	//	class MagicBoal : public GameObject;
 	//	用途: 魔法

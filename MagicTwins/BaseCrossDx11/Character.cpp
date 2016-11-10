@@ -127,6 +127,75 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class Enemy : public GameObject;
+	//	用途: 敵
+	//--------------------------------------------------------------------------------------
+	Enemy::Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale)
+	{}
+
+	void Enemy::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"ENEMY_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+
+	void Enemy::OnUpdate()
+	{
+		auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+		auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+		if (P1P->GetActive())
+		{
+			Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+			Vector3 dir;
+			dir = topos - nowpos;
+			Vector2 velo = Vector2(dir.x,dir.z);
+			float angle = atan2(velo.y, velo.x);
+			velo.x = cos(angle);
+			velo.y = sin(angle);
+			nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
+			nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
+			GetComponent<Transform>()->SetPosition(nowpos);
+		}
+
+		else if (P2P->GetActive())
+		{
+			Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+			Vector3 dir;
+			dir = topos - nowpos;
+			Vector2 velo = Vector2(dir.x, dir.z);
+			float angle = atan2(velo.y, velo.x);
+			velo.x = cos(angle);
+			velo.y = sin(angle);
+			nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
+			nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
+			GetComponent<Transform>()->SetPosition(nowpos);
+		}
+	}
+
+	void Enemy::ResetPos()
+	{
+		GetComponent<Transform>()->SetPosition(m_InitPos);
+	}
+
+	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	用途: 暗転用黒
 	//--------------------------------------------------------------------------------------

@@ -47,6 +47,8 @@ namespace basecross {
 		void PlayerToGoal();
 		//プレイヤーと魔導書の当たった処理
 		void PlayerToMagicBook(int count);
+		//プレイヤーとエネミーが当たった処理
+		void PlayerToEnemy(int Playernum);
 		//魔法とオブジェクトの当たった処理
 		void MagicToObj(int num,shared_ptr<GameObject> otherObj);
 

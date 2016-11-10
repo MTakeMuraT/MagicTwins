@@ -52,6 +52,24 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class Enemy : public GameObject;
+	//	ópìr: ìG
+	//--------------------------------------------------------------------------------------
+	class Enemy : public GameObject
+	{
+		//èâä˙à íu
+		Vector3 m_InitPos;
+		Vector3 m_Scale;
+		//ë¨ìx
+		float m_speed = 1.0f;
+	public :
+		Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate() override;
+		void OnUpdate() override;
+		void ResetPos();
+	};
+	
+	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	ópìr: à√ì]ópçïîwåi
 	//--------------------------------------------------------------------------------------
