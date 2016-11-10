@@ -49,6 +49,9 @@ namespace basecross
 		vector<Vector3> BoxPoss;
 		vector<Vector3> BoxScale;
 		vector<Vector3> BoxRot;
+		//岩
+		vector<Vector3> RockPos;
+		vector<Vector3> RockScale;
 		//ゴール
 		Vector3 GoalPos;
 		Vector3 GoalScale;
@@ -95,6 +98,14 @@ namespace basecross
 				BoxPoss.push_back(pos);
 				BoxScale.push_back(scale);
 				BoxRot.push_back(rot);
+			}
+			//岩
+			if (StageMapVec[0] == L"Rock")
+			{
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				RockPos.push_back(pos);
+				RockScale.push_back(scale);
 			}
 			//ゴール
 			if (StageMapVec[0] == L"Goal")
@@ -201,6 +212,15 @@ namespace basecross
 			Vector3 scale = BoxScale[count];
 			Vector3 rot = BoxRot[count];
 			st->AddGameObject<Box>(v, scale, rot);
+			count++;
+		}
+		count = 0;
+		//岩作成
+		for (auto v : RockPos)
+		{
+			//スケールは別で持ってくる
+			Vector3 scale = RockScale[count];
+			st->AddGameObject<Rock>(v, scale);
 			count++;
 		}
 		count = 0;

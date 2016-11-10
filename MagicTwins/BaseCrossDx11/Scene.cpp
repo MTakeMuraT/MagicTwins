@@ -25,6 +25,8 @@ namespace basecross{
 		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBook/magicbook2.bmf");
 		App::GetApp()->RegisterResource(L"MagicBook_Model", ModelMesh);
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Rock/Rock04.bmf");
+		App::GetApp()->RegisterResource(L"Rock_Model", ModelMesh);
 
 		try {
 			//最初のアクティブステージの設定
@@ -58,6 +60,9 @@ namespace basecross{
 		else if (event->m_MsgStr == L"StageSelect")
 		{
 			ResetActiveStage<StageSelect>();
+			//セレクト画面に入ったらGameStageBGMを止める
+			m_AudioObjectPtr->Stop(L"GameStageBGM");
+
 		}
 		//ゲーム中
 		else if (event->m_MsgStr == L"GameStage")

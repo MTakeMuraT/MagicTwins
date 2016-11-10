@@ -46,6 +46,52 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class Rpck : public GameObject;
+	//	用途：岩
+	//--------------------------------------------------------------------------------------
+	Rock::Rock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale)
+	{}
+
+	void Rock::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+
+		// モデルとトランスフォームの間の差分行列
+		float angle = (-90) * (3.14159265f / 180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(0.5f, 0.5f, 0.5f),
+			Vector3(0, angle, 0),
+			Vector3(0, 0, 0)
+			);
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"Rock_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"Rock_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+		//透明処理
+		SetAlphaActive(true);
+	}
+
+	//--------------------------------------------------------------------------------------
 	//	class Box : public GameObject;
 	//	用途: 箱
 	//--------------------------------------------------------------------------------------

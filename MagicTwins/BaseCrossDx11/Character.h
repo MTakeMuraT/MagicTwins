@@ -37,6 +37,21 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class Rock : public GameObject;
+	//ópìrÅFä‚
+	//--------------------------------------------------------------------------------------
+	class Rock :public GameObject
+	{
+		//èâä˙à íu
+		Vector3 m_InitPos;
+		//ëÂÇ´Ç≥
+		Vector3 m_Scale;
+	public:
+		Rock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate() override;
+	};
+
+	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	ópìr: à√ì]ópçïîwåi
 	//--------------------------------------------------------------------------------------
