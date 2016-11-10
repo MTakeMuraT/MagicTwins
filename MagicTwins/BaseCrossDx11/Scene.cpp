@@ -26,13 +26,6 @@ namespace basecross{
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBook/magicbook2.bmf");
 		App::GetApp()->RegisterResource(L"MagicBook_Model", ModelMesh);
 
-		//曲
-		/*
-		wstring BGMWav = App::GetApp()->m_wstrRelativeDataPath + L"bgm/gamebgm.wav";
-		App::GetApp()->RegisterWav(L"GAMEBGM", BGMWav);
-		BGMWav = App::GetApp()->m_wstrRelativeDataPath + L"bgm/titlebgm.wav";
-		App::GetApp()->RegisterWav(L"TITLEBGM", BGMWav);
-		*/
 		try {
 			//最初のアクティブステージの設定
 			//ResetActiveStage<GameStage>();
@@ -41,24 +34,18 @@ namespace basecross{
 			//ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
 
-			//曲再生
-			/*
+			//BGM
+			wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameStageBGM.wav";
+			App::GetApp()->RegisterWav(L"GameStageBGM", strMusic);
+
+			//オーディオの初期化
 			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			m_AudioObjectPtr->AddAudioResource(L"TITLEBGM");
-			m_AudioObjectPtr->Start(L"TITLEBGM", XAUDIO2_LOOP_INFINITE, 1.0f);
-			*/
+			m_AudioObjectPtr->AddAudioResource(L"GameStageBGM");
+			m_AudioObjectPtr->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.2f);
 		}
 		catch (...) {
 			throw;
 		}
-
-		/*
-		//オーディオの初期化
-		//曲
-		m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-		m_AudioObjectPtr->AddAudioResource(L"TITLEBGM");
-		m_AudioObjectPtr->Start(L"TITLEBGM", XAUDIO2_LOOP_INFINITE, 1.0f);
-		*/
 	}
 
 	void Scene::OnEvent(const shared_ptr<Event>& event) {

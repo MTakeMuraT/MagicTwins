@@ -66,7 +66,7 @@ namespace basecross{
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
 		//横部分のみ反発
-		//PtrCol->SetIsHitAction(IsHitAction::Stop);
+		PtrCol->SetIsHitAction(IsHitAction::Stop);
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();

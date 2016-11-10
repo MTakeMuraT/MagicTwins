@@ -16,9 +16,6 @@ namespace basecross {
 		strTexture = DataDir + L"PS.png";
 		App::GetApp()->RegisterTexture(L"PRESSSTART_TX", strTexture);
 
-		wstring BGMWav = App::GetApp()->m_wstrRelativeDataPath + L"bgm/titlebgm.wav";
-		App::GetApp()->RegisterWav(L"TITLEBGM", BGMWav);
-
 	}
 
 	//ビューとライトの作成

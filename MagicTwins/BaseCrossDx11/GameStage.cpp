@@ -56,15 +56,15 @@ namespace basecross {
 		auto PtrView = CreateView<SingleView>()
 			;
 		//ビューのカメラの設定(右スティックで向きを変えられる)
-		auto Camera = ObjectFactory::Create<LookAtCamera>();
+		/*auto Camera = ObjectFactory::Create<LookAtCamera>();
 		PtrView->SetCamera(Camera);
 		Camera->SetEye(Vector3(0.0f, 1.0f, -8.0f));
-		Camera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+		Camera->SetAt(Vector3(0.0f, 0.0f, 0.0f));*/
 
-		////ビューのカメラの設定(カメラ固定)
-		//auto PtrCamera = PtrView->GetCamera();
-		//PtrCamera->SetEye(Vector3(0.0f, 5.0f, -5.0f));
-		//PtrCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
+		//ビューのカメラの設定(カメラ固定)
+		auto PtrCamera = PtrView->GetCamera();
+		PtrCamera->SetEye(Vector3(0.0f, 5.0f, -5.0f));
+		PtrCamera->SetAt(Vector3(0.0f, 0.0f, 0.0f));
 
 		//シングルライトの作成
 		auto PtrSingleLight = CreateLight<SingleLight>();
@@ -290,14 +290,14 @@ namespace basecross {
 		SetSharedGameObject(L"LimitTime", LTP);
 	}
 
-	/*
+	
 	//コリジョンマネージャー作成
 	void GameStage::CreateCollisionManager()
 	{
 		//アタリ判定管理オブジェクト作成
 		auto ColManP = AddGameObject<CollisionManager>();
 	}
-	*/
+	
 
 	void GameStage::OnUpdate()
 	{
@@ -326,19 +326,19 @@ namespace basecross {
 	
 	void GameStage::OnCreate() {
 		try {
-			//魔法が当たって消えるオブジェクトグループ
-			CreateSharedObjectGroup(L"MagicObjects");
-
 			//リソースの作成
 			CreateResourses();
 			//ビューとライトの作成
 			CreateViewLight();
 			//プレートの作成
 			CreatePlate();
+			//CSV作成
+			AddGameObject<CSVReader>();
 			//制限時間の作成
 			CreateLimitTime();
-			
-			AddGameObject<CSVReader>();
+			//コリジョンマネージャー作成
+			CreateCollisionManager();
+
 			/*
 			//プレーヤーの作成
 			CreatePlayer(Vector3(0, 0.125f, 0));
@@ -356,8 +356,7 @@ namespace basecross {
 			CreateGoal(Vector3(-4, 0.5f, 5), Vector3(1, 1, 1));
 			//制限時間の作成
 			CreateLimitTime();
-			//コリジョンマネージャー作成
-			CreateCollisionManager();
+
 
 			//ギミック作成
 			//炎

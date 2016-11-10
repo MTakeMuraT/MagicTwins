@@ -190,6 +190,9 @@ namespace basecross
 		
 		//ステージで作成-----------------------------
 		auto st = GetStage();
+		//魔法が当たって消えるオブジェクトグループ
+		auto MOG = st->CreateSharedObjectGroup(L"MagicObjects");
+
 		//箱作成
 		int count = 0;
 		for (auto v : BoxPoss)
@@ -202,14 +205,77 @@ namespace basecross
 		}
 		count = 0;
 		//プレイヤー作成
+		st->SetSharedGameObject(L"Player1",st->AddGameObject<Player>(Player1Pos, true, "Player1"));
+		st->SetSharedGameObject(L"Player2",st->AddGameObject<Player>(Player2Pos, false, "Player2"));
 		//ゴール作成
+		st->SetSharedGameObject(L"Goal",st->AddGameObject<Goal>(GoalPos, GoalScale));
 		//魔導書作成
+		auto MBGroup = st->CreateSharedObjectGroup(L"MagicBook");
+		MBGroup->IntoGroup(st->AddGameObject<MagicBook>(FirePos, Fire));
+		MBGroup->IntoGroup(st->AddGameObject<MagicBook>(IceFogPos, IceFog));
 		//ギミック作成
 		//1
+		for (auto v : Gimmick1IcePos)
+		{
+			Vector3 scale = Gimmick1IceScale[count];
+			MOG->IntoGroup(st->AddGameObject<Gimmick1>(v, scale));
+			count++;
+		}
+		count = 0;
 		//2
-		//3
+		for (auto v : Gimmick2WindMillPos)
+		{
+			Vector3 scale = Gimmick2WindMillScale[count];
+			MOG->IntoGroup(st->AddGameObject<Gimmick2>(v, scale));
+			count++;
+		}
+		count = 0;
 		//5
+		for (auto v : Gimmick5FirePos)
+		{
+			Vector3 scale = Gimmick5FireScale[count];
+			MOG->IntoGroup(st->AddGameObject<Gimmick5>(v, scale));
+			count++;
+		}
+		count = 0;
 		//水
+		vector<shared_ptr<Water>> Water1Vec;
+		for (auto v : Water1Pos)
+		{
+			Vector3 scale = Water1Scale[count];
+			auto waP = st->AddGameObject<Water>(v, scale, 1);
+			Water1Vec.push_back(waP);
+			count++;
+		}
+		count = 0;
+		vector<shared_ptr<Water>> Water2Vec;
+		for (auto v : Water2Pos)
+		{
+			Vector3 scale = Water2Scale[count];
+			auto waP = st->AddGameObject<Water>(v, scale, 1);
+			Water2Vec.push_back(waP);
+			count++;
+		}
+		count = 0;
+		vector<shared_ptr<Water>> Water3Vec;
+		for (auto v : Water3Pos)
+		{
+			Vector3 scale = Water3Scale[count];
+			auto waP = st->AddGameObject<Water>(v, scale, 1);
+			Water3Vec.push_back(waP);
+			count++;
+		}
+		count = 0;
+		//3
+		for (auto v : Gimmick3CorePos)
+		{
+			Vector3 scale = Gimmick3CoreScale[count];
+			auto Gimi3P = st->AddGameObject<Gimmick3>(v, scale);
+			Gimi3P->SetWaters(Water1Vec);
+			MOG->IntoGroup(Gimi3P);
+			count++;
+		}
+		count = 0;
 		//
 
 		//ステージで作成-----------------------------
