@@ -22,6 +22,8 @@ namespace basecross {
 		void CreateLimitTime();
 		//コリジョンマネージャー作成
 		void CreateCollisionManager();
+		//アイコン作成
+		void CreateIcons();
 		/*
 		//ステージ構築関連-----------------
 		//ボックス

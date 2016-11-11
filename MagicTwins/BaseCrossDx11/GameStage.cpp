@@ -60,7 +60,11 @@ namespace basecross {
 		//魔法UI
 		strTexture = DataDir + L"icon_magic.png";
 		App::GetApp()->RegisterTexture(L"MAGICUI_TX", strTexture);
-
+		strTexture = DataDir + L"TimeWindow_01.png";
+		App::GetApp()->RegisterTexture(L"TIME_TX", strTexture);
+		//メニューアイコン
+		strTexture = DataDir + L"Menuicon.png";
+		App::GetApp()->RegisterTexture(L"MENUICON_TX", strTexture);
 
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
@@ -161,6 +165,11 @@ namespace basecross {
 		auto ColManP = AddGameObject<CollisionManager>();
 	}
 	
+	//アイコン作成
+	void GameStage::CreateIcons()
+	{
+		AddGameObject<MenuIcon>();
+	}
 
 	void GameStage::OnUpdate()
 	{
@@ -201,6 +210,8 @@ namespace basecross {
 			CreateLimitTime();
 			//コリジョンマネージャー作成
 			CreateCollisionManager();
+			//アイコン作成
+			CreateIcons();
 
 		}
 		catch (...) {

@@ -103,9 +103,9 @@ namespace basecross {
 			auto MUIDraw = MUI->AddComponent<PCTSpriteDraw>();
 			MUIDraw->SetTextureResource(L"MAGICUI_TX");
 			auto MUIT = MUI->AddComponent<Transform>();
-			MUIT->SetPosition(0,380,0);
+			MUIT->SetPosition(0,420,0);
 			MUIT->SetRotation(0, 0, 0);
-			MUIT->SetScale(300, 300, 0);
+			MUIT->SetScale(220, 220, 0);
 			MUI->SetAlphaActive(true);
 			MUI->SetDrawLayer(3);
 			m_MagicUI = MUI;

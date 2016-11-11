@@ -390,11 +390,19 @@ namespace basecross{
 	
 	void LimitTime::OnCreate()
 	{
+		auto DrawP = AddComponent<PCTSpriteDraw>();
+		DrawP->SetTextureResource(L"TIME_TX");
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(800,470,0);
+		TranP->SetRotation(0, 0, 0);
+		TranP->SetScale(300, 300, 0);
+		SetAlphaActive(true);
+
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
-		PtrString->SetTextRect(Rect2D<float>(512.0f, 16.0f, 1024.0f, 960.0f));
-		PtrString->SetFont(L"", 100);
+		PtrString->SetTextRect(Rect2D<float>(1700.0f, 15.0f, 2000.0f, 300.0f));
+		PtrString->SetFont(L"", 80);
 		m_nowTime = m_LimitTime;
 		SetDrawLayer(5);
 	}
@@ -402,7 +410,7 @@ namespace basecross{
 	void LimitTime::OnUpdate()
 	{
 		m_nowTime += -App::GetApp()->GetElapsedTime();
-		wstring txt = L"TIME:" + Util::IntToWStr((int)m_nowTime);
+		wstring txt = Util::IntToWStr((int)m_nowTime);
 		GetComponent<StringSprite>()->SetText(txt);
 
 		if (m_nowTime < 1)
@@ -410,6 +418,27 @@ namespace basecross{
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
 		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class MenuIcon : public GameObject;
+	//	用途: メニューボタンのアイコン
+	//--------------------------------------------------------------------------------------
+	MenuIcon::MenuIcon(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void MenuIcon::OnCreate()
+	{
+		auto DrawP = AddComponent<PCTSpriteDraw>();
+		DrawP->SetTextureResource(L"MENUICON_TX");
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(450,-450, 0);
+		TranP->SetRotation(0, 0, 0);
+		TranP->SetScale(100, 100, 0);
+		SetAlphaActive(true);
+		SetDrawLayer(5);
+
 	}
 
 	//--------------------------------------------------------------------------------------
