@@ -317,13 +317,13 @@ namespace basecross
 			switch (count)
 			{
 			case 0:
-				Gimi3P->SetWaters(Water1Vec);
-				break;
-			case 1:
 				Gimi3P->SetWaters(Water2Vec);
 				break;
-			case 2:
+			case 1:
 				Gimi3P->SetWaters(Water3Vec);
+				break;
+			case 2:
+				Gimi3P->SetWaters(Water1Vec);
 				break;
 			}
 			MOG->IntoGroup(Gimi3P);

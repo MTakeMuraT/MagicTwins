@@ -57,6 +57,9 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"LIFE2_TX", strTexture);
 		strTexture = DataDir + L"Life03.png";
 		App::GetApp()->RegisterTexture(L"LIFE3_TX", strTexture);
+		//魔法UI
+		strTexture = DataDir + L"icon_magic.png";
+		App::GetApp()->RegisterTexture(L"MAGICUI_TX", strTexture);
 
 
 		//アニメーション？

@@ -62,14 +62,20 @@ namespace basecross {
 			//プレイヤー１が当たる
 			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale))
 			{
-				PlayerToEnemy(1);
-				Ptr->ResetPos();
+				if (GetStage()->GetSharedGameObject<Player>(L"Player1")->GetActive())
+				{
+					PlayerToEnemy(1);
+					Ptr->ResetPos();
+				}
 			}
 			//プレイヤー２が当たる
 			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale))
 			{
-				PlayerToEnemy(2);
-				Ptr->ResetPos();
+				if (GetStage()->GetSharedGameObject<Player>(L"Player2")->GetActive())
+				{
+					PlayerToEnemy(2);
+					Ptr->ResetPos();
+				}
 			}
 		}
 		//魔法とオブジェクトのアタリ判定

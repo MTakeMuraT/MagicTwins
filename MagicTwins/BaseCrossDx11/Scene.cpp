@@ -37,6 +37,7 @@ namespace basecross{
 			//ResetActiveStage<Result>();
 
 			//BGM
+			/*
 			wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameStageBGM.wav";
 			App::GetApp()->RegisterWav(L"GameStageBGM", strMusic);
 
@@ -44,6 +45,7 @@ namespace basecross{
 			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioObjectPtr->AddAudioResource(L"GameStageBGM");
 			m_AudioObjectPtr->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.2f);
+			*/
 		}
 		catch (...) {
 			throw;
@@ -61,7 +63,7 @@ namespace basecross{
 		{
 			ResetActiveStage<StageSelect>();
 			//セレクト画面に入ったらGameStageBGMを止める
-			m_AudioObjectPtr->Stop(L"GameStageBGM");
+			//m_AudioObjectPtr->Stop(L"GameStageBGM");
 
 		}
 		//ゲーム中

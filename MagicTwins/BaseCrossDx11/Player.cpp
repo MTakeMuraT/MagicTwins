@@ -81,7 +81,7 @@ namespace basecross {
 			//魔法作成
 			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),1));
 
-			//ライフ表示
+			//ライフ表示----------------------------------------
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 			objDraw->SetTextureResource(L"LIFE3_TX");
@@ -89,11 +89,28 @@ namespace basecross {
 			auto objtrans = obj->AddComponent<Transform>();
 			//1920,1080
 			//960,540
-			objtrans->SetPosition(-800, 420, 0);
+			objtrans->SetPosition(-700, 420, 0);
 			objtrans->SetRotation(0, 0, 0);
-			objtrans->SetScale(200, 100, 1);
+			objtrans->SetScale(400, 200, 1);
 			obj->SetAlphaActive(true);
+			obj->SetDrawLayer(3);
 			m_LifeSprite = obj;
+			//ライフ表示----------------------------------------
+
+			//魔法UI表示----------------------------------------
+			//片方だけ作れば十分
+			auto MUI = GetStage()->AddGameObject<GameObject>();
+			auto MUIDraw = MUI->AddComponent<PCTSpriteDraw>();
+			MUIDraw->SetTextureResource(L"MAGICUI_TX");
+			auto MUIT = MUI->AddComponent<Transform>();
+			MUIT->SetPosition(0,380,0);
+			MUIT->SetRotation(0, 0, 0);
+			MUIT->SetScale(300, 300, 0);
+			MUI->SetAlphaActive(true);
+			MUI->SetDrawLayer(3);
+			m_MagicUI = MUI;
+			//魔法UI表示----------------------------------------
+
 		}
 		else if (m_myName == "Player2")
 		{
@@ -113,7 +130,6 @@ namespace basecross {
 			//魔法作成
 			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 2));
 			
-			
 			//ライフ表示
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -122,10 +138,11 @@ namespace basecross {
 			auto objtrans = obj->AddComponent<Transform>();
 			//1920,1080
 			//960,540
-			objtrans->SetPosition(800, 420, 0);
+			objtrans->SetPosition(700, 420, 0);
 			objtrans->SetRotation(0, 0, 0);
-			objtrans->SetScale(200, 100, 1);
+			objtrans->SetScale(400, 200, 1);
 			obj->SetAlphaActive(true);
+			obj->SetDrawLayer(3);
 			m_LifeSprite = obj;
 
 		}
@@ -146,7 +163,8 @@ namespace basecross {
 		//座標記憶
 		auto View = GetStage()->GetView();
 		auto CameraP = View->GetTargetCamera();
-		m_CameraPos = CameraP->GetEye();
+		m_CameraPos = m_CameraTargetVec;
+		m_CameraPos += Vector3(0, 5, -5);
 	}
 
 	//更新
