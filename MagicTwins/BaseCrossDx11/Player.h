@@ -44,7 +44,7 @@ namespace basecross{
 		const float m_CameraMove = 3.0f;
 
 		//‘Ì—Í•\Ž¦
-		vector<shared_ptr<GameObject>> m_LifeSprite;
+		shared_ptr<GameObject> m_LifeSprite;
 
 		//‘¬“x
 		Vector2 m_velocity;

@@ -82,22 +82,18 @@ namespace basecross {
 			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),1));
 
 			//ライフ表示
-			for (int i = 1; i <= 3; i++)
-			{
-				auto obj = GetStage()->AddGameObject<GameObject>();
-				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
-				wstring txt = L"LIFE";
-				txt += Util::IntToWStr(i) + L"_TX";
-				objDraw->SetTextureResource(txt);
+			auto obj = GetStage()->AddGameObject<GameObject>();
+			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+			objDraw->SetTextureResource(L"LIFE3_TX");
 
-				auto objtrans = obj->AddComponent<Transform>();
-				//1920,1080
-				//960,540
-				objtrans->SetPosition(-500 - (i*100), 420, 0);
-				objtrans->SetRotation(0, 0, 0);
-				objtrans->SetScale(100, 50, 1);
-				m_LifeSprite.push_back(obj);
-			}
+			auto objtrans = obj->AddComponent<Transform>();
+			//1920,1080
+			//960,540
+			objtrans->SetPosition(-800, 420, 0);
+			objtrans->SetRotation(0, 0, 0);
+			objtrans->SetScale(200, 100, 1);
+			obj->SetAlphaActive(true);
+			m_LifeSprite = obj;
 		}
 		else if (m_myName == "Player2")
 		{
@@ -115,24 +111,23 @@ namespace basecross {
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 			//魔法作成
-			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),2));
+			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 2));
+			
+			
 			//ライフ表示
-			for (int i = 1; i <= 3; i++)
-			{
-				auto obj = GetStage()->AddGameObject<GameObject>();
-				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
-				wstring txt = L"LIFE";
-				txt += Util::IntToWStr(i) + L"_TX";
-				objDraw->SetTextureResource(txt);
+			auto obj = GetStage()->AddGameObject<GameObject>();
+			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+			objDraw->SetTextureResource(L"LIFE3_TX");
 
-				auto objtrans = obj->AddComponent<Transform>();
-				//1920,1080
-				//960,540
-				objtrans->SetPosition(900 - (i * 100), 420, 0);
-				objtrans->SetRotation(0, 0, 0);
-				objtrans->SetScale(100, 50, 1);
-				m_LifeSprite.push_back(obj);
-			}
+			auto objtrans = obj->AddComponent<Transform>();
+			//1920,1080
+			//960,540
+			objtrans->SetPosition(800, 420, 0);
+			objtrans->SetRotation(0, 0, 0);
+			objtrans->SetScale(200, 100, 1);
+			obj->SetAlphaActive(true);
+			m_LifeSprite = obj;
+
 		}
 
 
@@ -507,16 +502,15 @@ namespace basecross {
 		{
 		case 0:
 			//しんだ
-			m_LifeSprite[2]->SetDrawActive(false);
+			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE0_TX");
 			//ゲームオーバーに遷移
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
-
 			break;
 		case 1:
-			m_LifeSprite[1]->SetDrawActive(false);
+			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE1_TX");
 			break;
 		case 2:
-			m_LifeSprite[0]->SetDrawActive(false);
+			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE2_TX");
 			break;
 		}
 	}

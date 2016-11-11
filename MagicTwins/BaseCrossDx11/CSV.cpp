@@ -314,7 +314,18 @@ namespace basecross
 		{
 			Vector3 scale = Gimmick3CoreScale[count];
 			auto Gimi3P = st->AddGameObject<Gimmick3>(v, scale);
-			Gimi3P->SetWaters(Water1Vec);
+			switch (count)
+			{
+			case 0:
+				Gimi3P->SetWaters(Water1Vec);
+				break;
+			case 1:
+				Gimi3P->SetWaters(Water2Vec);
+				break;
+			case 2:
+				Gimi3P->SetWaters(Water3Vec);
+				break;
+			}
 			MOG->IntoGroup(Gimi3P);
 			count++;
 		}
