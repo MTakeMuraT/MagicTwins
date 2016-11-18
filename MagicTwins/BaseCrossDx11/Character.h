@@ -61,11 +61,19 @@ namespace basecross{
 		Vector3 m_InitPos;
 		Vector3 m_Scale;
 		//速度
-		float m_speed = 1.0f;
+		float m_speed = 2.0f;
+
+		//停止状態
+		bool m_StopFlg = false;
+		//停止時間
+		const float m_StopTime = 3.0f;
+		//計算用
+		float m_time = 0;
 	public :
 		Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
 		void OnUpdate() override;
+		void StopEnemy();
 		void ResetPos();
 	};
 	
@@ -141,6 +149,27 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;
+	//	用途: 数字のスプライト
+	//--------------------------------------------------------------------------------------
+	class NumberSprite : public GameObject
+	{
+	private:
+		//なんかしらんメッシュのリスト
+		vector<shared_ptr<MeshResource>> m_Mesh;
+		unsigned int m_num = 0;
+		//大きさ
+		Vector2 m_scale;
+		//位置
+		Vector2 m_pos;
+	public :
+		NumberSprite(const shared_ptr<Stage>& StagePtr, int num,Vector2 pos,Vector2 scale);
+		
+		void OnCreate()override;
+
+		void SetNum(int num);
+	};
+	//--------------------------------------------------------------------------------------
 	//	class MenuIcon : public GameObject;
 	//	用途: メニューボタンのアイコン
 	//--------------------------------------------------------------------------------------
@@ -157,6 +186,61 @@ namespace basecross{
 	//	用途: 数字
 	//--------------------------------------------------------------------------------------
 
+	//--------------------------------------------------------------------------------------
+	//	class PauseMenu : public GameObject;
+	//	用途: ポーズメニュー
+	//--------------------------------------------------------------------------------------
+	class PauseMenu : public GameObject
+	{
+	private:
+		shared_ptr<GameObject> m_ReTryLogo;
+		shared_ptr<GameObject> m_mapLogo;
+		shared_ptr<GameObject> m_StageSelectLogo;
+		shared_ptr<GameObject> m_TitleLogo;
+		shared_ptr<GameObject> m_Black;
+
+		shared_ptr<GameObject> m_Map;
+
+		//起動してるかどうか
+		bool m_ActivePauseFlg = false;
+		//暗転してるかどうか
+		bool m_BlackOutFlg = false;
+		//マップ選んでるか
+		bool m_selectMapFlg = false;
+
+		//現在何選んでるかの数字
+		//0:retry1:map2:stageselect3:title
+		int m_selectnum = 0;
+
+		//操作フラグ
+		bool m_moveFlg = false;
+
+		//選択時X
+		const float m_SelectX = -750;
+		//非選択時X
+		const float m_NotSelectX = -850;
+
+		//暗転の透明度
+		float m_BlackAlpha = 0;
+	public :
+		PauseMenu(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate();
+
+		void OnUpdate();
+
+		//ゲームステージで呼ぶと、ポーズ状態に。ポーズ中に読んだら解除する。
+		void Pause();
+
+		//ポーズしてるかどうか
+		bool GetPause() { return m_ActivePauseFlg; };
+
+		//暗転してるかどうか
+		bool GetBlackOut() { return m_BlackOutFlg; };
+
+		//暗転関数
+		void BlackOut();
+	};
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる

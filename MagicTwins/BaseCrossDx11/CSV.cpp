@@ -71,9 +71,14 @@ namespace basecross
 		//ギミック２(風車)
 		vector<Vector3> Gimmick2WindMillPos;
 		vector<Vector3> Gimmick2WindMillScale;
-		//ギミック３(川のコア)
-		vector<Vector3> Gimmick3CorePos;
-		vector<Vector3> Gimmick3CoreScale;
+		//ギミック３(川のコア)最大３個まで対応
+		Vector3 WaterCore1Pos;
+		Vector3 WaterCore2Pos;
+		Vector3 WaterCore3Pos;
+
+		Vector3 WaterCore1Scale;
+		Vector3 WaterCore2Scale;
+		Vector3 WaterCore3Scale;
 		//ギミック５(炎)
 		vector<Vector3> Gimmick5FirePos;
 		vector<Vector3> Gimmick5FireScale;
@@ -91,10 +96,13 @@ namespace basecross
 		//空(最後)になるまで繰り返す
 		while (StageMapVec[0] != L"end")
 		{
+			//文字列あったかどうか
+			bool Flgg = false;
 			// 0:name 1:PosX 2:PosY 3:PosZ 4:ScaleX 5:ScaleY 6:ScaleZ 7:RotX 8:RotY 9:RotZ
 			//箱
 			if (StageMapVec[0] == L"Cube")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Vector3 rot = Vector3(_wtof(StageMapVec[7].c_str()), _wtof(StageMapVec[8].c_str()), _wtof(StageMapVec[9].c_str()));
@@ -105,6 +113,7 @@ namespace basecross
 			//岩
 			if (StageMapVec[0] == L"Rock")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				RockPos.push_back(pos);
@@ -113,6 +122,7 @@ namespace basecross
 			//ゴール
 			if (StageMapVec[0] == L"Goal")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 
@@ -122,17 +132,20 @@ namespace basecross
 			//プレイヤー
 			if (StageMapVec[0] == L"Player1")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Player1Pos = pos;
 			}
 			if (StageMapVec[0] == L"Player2")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Player2Pos = pos;
 			}
 			//エネミー
 			if (StageMapVec[0] == L"Enemy")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Enemypos.push_back(pos);
@@ -141,6 +154,7 @@ namespace basecross
 			//ギミック１
 			if (StageMapVec[0] == L"Gimmick1")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Gimmick1IcePos.push_back(pos);
@@ -149,22 +163,41 @@ namespace basecross
 			//ギミック２
 			if (StageMapVec[0] == L"Gimmick2")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Gimmick2WindMillPos.push_back(pos);
 				Gimmick2WindMillScale.push_back(scale);
 			}
 			//ギミック３
-			if (StageMapVec[0] == L"Gimmick3")
+			if (StageMapVec[0] == L"Gimmick31")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
-				Gimmick3CorePos.push_back(pos);
-				Gimmick3CoreScale.push_back(scale);
+				WaterCore1Pos = pos;
+				WaterCore1Scale = scale;
+			}
+			if (StageMapVec[0] == L"Gimmick32")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				WaterCore2Pos = pos;
+				WaterCore2Scale = scale;
+			}
+			if (StageMapVec[0] == L"Gimmick33")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				WaterCore3Pos = pos;
+				WaterCore3Scale = scale;
 			}
 			//ギミック５
 			if (StageMapVec[0] == L"Gimmick5")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Gimmick5FirePos.push_back(pos);
@@ -173,6 +206,7 @@ namespace basecross
 			//水
 			if (StageMapVec[0] == L"Water1")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Water1Pos.push_back(pos);
@@ -180,6 +214,7 @@ namespace basecross
 			}
 			if (StageMapVec[0] == L"Water2")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Water2Pos.push_back(pos);
@@ -187,6 +222,7 @@ namespace basecross
 			}
 			if (StageMapVec[0] == L"Water3")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Water3Pos.push_back(pos);
@@ -196,13 +232,23 @@ namespace basecross
 			//魔導書
 			if (StageMapVec[0] == L"MagicBookFire")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				FirePos = pos;
 			}
 			if (StageMapVec[0] == L"MagicBookIceFog")
 			{
+				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				IceFogPos = pos;
+			}
+
+			if (!Flgg)
+			{
+				throw BaseException(
+					L"CSVに指定されていない文字列が", L"設定されています", L""
+					);
+
 			}
 			//行更新
 			RowData++;
@@ -210,6 +256,9 @@ namespace basecross
 		}
 		//CSVから読み込み-----------------------------
 		
+		//ポーズとかでアップデート止めるオブジェクト
+		auto SUG = GetStage()->GetSharedObjectGroup(L"SetUpdateObj");
+
 		//ステージで作成-----------------------------
 		auto st = GetStage();
 		//魔法が当たって消えるオブジェクトグループ
@@ -236,17 +285,25 @@ namespace basecross
 		}
 		count = 0;
 		//プレイヤー作成
-		st->SetSharedGameObject(L"Player1",st->AddGameObject<Player>(Player1Pos, true, "Player1"));
-		st->SetSharedGameObject(L"Player2",st->AddGameObject<Player>(Player2Pos, false, "Player2"));
+		auto PP = st->AddGameObject<Player>(Player1Pos, true, "Player1");
+		st->SetSharedGameObject(L"Player1",PP);
+		//アップデートグループ追加
+		SUG->IntoGroup(PP);
+		auto PP2 = st->AddGameObject<Player>(Player2Pos, false, "Player2");
+		//アップデートグループ追加
+		SUG->IntoGroup(PP2);
+		st->SetSharedGameObject(L"Player2",PP2);
 		//エネミー作成
 		auto EG = GetStage()->CreateSharedObjectGroup(L"Enemy");
 		for (auto v : Enemypos)
 		{
 			//スケールは別で持ってくる
-			Vector3 scale = RockScale[count];
+			Vector3 scale = EnemyScale[count];
 			auto EPt = st->AddGameObject<Enemy>(v, scale);
 			EG->IntoGroup(EPt);
 			MOG->IntoGroup(EPt);
+			//アップデートグループ追加
+			SUG->IntoGroup(EPt);
 			count++;
 		}
 		count = 0;
@@ -254,8 +311,15 @@ namespace basecross
 		st->SetSharedGameObject(L"Goal",st->AddGameObject<Goal>(GoalPos, GoalScale));
 		//魔導書作成
 		auto MBGroup = st->CreateSharedObjectGroup(L"MagicBook");
-		MBGroup->IntoGroup(st->AddGameObject<MagicBook>(FirePos, Fire));
-		MBGroup->IntoGroup(st->AddGameObject<MagicBook>(IceFogPos, IceFog));
+		auto MPt = st->AddGameObject<MagicBook>(FirePos, Fire);
+		MBGroup->IntoGroup(MPt);
+		//アップデートグループ追加
+		SUG->IntoGroup(MPt);
+		MPt = st->AddGameObject<MagicBook>(IceFogPos, IceFog);
+		MBGroup->IntoGroup(MPt);
+		//アップデートグループ追加
+		SUG->IntoGroup(MPt);
+
 		//ギミック作成
 		//1
 		for (auto v : Gimmick1IcePos)
@@ -310,26 +374,26 @@ namespace basecross
 		}
 		count = 0;
 		//3
-		for (auto v : Gimmick3CorePos)
-		{
-			Vector3 scale = Gimmick3CoreScale[count];
-			auto Gimi3P = st->AddGameObject<Gimmick3>(v, scale);
-			switch (count)
-			{
-			case 0:
-				Gimi3P->SetWaters(Water1Vec);
-				break;
-			case 1:
-				Gimi3P->SetWaters(Water2Vec);
-				break;
-			case 2:
-				Gimi3P->SetWaters(Water3Vec);
-				break;
-			}
-			MOG->IntoGroup(Gimi3P);
-			count++;
-		}
-		count = 0;
+		auto Gimi3P = st->AddGameObject<Gimmick3>(WaterCore1Pos, WaterCore1Scale);
+		//コアに関連する水を追加
+		Gimi3P->SetWaters(Water1Vec);
+		//魔法が当たるオブジェクトに設定
+		MOG->IntoGroup(Gimi3P);
+		//アップデートグループ追加
+		SUG->IntoGroup(Gimi3P);
+		//以下同
+
+		Gimi3P = st->AddGameObject<Gimmick3>(WaterCore2Pos, WaterCore2Scale);
+		Gimi3P->SetWaters(Water2Vec);
+		MOG->IntoGroup(Gimi3P);
+		SUG->IntoGroup(Gimi3P);
+
+		Gimi3P = st->AddGameObject<Gimmick3>(WaterCore3Pos, WaterCore3Scale);
+		Gimi3P->SetWaters(Water3Vec);
+		MOG->IntoGroup(Gimi3P);
+		SUG->IntoGroup(Gimi3P);
+
+
 		//
 
 		//ステージで作成-----------------------------

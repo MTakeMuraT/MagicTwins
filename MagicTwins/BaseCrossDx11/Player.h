@@ -52,7 +52,6 @@ namespace basecross{
 		//魔法打つ関数
 		void ShotMagic();
 
-
 		//魔法のリスト
 		//*********************************//
 		//MagicTypeはenum型、stdafx.hに書いてある
@@ -89,6 +88,8 @@ namespace basecross{
 
 		//ダメージ処理
 		void PlayerDamege();
+
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -102,6 +103,9 @@ namespace basecross{
 		Vector2 m_velocity;
 		//座標
 		Vector3 m_pos;
+		//大きさ
+		Vector3 m_magicSize = Vector3(0.5f, 0.5f, 0.5f);
+
 		//生きてるかどうか
 		bool m_ActiveFlg = false;
 		//速度

@@ -32,6 +32,9 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"MAGICBOOKFIRE_TX", strTexture);
 		strTexture = DataDir + L"MagicBookIceFog.png";
 		App::GetApp()->RegisterTexture(L"MAGICBOOKICEFOG_TX", strTexture);
+		strTexture = DataDir + L"MagicBookWind.png";
+		App::GetApp()->RegisterTexture(L"MAGICBOOKWIND_TX", strTexture);
+
 		strTexture = DataDir + L"Gimmick1.png";
 		App::GetApp()->RegisterTexture(L"GIMMICK1_TX", strTexture);
 		strTexture = DataDir + L"Gimmick2.png";
@@ -65,7 +68,24 @@ namespace basecross {
 		//メニューアイコン
 		strTexture = DataDir + L"Menuicon.png";
 		App::GetApp()->RegisterTexture(L"MENUICON_TX", strTexture);
+		//魔法
+		strTexture = DataDir + L"FireEf.png";
+		App::GetApp()->RegisterTexture(L"FIREEF_TX", strTexture);
+		//ポーズメニュー
+		strTexture = DataDir + L"PauseLogo.png";
+		App::GetApp()->RegisterTexture(L"PAUSELOGO_TX", strTexture);
+		strTexture = DataDir + L"PauseReTryLogo.png";
+		App::GetApp()->RegisterTexture(L"PAUSERETRY_TX", strTexture);
+		strTexture = DataDir + L"PauseMapLogo.png";
+		App::GetApp()->RegisterTexture(L"PAUSEMAPLOGO_TX", strTexture);
+		strTexture = DataDir + L"PauseStageSelect.png";
+		App::GetApp()->RegisterTexture(L"PAUSESTAGESELECTLOGO_TX", strTexture);
+		strTexture = DataDir + L"PauseTitleLogo.png";
+		App::GetApp()->RegisterTexture(L"PAUSETITLELOGO_TX", strTexture);
+		strTexture = DataDir + L"map/map.png";
+		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
 
+		
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
 		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);
@@ -155,6 +175,7 @@ namespace basecross {
 	{
 		auto LTP = AddGameObject<LimitTime>(1000);
 		SetSharedGameObject(L"LimitTime", LTP);
+		GetSharedObjectGroup(L"SetUpdateObj")->IntoGroup(LTP);
 	}
 
 	
@@ -171,6 +192,12 @@ namespace basecross {
 		AddGameObject<MenuIcon>();
 	}
 
+	//ポーズメニュー作成
+	void GameStage::CreatePauseMenu() 
+	{
+		SetSharedGameObject(L"PauseMenu", AddGameObject<PauseMenu>());
+	}
+
 	void GameStage::OnUpdate()
 	{
 		//*テスト用
@@ -181,7 +208,22 @@ namespace basecross {
 			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 
 		}
-		//*テスト用
+		//ポーズ
+		if (key.m_bPressedKeyTbl['Q'])
+		{
+			auto PauseP = GetSharedGameObject<PauseMenu>(L"PauseMenu",false);
+			bool PauseFlg = PauseP->GetPause();
+			auto SUG = GetSharedObjectGroup(L"SetUpdateObj");
+			auto SUGV = SUG->GetGroupVector();
+			for (auto v : SUGV)
+			{
+				auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
+				Ptr->SetUpdateActive(PauseFlg);
+			}
+			PauseP->Pause();
+		}
+			//*テスト用
+
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
@@ -191,6 +233,24 @@ namespace basecross {
 				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 
 			}
+			//ポーズ
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START)
+			{
+				auto PauseP = GetSharedGameObject<PauseMenu>(L"PauseMenu", false);
+				//暗転状態じゃなければ
+				if (!PauseP->GetBlackOut())
+				{
+					bool PauseFlg = PauseP->GetPause();
+					auto SUG = GetSharedObjectGroup(L"SetUpdateObj");
+					auto SUGV = SUG->GetGroupVector();
+					for (auto v : SUGV)
+					{
+						auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
+						Ptr->SetUpdateActive(PauseFlg);
+					}
+					PauseP->Pause();
+				}
+			}
 		}
 
 
@@ -198,6 +258,8 @@ namespace basecross {
 	
 	void GameStage::OnCreate() {
 		try {
+			//ポーズとかでアップデート止めるオブジェクト
+			CreateSharedObjectGroup(L"SetUpdateObj");
 			//リソースの作成
 			CreateResourses();
 			//ビューとライトの作成
@@ -208,6 +270,8 @@ namespace basecross {
 			CreatePlate();
 			//制限時間の作成
 			CreateLimitTime();
+			//ポーズメニュー作成
+			CreatePauseMenu();
 			//コリジョンマネージャー作成
 			CreateCollisionManager();
 			//アイコン作成

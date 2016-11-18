@@ -156,38 +156,60 @@ namespace basecross{
 
 	void Enemy::OnUpdate()
 	{
-		auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
-		auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
-
-		if (P1P->GetActive())
+		//止まってなければ追う
+		if (!m_StopFlg)
 		{
-			Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
-			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
-			Vector3 dir;
-			dir = topos - nowpos;
-			Vector2 velo = Vector2(dir.x,dir.z);
-			float angle = atan2(velo.y, velo.x);
-			velo.x = cos(angle);
-			velo.y = sin(angle);
-			nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
-			nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
-			GetComponent<Transform>()->SetPosition(nowpos);
-		}
+			auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+			auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
 
-		else if (P2P->GetActive())
-		{
-			Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
-			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
-			Vector3 dir;
-			dir = topos - nowpos;
-			Vector2 velo = Vector2(dir.x, dir.z);
-			float angle = atan2(velo.y, velo.x);
-			velo.x = cos(angle);
-			velo.y = sin(angle);
-			nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
-			nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
-			GetComponent<Transform>()->SetPosition(nowpos);
+			if (P1P->GetActive())
+			{
+				Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+				Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+				Vector3 dir;
+				dir = topos - nowpos;
+				Vector2 velo = Vector2(dir.x, dir.z);
+				float angle = atan2(velo.y, velo.x);
+				velo.x = cos(angle);
+				velo.y = sin(angle);
+				nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
+				nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
+				GetComponent<Transform>()->SetPosition(nowpos);
+			}
+
+			else if (P2P->GetActive())
+			{
+				Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+				Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+				Vector3 dir;
+				dir = topos - nowpos;
+				Vector2 velo = Vector2(dir.x, dir.z);
+				float angle = atan2(velo.y, velo.x);
+				velo.x = cos(angle);
+				velo.y = sin(angle);
+				nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
+				nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
+				GetComponent<Transform>()->SetPosition(nowpos);
+			}
 		}
+		else
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			if (m_time > m_StopTime)
+			{
+				m_StopFlg = false;
+				m_time = 0;
+				GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+			}
+		}
+	}
+
+	void Enemy::StopEnemy()
+	{
+		m_StopFlg = true;
+		m_time = 0;
+		GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1,0.5f));
+
 	}
 
 	void Enemy::ResetPos()
@@ -215,7 +237,7 @@ namespace basecross{
 
 		//テクスチャをつける
 		auto PtrSprite = this->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"BRACK_TX");
+		PtrSprite->SetTextureResource(L"BLACK_TX");
 
 		//透明化
 		PtrSprite->SetDiffuse(Color4(1,1,1,0));
@@ -420,6 +442,387 @@ namespace basecross{
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	class NumberSprite : public GameObject;
+	//	用途: 数字のスプライト
+	//--------------------------------------------------------------------------------------
+	NumberSprite::NumberSprite(const shared_ptr<Stage>& StagePtr,int numb,Vector2 pos,Vector2 Scale):
+		GameObject(StagePtr),
+		m_num(numb),
+		m_pos(pos),
+		m_scale(Scale)
+	{}
+
+	void NumberSprite::OnCreate()
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float from = i / 10.0f;
+			float to = from + (1.0f / 10.0f);
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(from, 0);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(to, 0);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(from, 1.0f);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(to, 1.0f);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
+			}
+			//メッシュ作成
+			m_Mesh.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+		
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(m_pos.x,m_pos.y, 0);
+		TranP->SetScale(m_scale.x,m_scale.y, 1);
+		TranP->SetRotation(0, 0, 0);
+		
+		auto DrawP = AddComponent<PCTSpriteDraw>();
+		DrawP->SetMeshResource(m_Mesh[m_num]);
+		DrawP->SetTextureResource(L"NUMBER_TX");
+		SetAlphaActive(true);
+
+	}
+	//--------------------------------------------------------------------------------------
+	//	class PauseMenu : public GameObject;
+	//	用途: ポーズメニュー
+	//--------------------------------------------------------------------------------------
+	PauseMenu::PauseMenu(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void PauseMenu::OnCreate()
+	{
+		//ポーズのロゴ
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(Vector3(0,400,0));
+		TranP->SetScale(500, 100, 1);
+		TranP->SetRotation(0, 0, 0);
+
+		auto DrawP = AddComponent<PCTSpriteDraw>();
+		DrawP->SetTextureResource(L"PAUSELOGO_TX");
+		SetAlphaActive(true);
+		SetDrawActive(false);
+		SetDrawLayer(7);
+
+		//暗転
+		auto BlackP = GetStage()->AddGameObject<GameObject>();
+		auto BTranP = BlackP->AddComponent<Transform>();
+		BTranP->SetPosition(0, 0, 0);
+		BTranP->SetScale(1920, 1080, 1);
+		BTranP->SetRotation(0, 0, 0);
+		auto BDrawP = BlackP->AddComponent<PCTSpriteDraw>();
+		BDrawP->SetTextureResource(L"BLACK_TX");
+		BDrawP->SetDiffuse(Color4(1, 1, 1, 0.5f));
+
+		BlackP->SetDrawLayer(6);
+		BlackP->SetAlphaActive(true);
+		BlackP->SetDrawActive(false);
+		m_Black = BlackP;
+
+		//サイズ
+		Vector3 LogoScale = Vector3(500, 200, 1);
+
+		//リトライロゴ
+		auto ReTryP = GetStage()->AddGameObject<GameObject>();
+		auto RTTP = ReTryP->AddComponent<Transform>();
+		RTTP->SetPosition(m_SelectX, 300, 0);
+		RTTP->SetScale(LogoScale);
+		RTTP->SetRotation(0, 0, 0);
+		auto RTDP = ReTryP->AddComponent<PCTSpriteDraw>();
+		RTDP->SetTextureResource(L"PAUSERETRY_TX");
+		ReTryP->SetAlphaActive(true);
+		ReTryP->SetDrawActive(false);
+		ReTryP->SetDrawLayer(7);
+		m_ReTryLogo = ReTryP;
+
+		//マップロゴ
+		auto MaPP = GetStage()->AddGameObject<GameObject>();
+		auto MTPP = MaPP->AddComponent<Transform>();
+		MTPP->SetPosition(m_NotSelectX, 150, 0);
+		MTPP->SetScale(LogoScale);
+		MTPP->SetRotation(0, 0, 0);
+		auto MDPP = MaPP->AddComponent<PCTSpriteDraw>();
+		MDPP->SetTextureResource(L"PAUSEMAPLOGO_TX");
+		MaPP->SetAlphaActive(true);
+		MaPP->SetDrawActive(false);
+		MaPP->SetDrawLayer(7);
+		m_mapLogo = MaPP;
+
+		//ステージセレクトロゴ
+		auto SSP = GetStage()->AddGameObject<GameObject>();
+		auto SSTP = SSP->AddComponent<Transform>();
+		SSTP->SetPosition(m_NotSelectX, 0, 0);
+		SSTP->SetScale(LogoScale);
+		SSTP->SetRotation(0, 0, 0);
+		auto SSDP = SSP->AddComponent<PCTSpriteDraw>();
+		SSDP->SetTextureResource(L"PAUSESTAGESELECTLOGO_TX");
+		SSP->SetAlphaActive(true);
+		SSP->SetDrawActive(false);
+		SSP->SetDrawLayer(7);
+		m_StageSelectLogo = SSP;
+
+		//タイトルロゴ
+		auto TiP = GetStage()->AddGameObject<GameObject>();
+		auto TTP = TiP->AddComponent<Transform>();
+		TTP->SetPosition(m_NotSelectX, -150, 0);
+		TTP->SetScale(LogoScale);
+		TTP->SetRotation(0, 0, 0);
+		auto TDP = TiP->AddComponent<PCTSpriteDraw>();
+		TDP->SetTextureResource(L"PAUSETITLELOGO_TX");
+		TiP->SetAlphaActive(true);
+		TiP->SetDrawActive(false);
+		TiP->SetDrawLayer(7);
+		m_TitleLogo = TiP;
+
+		//マップ画像
+		auto MaP = GetStage()->AddGameObject<GameObject>();
+		auto MaTP = MaP->AddComponent<Transform>();
+		MaTP->SetPosition(0, 0, 0);
+		MaTP->SetScale(500,500,1);
+		MaTP->SetRotation(0, 0, 0);
+		auto MaTDP = MaP->AddComponent<PCTSpriteDraw>();
+		MaTDP->SetTextureResource(L"MAP_TX");
+		MaP->SetAlphaActive(true);
+		MaP->SetDrawActive(false);
+		MaP->SetDrawLayer(7);
+		m_Map = MaP;
+
+	}
+
+	void PauseMenu::OnUpdate()
+	{
+		if (m_BlackOutFlg)
+		{
+			BlackOut();
+			return;
+		}
+		//マップ表示してない
+		if (!m_selectMapFlg)
+		{
+			//ポーズ中かつ暗転入ってない
+			if (m_ActivePauseFlg && !m_BlackOutFlg)
+			{
+				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+				//決定押されたら
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+				{
+					//マップじゃなければ
+					if (m_selectnum != 1)
+					{
+						//暗転状態へ
+						m_BlackOutFlg = true;
+
+						m_Black->SetDrawLayer(8);
+						return;
+					}
+					else
+					{
+						m_Map->SetDrawActive(true);
+						m_selectMapFlg = true;
+					}
+				}
+				Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+				if (!m_moveFlg)
+				{
+					if (inputXY.y < -0.8f)
+					{
+						m_moveFlg = true;
+						m_selectnum++;
+						if (m_selectnum > 3)
+						{
+							m_selectnum = 0;
+						}
+					}
+					if (inputXY.y > 0.8f)
+					{
+						m_moveFlg = true;
+						m_selectnum--;
+						if (m_selectnum < 0)
+						{
+							m_selectnum = 3;
+						}
+					}
+
+					//変更あったら
+					if (m_moveFlg)
+					{
+						Vector3 pos;
+						switch (m_selectnum)
+						{
+						case 0:
+							//前後の物を移動
+							//0なら(3,1)
+							//3
+							pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
+							//1
+							pos = m_mapLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_mapLogo->GetComponent<Transform>()->SetPosition(pos);
+
+							//0
+							pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_SelectX;
+							m_ReTryLogo->GetComponent<Transform>()->SetPosition(pos);
+							break;
+						case 1:
+							//0
+							pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_ReTryLogo->GetComponent<Transform>()->SetPosition(pos);
+							//2
+							pos = m_StageSelectLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_StageSelectLogo->GetComponent<Transform>()->SetPosition(pos);
+							//1
+							pos = m_mapLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_SelectX;
+							m_mapLogo->GetComponent<Transform>()->SetPosition(pos);
+
+							break;
+						case 2:
+							//1
+							pos = m_mapLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_mapLogo->GetComponent<Transform>()->SetPosition(pos);
+							//3
+							pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
+							//2
+							pos = m_StageSelectLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_SelectX;
+							m_StageSelectLogo->GetComponent<Transform>()->SetPosition(pos);
+							break;
+						case 3:
+							//0
+							pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_ReTryLogo->GetComponent<Transform>()->SetPosition(pos);
+							//2
+							pos = m_StageSelectLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_NotSelectX;
+							m_StageSelectLogo->GetComponent<Transform>()->SetPosition(pos);
+							//3
+							pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
+							pos.x = m_SelectX;
+							m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
+							break;
+						default:
+							throw BaseException(
+								L"(PauseMenu)変なの入ってる",
+								L"",
+								L""
+								);
+							break;
+						}
+					}
+				}
+				else if (inputXY.y < 0.1f && inputXY.y > -0.1f)
+				{
+					m_moveFlg = false;
+				}
+			}
+		}
+		//マップ表示してる状態
+		else
+		{
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+			{
+				m_Map->SetDrawActive(false);
+				m_selectMapFlg = false;
+			}
+		}
+	}
+
+	void PauseMenu::BlackOut()
+	{
+		if (m_BlackAlpha >= 1.2f)
+		{
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+
+			switch (m_selectnum)
+			{
+			case 0:
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+
+				break;
+			case 2:
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"StageSelect");
+
+				break;
+			case 3:
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
+
+				break;
+
+			default:
+				break;
+			}
+		}
+		else
+		{
+			m_BlackAlpha += +0.01f;
+			m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+		}
+	}
+
+	void PauseMenu::Pause()
+	{
+		//フラグ反転
+		m_ActivePauseFlg = !m_ActivePauseFlg;
+		//それぞれ実体or透明化
+		SetDrawActive(m_ActivePauseFlg);
+		m_Black->SetDrawActive(m_ActivePauseFlg);
+		m_ReTryLogo->SetDrawActive(m_ActivePauseFlg);
+		m_mapLogo->SetDrawActive(m_ActivePauseFlg);
+		m_StageSelectLogo->SetDrawActive(m_ActivePauseFlg);
+		m_TitleLogo->SetDrawActive(m_ActivePauseFlg);
+
+		m_Map->SetDrawActive(false);
+		m_selectMapFlg = false;
+		m_selectnum = 0;
+
+		//位置調整
+		Vector3 pos;
+		//0
+		pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
+		pos.x = m_SelectX;
+		m_ReTryLogo->GetComponent<Transform>()->SetPosition(pos);
+
+		//1
+		pos = m_mapLogo->GetComponent<Transform>()->GetPosition();
+		pos.x = m_NotSelectX;
+		m_mapLogo->GetComponent<Transform>()->SetPosition(pos);
+		//2
+		pos = m_StageSelectLogo->GetComponent<Transform>()->GetPosition();
+		pos.x = m_NotSelectX;
+		m_StageSelectLogo->GetComponent<Transform>()->SetPosition(pos);
+		//3
+		pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
+		pos.x = m_NotSelectX;
+		m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
+
+
+	}
 	//--------------------------------------------------------------------------------------
 	//	class MenuIcon : public GameObject;
 	//	用途: メニューボタンのアイコン

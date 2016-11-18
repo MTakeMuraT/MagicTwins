@@ -12,9 +12,12 @@ namespace basecross {
 		strTexture = DataDir + L"sky.png";
 		App::GetApp()->RegisterTexture(L"TITLEBACK_TX", strTexture);
 		strTexture = DataDir + L"Black.png";
-		App::GetApp()->RegisterTexture(L"BRACK_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"BLACK_TX", strTexture);
 		strTexture = DataDir + L"PS.png";
 		App::GetApp()->RegisterTexture(L"PRESSSTART_TX", strTexture);
+
+		strTexture = DataDir + L"Number.png";
+		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
 
 	}
 
@@ -133,7 +136,6 @@ namespace basecross {
 			CreateBlack();
 			//PRESS STARTçÏê¨
 			CreatePressStart();
-
 
 		}
 		catch (...) {

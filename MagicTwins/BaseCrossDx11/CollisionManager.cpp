@@ -178,11 +178,14 @@ namespace basecross {
 	{
 		if (Playernum == 1)
 		{
-			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->PlayerDamege();
+			//GetStage()->GetSharedGameObject<Player>(L"Player1", false)->PlayerDamege();
+			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(None);
 		}
 		else if (Playernum == 2)
 		{
-			GetStage()->GetSharedGameObject<Player>(L"Player2", false)->PlayerDamege();
+			//GetStage()->GetSharedGameObject<Player>(L"Player2", false)->PlayerDamege();
+			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(None);
+
 		}
 	}
 
@@ -220,7 +223,8 @@ namespace basecross {
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Enemy>(otherObj);
-				Ptr->ResetPos();
+				//Ptr->ResetPos();
+				Ptr->StopEnemy();
 			}
 			MaBo->SetActive(false, None);
 		}
@@ -255,7 +259,8 @@ namespace basecross {
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Enemy>(otherObj);
-				Ptr->ResetPos();
+				//Ptr->ResetPos();
+				Ptr->StopEnemy();
 			}
 			MaBo->SetActive(false, None);
 

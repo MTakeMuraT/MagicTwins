@@ -79,7 +79,10 @@ namespace basecross {
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 			//魔法作成
-			GetStage()->SetSharedGameObject(L"MagicBoal1", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0),1));
+			auto magicBoal = GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 1);
+			GetStage()->SetSharedGameObject(L"MagicBoal1",magicBoal);
+			//アップデート止めるグループに追加
+			GetStage()->GetSharedObjectGroup(L"SetUpdateObj")->IntoGroup(magicBoal);
 
 			//ライフ表示----------------------------------------
 			auto obj = GetStage()->AddGameObject<GameObject>();
@@ -128,8 +131,11 @@ namespace basecross {
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 			//魔法作成
-			GetStage()->SetSharedGameObject(L"MagicBoal2", GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 2));
-			
+			auto magicBoal = GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 2);
+			GetStage()->SetSharedGameObject(L"MagicBoal2", magicBoal);
+			//アップデート止めるグループに追加
+			GetStage()->GetSharedObjectGroup(L"SetUpdateObj")->IntoGroup(magicBoal);
+
 			//ライフ表示
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -356,7 +362,6 @@ namespace basecross {
 		CameraP->SetEye(m_CameraPos);
 	}
 
-
 	//キャラチェンジ
 	void Player::ChangeChar()
 	{
@@ -548,14 +553,14 @@ namespace basecross {
 	{
 		//初期位置などの設定
 		auto Ptr = GetComponent<Transform>();
-		Ptr->SetScale(0.25f, 0.25f, 0.25f);
+		Ptr->SetScale(m_magicSize);
 		Ptr->SetRotation(0, 0, 0);
 		Ptr->SetPosition(m_pos);
 
 		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
+		//auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 		//描画コンポーネントの設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//メッシュを設定
@@ -571,7 +576,6 @@ namespace basecross {
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 320.0f, 640.0f, 480.0f));
 		PtrString->SetFont(L"", 60);
-
 	}
 
 	void MagicBoal::OnUpdate()
@@ -596,11 +600,11 @@ namespace basecross {
 			Vector3 scale = GetComponent<Transform>()->GetScale();
 			scale *= 0.95f;
 			GetComponent<Transform>()->SetScale(scale);
-			if (scale.x < 0)
+			if (scale.x < 0.2f)
 			{
+				GetComponent<Transform>()->SetPosition(Vector3(0, -10, 0));
 				SetDrawActive(false);
 				m_DeleteFlg = false;
-
 			}
 		}
 	}
@@ -619,9 +623,13 @@ namespace basecross {
 				break;
 			case Fire:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKFIRE_TX");
+				//GetComponent<PNTStaticDraw>()->SetTextureResource(L"FIREEF_TX");
 				break;
 			case IceFog:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKICEFOG_TX");
+				break;
+			case Wind:
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKWIND_TX");
 				break;
 			default:
 				break;
@@ -643,7 +651,7 @@ namespace basecross {
 	//向き、移動量計算
 	void MagicBoal::SetVelo()
 	{
-		GetComponent<Transform>()->SetScale(0.25f, 0.25f, 0.25f);
+		GetComponent<Transform>()->SetScale(m_magicSize);
 		SetDrawActive(true);
 
 		if (m_mynumber == 1)

@@ -16,7 +16,8 @@ enum MagicType
 {
 	None,
 	Fire,
-	IceFog
+	IceFog,
+	Wind
 };
 
 
