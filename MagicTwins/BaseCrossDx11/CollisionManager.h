@@ -30,6 +30,10 @@ namespace basecross {
 		Vector3 MagicPos2;
 		Vector3 MagicScale2;
 		bool MagicFlg2;
+
+
+		//スコアアイテム取得数
+		unsigned int m_scoreItemCount = 0;
 	public :
 		CollisionManager(const shared_ptr<Stage>& StagePtr);
 		virtual void OnCreate() override;

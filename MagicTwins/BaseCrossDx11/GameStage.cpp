@@ -34,11 +34,17 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"MAGICBOOKICEFOG_TX", strTexture);
 		strTexture = DataDir + L"MagicBookWind.png";
 		App::GetApp()->RegisterTexture(L"MAGICBOOKWIND_TX", strTexture);
+		//スコアアイテム
+		strTexture = DataDir + L"ScoreItem.png";
+		App::GetApp()->RegisterTexture(L"SCOREITEM_TX", strTexture);
+
 
 		strTexture = DataDir + L"Gimmick1.png";
 		App::GetApp()->RegisterTexture(L"GIMMICK1_TX", strTexture);
 		strTexture = DataDir + L"Gimmick2.png";
 		App::GetApp()->RegisterTexture(L"GIMMICK2_TX", strTexture);
+		strTexture = DataDir + L"tex01.png";
+		App::GetApp()->RegisterTexture(L"WATERGATE_TX", strTexture);
 		strTexture = DataDir + L"water.png";
 		App::GetApp()->RegisterTexture(L"WATER_TX", strTexture);
 		strTexture = DataDir + L"Ice.png";
@@ -63,6 +69,23 @@ namespace basecross {
 		//魔法UI
 		strTexture = DataDir + L"icon_magic.png";
 		App::GetApp()->RegisterTexture(L"MAGICUI_TX", strTexture);
+		//中身
+		strTexture = DataDir + L"NullUI.png";
+		App::GetApp()->RegisterTexture(L"NULLUI_TX", strTexture);
+		strTexture = DataDir + L"FireUI.png";
+		App::GetApp()->RegisterTexture(L"FIREUI_TX", strTexture);
+		strTexture = DataDir + L"IceUI.png";
+		App::GetApp()->RegisterTexture(L"ICEUI_TX", strTexture);
+		strTexture = DataDir + L"WindUI.png";
+		App::GetApp()->RegisterTexture(L"WINDUI_TX", strTexture);
+
+		//キャラUI
+		strTexture = DataDir + L"Chara1UI.png";
+		App::GetApp()->RegisterTexture(L"CHARA1UI_TX", strTexture);
+		strTexture = DataDir + L"Chara2UI.png";
+		App::GetApp()->RegisterTexture(L"CHARA2UI_TX", strTexture);
+
+		//時間
 		strTexture = DataDir + L"TimeWindow_01.png";
 		App::GetApp()->RegisterTexture(L"TIME_TX", strTexture);
 		//メニューアイコン

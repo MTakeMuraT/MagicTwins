@@ -75,6 +75,8 @@ namespace basecross{
 		void OnUpdate() override;
 		void StopEnemy();
 		void ResetPos();
+
+		bool GetStopFlg() { return m_StopFlg; }
 	};
 	
 	//--------------------------------------------------------------------------------------
@@ -177,6 +179,32 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class ScoreItem : public GameObject;
+	//	用途:　スコアアイテム
+	//--------------------------------------------------------------------------------------
+	class ScoreItem : public GameObject
+	{
+	private :
+		Vector3 m_InitPos;
+		Vector3 m_InitScale;
+		bool m_Active = true;
+	public :
+		ScoreItem(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+
+		void OnCreate() override;
+
+		void Delete();
+
+		bool GetActive() { return m_Active; }
+
+
+		//****仮
+		void Detekuru();
+		void Kieru();
+		//****仮
+	};
+
+	//--------------------------------------------------------------------------------------
 	//	class MenuIcon : public GameObject;
 	//	用途: メニューボタンのアイコン
 	//--------------------------------------------------------------------------------------
@@ -187,11 +215,6 @@ namespace basecross{
 		MenuIcon(const shared_ptr<Stage>& StagePtr);
 		void OnCreate() override;
 	};
-
-	//--------------------------------------------------------------------------------------
-	//	class NumberSprite : public GameObject;
-	//	用途: 数字
-	//--------------------------------------------------------------------------------------
 
 	//--------------------------------------------------------------------------------------
 	//	class PauseMenu : public GameObject;
@@ -248,6 +271,7 @@ namespace basecross{
 		//暗転関数
 		void BlackOut();
 	};
+
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる
@@ -260,12 +284,15 @@ namespace basecross{
 		//大きさ
 		Vector3 m_Scale;
 		//生きてるかどうか
-		bool m_ActiveFlg = false;
+		bool m_ActiveFlg = true;
 	public :
 		Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale);
 		void OnCreate() override;
 
 		void Delete(MagicType MT);
+
+		bool GetActive() { return m_ActiveFlg; }
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -280,14 +307,40 @@ namespace basecross{
 		//大きさ
 		Vector3 m_Scale;
 		//生きてるかどうか
-		bool m_ActiveFlg = false;
+		bool m_ActiveFlg = true;
 	public:
 		Gimmick2(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
 
 		void Delete(MagicType MT);
+
+		bool GetActive() { return m_ActiveFlg; }
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick2_1 : public GameObject;
+	//	用途:　風車に風当てると閉じる水門
+	//--------------------------------------------------------------------------------------
+	class Gimmick2_1 : public GameObject
+	{
+	private :
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_Scale;
+		//閉じてるかどうか
+		bool m_CloseFlg = false;
+		//動いてるかどうか
+		bool m_MoveFlg = false;
+		//目指してる座標
+		float m_targetY=0;
+	public:
+		Gimmick2_1(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		void OnCreate()override;
+		void OnUpdate()override;
+		//なんか動く
+		void Action();
+	};
 
 	//--------------------------------------------------------------------------------------
 	//	class Water : public GameObject;
@@ -362,6 +415,8 @@ namespace basecross{
 		void Flow();
 
 		void SetWaters(vector<shared_ptr<Water>> waters) { m_waters = waters; }
+
+		bool GetFlow() { return m_FlowFlg; }
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -376,12 +431,15 @@ namespace basecross{
 		//大きさ
 		Vector3 m_Scale;
 		//生きてるかどうか
-		bool m_ActiveFlg = false;
+		bool m_ActiveFlg = true;
 	public:
 		Gimmick5(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
 
 		void Delete(MagicType MT);
+
+		bool GetActive() { return m_ActiveFlg; }
+
 	};
 
 }

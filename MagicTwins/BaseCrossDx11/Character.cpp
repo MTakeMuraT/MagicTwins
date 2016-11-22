@@ -46,7 +46,7 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
-	//	class Rpck : public GameObject;
+	//	class Rock : public GameObject;
 	//	用途：岩
 	//--------------------------------------------------------------------------------------
 	Rock::Rock(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
@@ -873,6 +873,67 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class ScoreItem : public GameObject;
+	//	用途:　スコアアイテム
+	//--------------------------------------------------------------------------------------
+	ScoreItem::ScoreItem(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale)
+	{}
+
+	void ScoreItem::OnCreate()
+	{
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//メッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+
+		//テクスチャを設定
+		PtrDraw->SetTextureResource(L"SCOREITEM_TX");
+
+		SetAlphaActive(true);
+
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(m_InitPos);
+		TranP->SetScale(m_InitScale);
+		TranP->SetRotation(0, 0, 0);
+
+
+		//****仮	
+		Kieru();
+		//****仮
+	}
+
+	void ScoreItem::Delete()
+	{
+		m_Active = false;
+		SetDrawActive(false);
+		GetComponent<Transform>()->SetPosition(0, -10, 0);
+
+	}
+
+	void ScoreItem::Detekuru()
+	{
+		if (m_Active)
+		{
+			GetComponent<Transform>()->SetPosition(m_InitPos);
+		}
+	}
+
+	void ScoreItem::Kieru()
+	{
+		if (m_Active)
+		{
+			GetComponent<Transform>()->SetPosition(0, -10, 0);
+		}
+	}
+
+	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる
 	//--------------------------------------------------------------------------------------
@@ -914,8 +975,8 @@ namespace basecross{
 		{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
-			GetComponent<Transform>()->SetPosition(0, -10, 0);
 			GetComponent<CollisionObb>()->SetUpdateActive(false);
+			GetComponent<Transform>()->SetPosition(0, -10, 0);
 			
 		}
 	}
@@ -974,12 +1035,148 @@ namespace basecross{
 		if (MT == Fire)
 		{
 			m_ActiveFlg = false;
+			GetComponent<CollisionObb>()->SetUpdateActive(false);
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
-			GetComponent<CollisionObb>()->SetUpdateActive(false);
+			m_ActiveFlg = false;
+		}
 
+		if (MT == Wind)
+		{
+			GetStage()->GetSharedGameObject<Gimmick2_1>(L"WaterGate", false)->Action();
 		}
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Gimmick2_1 : public GameObject;
+	//	用途:　風車に風当てると閉じる水門
+	//--------------------------------------------------------------------------------------
+		Gimmick2_1::Gimmick2_1(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+			GameObject(StagePtr),
+			m_InitPos(pos),
+			m_Scale(scale)
+		{}
+
+		void Gimmick2_1::OnCreate()
+		{
+		
+			auto Ptr = GetComponent<Transform>();
+			Ptr->SetScale(m_Scale);
+			Ptr->SetRotation(0, 0, 0);
+			Ptr->SetPosition(m_InitPos);
+
+			//影をつける（シャドウマップを描画する）
+			auto ShadowPtr = AddComponent<Shadowmap>();
+			//影の形（メッシュ）を設定
+			ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+			//描画コンポーネントの設定
+			auto PtrDraw = AddComponent<PNTStaticDraw>();
+			//メッシュを設定
+			PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+
+			//テクスチャを設定
+			PtrDraw->SetTextureResource(L"WATERGATE_TX");
+
+			//透明処理
+			SetAlphaActive(true);
+
+			auto PtrCol = AddComponent<CollisionObb>();
+			PtrCol->SetUpdateActive(false);
+		}
+
+		void Gimmick2_1::OnUpdate()
+		{
+			if (m_MoveFlg)
+			{
+				Vector3 pos = GetComponent<Transform>()->GetPosition();
+				//閉じてる最中
+				if (m_CloseFlg)
+				{
+					pos.y += -0.02f;
+					if (pos.y <= m_targetY)
+					{
+						m_MoveFlg = false;
+						pos.y = m_targetY;
+						//水閉じる
+						auto WaterCoreGroupVec = GetStage()->GetSharedObjectGroup(L"WaterCoreGate")->GetGroupVector();
+						for (auto v : WaterCoreGroupVec)
+						{
+							auto WCP = dynamic_pointer_cast<Gimmick3>(v.lock());
+							WCP->Stop();
+						}
+						//アタリつける
+						GetComponent<CollisionObb>()->SetUpdateActive(true);
+
+						//スコアアイテム出現
+						//****仮
+						auto SIGV = GetStage()->GetSharedObjectGroup(L"ScoreItem")->GetGroupVector();
+						for (auto v : SIGV)
+						{
+							auto Ptr = dynamic_pointer_cast<ScoreItem>(v.lock());
+							Ptr->Detekuru();
+						}
+						//****仮
+					}
+				}
+				//開いてる最中
+				else
+				{
+					pos.y += 0.02f;
+					if (pos.y >= m_targetY)
+					{
+						m_MoveFlg = false;
+						pos.y = m_targetY;
+						//水開く
+						auto WaterCoreGroupVec = GetStage()->GetSharedObjectGroup(L"WaterCoreGate")->GetGroupVector();
+						for (auto v : WaterCoreGroupVec)
+						{
+							auto WCP = dynamic_pointer_cast<Gimmick3>(v.lock());
+							WCP->Flow();
+						}
+						//スコアアイテム消える
+						//****仮
+						auto SIGV = GetStage()->GetSharedObjectGroup(L"ScoreItem")->GetGroupVector();
+						for (auto v : SIGV)
+						{
+							auto Ptr = dynamic_pointer_cast<ScoreItem>(v.lock());
+							Ptr->Kieru();
+						}
+						//****仮
+					}
+				}
+				GetComponent<Transform>()->SetPosition(pos);
+			}
+		}
+
+		void Gimmick2_1::Action()
+		{
+			if (!m_MoveFlg)
+			{
+				//開く
+				if (m_CloseFlg)
+				{
+					Vector3 pos = GetComponent<Transform>()->GetPosition();
+					m_targetY = pos.y + m_Scale.y;
+
+					m_CloseFlg = false;
+					m_MoveFlg = true;
+
+					//アタリ消す
+					GetComponent<CollisionObb>()->SetUpdateActive(false);
+
+				}
+				//閉じる
+				else
+				{
+					Vector3 pos = GetComponent<Transform>()->GetPosition();
+					m_targetY = pos.y + -m_Scale.y;
+
+					m_CloseFlg = true;
+					m_MoveFlg = true;
+
+				}
+			}
+		}
 
 	//--------------------------------------------------------------------------------------
 	//	class Water : public GameObject;
@@ -1048,12 +1245,23 @@ namespace basecross{
 	//止める
 	void Water::Stop()
 	{
+		GetComponent<CollisionObb>()->SetUpdateActive(false);
+
+		//水の部分
+		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		pos.y += -m_InitScale.y;
+		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
 	}
 	//流す
 	void Water::Flow()
 	{
+		//水の部分
+		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		pos.y += m_InitScale.y;
+		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
 	}
 
 
@@ -1149,13 +1357,36 @@ namespace basecross{
 	//止める
 	void Gimmick3::Stop()
 	{
+		//アタリ判定の部分
+		GetComponent<CollisionObb>()->SetUpdateActive(false);
 
+		//水の部分
+		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		pos.y += -m_InitScale.y;
+		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+
+			for (auto v : m_waters)
+		{
+			v->Stop();
+		}
 	}
 
 	//流す
 	void Gimmick3::Flow()
 	{
+		//アタリ判定の部分
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
 
+		//水の部分
+		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		pos.y += m_InitScale.y;
+		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+
+
+		for (auto v : m_waters)
+		{
+			v->Flow();
+		}
 	}
 
 
@@ -1201,8 +1432,8 @@ namespace basecross{
 		{
 			m_ActiveFlg = false;
 			SetDrawActive(false);
-			GetComponent<Transform>()->SetPosition(0, -10, 0);
 			GetComponent<CollisionObb>()->SetUpdateActive(false);
+			GetComponent<Transform>()->SetPosition(0, -10, 0);
 
 		}
 	}

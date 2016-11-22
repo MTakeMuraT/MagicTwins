@@ -60,7 +60,7 @@ namespace basecross {
 			Vector3 PPos = Ptr->GetComponent<Transform>()->GetPosition();
 			Vector3 PScale = Ptr->GetComponent<Transform>()->GetScale();
 			//プレイヤー１が当たる
-			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale))
+			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale) && !Ptr->GetStopFlg())
 			{
 				if (GetStage()->GetSharedGameObject<Player>(L"Player1")->GetActive())
 				{
@@ -69,7 +69,7 @@ namespace basecross {
 				}
 			}
 			//プレイヤー２が当たる
-			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale))
+			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale) && !Ptr->GetStopFlg())
 			{
 				if (GetStage()->GetSharedGameObject<Player>(L"Player2")->GetActive())
 				{
@@ -78,6 +78,39 @@ namespace basecross {
 				}
 			}
 		}
+		
+		//プレイヤーとスコアアイテムのあたり判定
+		auto SCG = GetStage()->GetSharedObjectGroup(L"ScoreItem", false);
+		auto SCGV = SCG->GetGroupVector();
+		for (auto v : SCGV)
+		{
+			auto Ptr = dynamic_pointer_cast<ScoreItem>(v.lock());
+			Vector3 PPos = Ptr->GetComponent<Transform>()->GetPosition();
+			Vector3 PScale = Ptr->GetComponent<Transform>()->GetScale();
+			//プレイヤー１が当たる
+			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale) && Ptr->GetActive())
+			{
+				if (GetStage()->GetSharedGameObject<Player>(L"Player1")->GetActive())
+				{
+					Ptr->Delete();
+					//****スコアアイテム加算
+					m_scoreItemCount++;
+					//****スコアアイテム加算
+				}
+			}
+			//プレイヤー２が当たる
+			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale) && Ptr->GetActive())
+			{
+				if (GetStage()->GetSharedGameObject<Player>(L"Player2")->GetActive())
+				{
+					Ptr->Delete();
+					//****スコアアイテム加算
+					m_scoreItemCount++;
+					//****スコアアイテム加算
+				}
+			}
+		}
+		
 		//魔法とオブジェクトのアタリ判定
 		auto Objects = GetStage()->GetSharedObjectGroup(L"MagicObjects")->GetGroupVector();
 		for (auto v : Objects)
@@ -161,6 +194,7 @@ namespace basecross {
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 		auto num = GetStage()->GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetClearTime();
 		ScenePtr->SetClearTime(num);
+		ScenePtr->SetScoreItemCount(m_scoreItemCount);
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Result");
 
 	}
@@ -178,12 +212,12 @@ namespace basecross {
 	{
 		if (Playernum == 1)
 		{
-			//GetStage()->GetSharedGameObject<Player>(L"Player1", false)->PlayerDamege();
+			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->PlayerDamege();
 			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(None);
 		}
 		else if (Playernum == 2)
 		{
-			//GetStage()->GetSharedGameObject<Player>(L"Player2", false)->PlayerDamege();
+			GetStage()->GetSharedGameObject<Player>(L"Player2", false)->PlayerDamege();
 			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(None);
 
 		}
@@ -194,76 +228,123 @@ namespace basecross {
 	{
 		if (num == 1)
 		{
+			bool HitFlg = false;
 			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal1", false);
 			//氷のギミック
 			if (dynamic_pointer_cast<Gimmick1>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
-				Ptr->Delete(MaBo->GetMagicType());
+				if (Ptr->GetActive())
+				{
+					Ptr->Delete(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//風車
 			else if (dynamic_pointer_cast<Gimmick2>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
-				Ptr->Delete(MaBo->GetMagicType());
+				if (Ptr->GetActive())
+				{
+					Ptr->Delete(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//炎
 			else if (dynamic_pointer_cast<Gimmick5>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick5>(otherObj);
-				Ptr->Delete(MaBo->GetMagicType());
+				if (Ptr->GetActive())
+				{
+					Ptr->Delete(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//川のコア
 			else if (dynamic_pointer_cast<Gimmick3>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick3>(otherObj);
-				Ptr->HitMagic(MaBo->GetMagicType());
+				if (Ptr->GetFlow())
+				{
+					Ptr->HitMagic(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//エネミー
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Enemy>(otherObj);
 				//Ptr->ResetPos();
-				Ptr->StopEnemy();
+				if (!Ptr->GetStopFlg())
+				{
+					Ptr->StopEnemy();
+					HitFlg = true;
+				}
 			}
-			MaBo->SetActive(false, None);
+			if (HitFlg)
+			{
+				MaBo->SetActive(false, None);
+			}
 		}
 		else if (num == 2)
 		{
+			bool HitFlg = false;
 			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false);
 			//氷のギミック
 			if (dynamic_pointer_cast<Gimmick1>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick1>(otherObj);
-				Ptr->Delete(MaBo->GetMagicType());
+				if (Ptr->GetActive())
+				{
+					Ptr->Delete(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//風車
 			else if (dynamic_pointer_cast<Gimmick2>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick2>(otherObj);
-				Ptr->Delete(MaBo->GetMagicType());
+				if (Ptr->GetActive())
+				{
+					Ptr->Delete(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//炎
 			else if (dynamic_pointer_cast<Gimmick5>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick5>(otherObj);
-				Ptr->Delete(MaBo->GetMagicType());
+				if (Ptr->GetActive())
+				{
+					Ptr->Delete(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//川のコア
 			else if (dynamic_pointer_cast<Gimmick3>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Gimmick3>(otherObj);
-				Ptr->HitMagic(MaBo->GetMagicType());
+				if (Ptr->GetFlow())
+				{
+					Ptr->HitMagic(MaBo->GetMagicType());
+					HitFlg = true;
+				}
 			}
 			//エネミー
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
 			{
 				auto Ptr = dynamic_pointer_cast<Enemy>(otherObj);
 				//Ptr->ResetPos();
-				Ptr->StopEnemy();
+				if (!Ptr->GetStopFlg())
+				{
+					Ptr->StopEnemy();
+					HitFlg = true;
+				}
 			}
-			MaBo->SetActive(false, None);
-
+			if (HitFlg)
+			{
+				MaBo->SetActive(false, None);
+			}
 		}
 	}
 

@@ -65,6 +65,9 @@ namespace basecross
 		Vector3 FirePos;
 		Vector3 IceFogPos;
 		Vector3 WindPos;
+		//スコアアイテム
+		vector<Vector3> ScoreItemPos;
+		vector<Vector3> ScoreItemScale;
 		//ギミック
 		//ギミック１(氷)
 		vector<Vector3> Gimmick1IcePos;
@@ -72,6 +75,9 @@ namespace basecross
 		//ギミック２(風車)
 		vector<Vector3> Gimmick2WindMillPos;
 		vector<Vector3> Gimmick2WindMillScale;
+		//↑の水門
+		Vector3 Gimmick2_1WaterGatePos;
+		Vector3 Gimmick2_1WaterGateScale;
 		//ギミック３(川のコア)最大３個まで対応
 		Vector3 WaterCore1Pos;
 		Vector3 WaterCore2Pos;
@@ -119,6 +125,16 @@ namespace basecross
 				RockPos.push_back(pos);
 				RockScale.push_back(scale);
 			}
+			//スコアアイテム
+			if (StageMapVec[0] == L"ScoreItem")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				ScoreItemPos.push_back(pos);
+				ScoreItemScale.push_back(scale);
+			}
+
 			//ゴール
 			if (StageMapVec[0] == L"Goal")
 			{
@@ -168,6 +184,15 @@ namespace basecross
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				Gimmick2WindMillPos.push_back(pos);
 				Gimmick2WindMillScale.push_back(scale);
+			}
+			//水門
+			if (StageMapVec[0] == L"Gimmick2_1")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				Gimmick2_1WaterGatePos = pos;
+				Gimmick2_1WaterGateScale = scale;
 			}
 			//ギミック３
 			if (StageMapVec[0] == L"Gimmick31")
@@ -291,6 +316,18 @@ namespace basecross
 			count++;
 		}
 		count = 0;
+		//スコアアイテム作成
+		//スコアアイテムグループ
+		auto SIG = st->CreateSharedObjectGroup(L"ScoreItem");
+		for (auto v : ScoreItemPos)
+		{
+			//スケールは別で持ってくる
+			Vector3 scale = ScoreItemScale[count];
+			auto Ptr = st->AddGameObject<ScoreItem>(v, scale);
+			SIG->IntoGroup(Ptr);
+			count++;
+		}
+		count = 0;
 		//プレイヤー作成
 		auto PP = st->AddGameObject<Player>(Player1Pos, true, "Player1");
 		st->SetSharedGameObject(L"Player1",PP);
@@ -351,6 +388,8 @@ namespace basecross
 			count++;
 		}
 		count = 0;
+		//水門
+		st->SetSharedGameObject(L"WaterGate",st->AddGameObject<Gimmick2_1>(Gimmick2_1WaterGatePos, Gimmick2_1WaterGateScale));
 		//5
 		for (auto v : Gimmick5FirePos)
 		{
@@ -388,6 +427,8 @@ namespace basecross
 		}
 		count = 0;
 		//3
+		//水門用グループ
+		auto WaterGateGroup = st->CreateSharedObjectGroup(L"WaterCoreGate");
 		auto Gimi3P = st->AddGameObject<Gimmick3>(WaterCore1Pos, WaterCore1Scale);
 		//コアに関連する水を追加
 		Gimi3P->SetWaters(Water1Vec);
@@ -395,17 +436,21 @@ namespace basecross
 		MOG->IntoGroup(Gimi3P);
 		//アップデートグループ追加
 		SUG->IntoGroup(Gimi3P);
+		WaterGateGroup->IntoGroup(Gimi3P);
 		//以下同
 
 		Gimi3P = st->AddGameObject<Gimmick3>(WaterCore2Pos, WaterCore2Scale);
 		Gimi3P->SetWaters(Water2Vec);
 		MOG->IntoGroup(Gimi3P);
 		SUG->IntoGroup(Gimi3P);
+		WaterGateGroup->IntoGroup(Gimi3P);
+
 
 		Gimi3P = st->AddGameObject<Gimmick3>(WaterCore3Pos, WaterCore3Scale);
 		Gimi3P->SetWaters(Water3Vec);
 		MOG->IntoGroup(Gimi3P);
 		SUG->IntoGroup(Gimi3P);
+		WaterGateGroup->IntoGroup(Gimi3P);
 
 
 		//

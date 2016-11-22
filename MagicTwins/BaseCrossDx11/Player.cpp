@@ -112,7 +112,33 @@ namespace basecross {
 			MUI->SetAlphaActive(true);
 			MUI->SetDrawLayer(3);
 			m_MagicUI = MUI;
+
+			auto MUI2 = GetStage()->AddGameObject<GameObject>();
+			auto MUIDraw2 = MUI2->AddComponent<PCTSpriteDraw>();
+			MUIDraw2->SetTextureResource(L"NULLUI_TX");
+			auto MUIT2 = MUI2->AddComponent<Transform>();
+			MUIT2->SetPosition(0, 420, 0);
+			MUIT2->SetRotation(0, 0, 0);
+			MUIT2->SetScale(100, 100, 0);
+			MUI2->SetAlphaActive(true);
+			MUI2->SetDrawLayer(4);
+			m_MagicUIIn = MUI2;
 			//魔法UI表示----------------------------------------
+
+
+			//キャラUI表示--------------------------------------
+			auto CHU = GetStage()->AddGameObject<GameObject>();
+			auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
+			CHUD->SetTextureResource(L"CHARA1UI_TX");
+			auto CHUT = CHU->AddComponent<Transform>();
+			CHUT->SetPosition(-850, 480, 0);
+			CHUT->SetRotation(0, 0, 0);
+			CHUT->SetScale(100, 100, 0);
+			CHU->SetAlphaActive(true);
+			CHU->SetDrawLayer(3);
+			CHU->SetDrawActive(true);
+			m_CharaUI = CHU;
+			//キャラUI表示--------------------------------------
 
 		}
 		else if (m_myName == "Player2")
@@ -136,6 +162,7 @@ namespace basecross {
 			//アップデート止めるグループに追加
 			GetStage()->GetSharedObjectGroup(L"SetUpdateObj")->IntoGroup(magicBoal);
 
+			/*
 			//ライフ表示
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -150,6 +177,41 @@ namespace basecross {
 			obj->SetAlphaActive(true);
 			obj->SetDrawLayer(3);
 			m_LifeSprite = obj;
+
+			*/
+
+			//ライフ表示----------------------------------------
+			auto obj = GetStage()->AddGameObject<GameObject>();
+			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+			objDraw->SetTextureResource(L"LIFE3_TX");
+
+			auto objtrans = obj->AddComponent<Transform>();
+			//1920,1080
+			//960,540
+			objtrans->SetPosition(-700, 420, 0);
+			objtrans->SetRotation(0, 0, 0);
+			objtrans->SetScale(400, 200, 1);
+			obj->SetAlphaActive(true);
+			obj->SetDrawLayer(3);
+
+			obj->SetDrawActive(false);
+			m_LifeSprite = obj;
+			//ライフ表示----------------------------------------
+
+			//キャラUI表示--------------------------------------
+			auto CHU = GetStage()->AddGameObject<GameObject>();
+			auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
+			CHUD->SetTextureResource(L"CHARA2UI_TX");
+			auto CHUT = CHU->AddComponent<Transform>();
+			CHUT->SetPosition(-850, 480, 0);
+			CHUT->SetRotation(0, 0, 0);
+			CHUT->SetScale(100, 100, 0);
+			CHU->SetAlphaActive(true);
+			CHU->SetDrawLayer(3);
+			CHU->SetDrawActive(false);
+			m_CharaUI = CHU;
+			//キャラUI表示--------------------------------------
+
 
 		}
 
@@ -380,6 +442,10 @@ namespace basecross {
 
 			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
 
+			//ライフ透明化＆表示 キャラUIも
+			m_LifeSprite->SetDrawActive(false);
+			m_CharaUI->SetDrawActive(false);
+			DPlayer->DispUI();
 
 			//いなかったらエラー終了
 			if (!DPlayer)
@@ -413,6 +479,12 @@ namespace basecross {
 		else if (m_myName == "Player2")
 		{
 			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+
+			//ライフ透明化＆表示 キャラUIも
+			m_LifeSprite->SetDrawActive(false);
+			m_CharaUI->SetDrawActive(false);
+			DPlayer->DispUI();
+
 			//いなかったらエラー終了
 			if (!DPlayer)
 			{
@@ -473,6 +545,27 @@ namespace basecross {
 				L"誰やお前", L"PlayerのmyNameが", L"リスト外やねん"
 				);
 		}
+
+		if (m_myName == "Player1")
+		{
+			//魔法UI変更
+			switch (MT)
+			{
+			case None:
+				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"NULLUI_TX");
+				break;
+			case Fire:
+				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"FIREUI_TX");
+				break;
+			case IceFog:
+				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"ICEUI_TX");
+				break;
+			case Wind:
+				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"WINDUI_TX");
+			default:
+				break;
+			}
+		}
 	}
 
 	//魔法を発射する
@@ -497,8 +590,10 @@ namespace basecross {
 	}
 
 	//ターンの最終更新時
-	void Player::OnLastUpdate() {
+	void Player::OnLastUpdate()
+	{
 
+		/*
 		wstring txt;
 		//回転とってる
 		//auto TranP = GetComponent<Transform>();
@@ -521,7 +616,7 @@ namespace basecross {
 			break;
 		}
 		GetComponent<StringSprite>()->SetText(txt);
-		
+		*/
 	}
 
 	void Player::PlayerDamege()

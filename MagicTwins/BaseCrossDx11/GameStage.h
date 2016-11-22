@@ -27,6 +27,7 @@ namespace basecross {
 
 		//ポーズメニュー作成
 		void CreatePauseMenu();
+
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

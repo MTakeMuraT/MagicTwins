@@ -344,6 +344,14 @@ namespace basecross
 			st2->SetText(txt);
 			obj2->SetDrawLayer(10);
 
+			auto obj3 = AddGameObject<GameObject>();
+			auto st3 = obj3->AddComponent<StringSprite>();
+			st3->SetTextRect(Rect2D<float>(400.0f, 800.0f, 1920.0f, 1080.0f));
+			st3->SetFontColor(Color4(0, 0, 0, 1));
+			st3->SetFont(L"", 100);
+			txt = L"SCOREITEM : " + Util::IntToWStr(ScenePtr->GetScoreItemCount());
+			st3->SetText(txt);
+			obj3->SetDrawLayer(10);
 		}
 		catch (...) {
 			throw;

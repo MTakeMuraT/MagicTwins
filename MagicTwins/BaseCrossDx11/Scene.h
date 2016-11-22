@@ -16,6 +16,8 @@ namespace basecross{
 	private:
 		//クリアタイム
 		unsigned int m_clearTime = 0;
+		//スコアアイテム取得数
+		unsigned int m_ScoreItemCount = 0;
 		//曲
 		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
 
@@ -36,9 +38,14 @@ namespace basecross{
 		unsigned int GetStageNum() { return m_stageNum; }
 
 		//クリアタイムをセット
-		void SetClearTime(int num) { m_clearTime = num; }
+		void SetClearTime(unsigned int num) { m_clearTime = num; }
 		//クリアタイム取得
-		int GetClearTime() { return m_clearTime; }
+		unsigned int GetClearTime() { return m_clearTime; }
+
+		//スコアアイテム取得数をセット
+		void SetScoreItemCount(unsigned int num) { m_ScoreItemCount = num; }
+		//スコアアイテム取得
+		unsigned int GetScoreItemCount() { return m_ScoreItemCount; }
 	};
 
 }

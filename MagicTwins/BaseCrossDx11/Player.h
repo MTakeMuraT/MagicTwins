@@ -60,7 +60,13 @@ namespace basecross{
 		//*********************************//
 		MagicType m_Magic = None;
 
+		//魔法UI
 		shared_ptr<GameObject> m_MagicUI;
+		//中身UI
+		shared_ptr<GameObject> m_MagicUIIn;
+
+		//キャラUI
+		shared_ptr<GameObject> m_CharaUI;
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))
@@ -89,7 +95,8 @@ namespace basecross{
 		//ダメージ処理
 		void PlayerDamege();
 
-
+		//ライフ表示
+		void DispUI() { m_LifeSprite->SetDrawActive(true); m_CharaUI->SetDrawActive(true); }
 	};
 
 	//--------------------------------------------------------------------------------------

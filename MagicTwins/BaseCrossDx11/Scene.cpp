@@ -37,15 +37,17 @@ namespace basecross{
 			//ResetActiveStage<Result>();
 
 			//BGM
-			/*
+			
 			wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameStageBGM.wav";
 			App::GetApp()->RegisterWav(L"GameStageBGM", strMusic);
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameStageBGM2.wav";
+			App::GetApp()->RegisterWav(L"GameStageBGM2", strMusic);
 
 			//オーディオの初期化
 			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioObjectPtr->AddAudioResource(L"GameStageBGM");
 			m_AudioObjectPtr->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.2f);
-			*/
+			
 		}
 		catch (...) {
 			throw;
@@ -61,24 +63,28 @@ namespace basecross{
 		//ステージセレクト
 		else if (event->m_MsgStr == L"StageSelect")
 		{
-			ResetActiveStage<StageSelect>();
 			//セレクト画面に入ったらGameStageBGMを止める
-			//m_AudioObjectPtr->Stop(L"GameStageBGM");
-
+			m_AudioObjectPtr->Stop(L"GameStageBGM");
+			ResetActiveStage<StageSelect>();
 		}
 		//ゲーム中
 		else if (event->m_MsgStr == L"GameStage")
 		{
+			m_AudioObjectPtr->AddAudioResource(L"GameStageBGM2");
+			m_AudioObjectPtr->Start(L"GameStageBGM2", XAUDIO2_LOOP_INFINITE, 0.2f);
 			ResetActiveStage<GameStage>();
 		}
 		//クリア
 		else if (event->m_MsgStr == L"Result")
 		{
+			m_AudioObjectPtr->Stop(L"GameStageBGM2");
 			ResetActiveStage<Result>();
+
 		}
 		//ゲームオーバー
 		else if (event->m_MsgStr == L"GameOver")
 		{
+			m_AudioObjectPtr->Stop(L"GameStageBGM2");
 			ResetActiveStage<GameOver>();
 		}
 
