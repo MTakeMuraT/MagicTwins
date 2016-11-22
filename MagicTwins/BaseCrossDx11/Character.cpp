@@ -315,6 +315,8 @@ namespace basecross{
 		case IceFog :
 			PtrDraw->SetTextureResource(L"MAGICBOOKICEFOG_TX");
 			break;
+		case Wind:
+			PtrDraw->SetTextureResource(L"MAGICBOOKWIND_TX");
 		default:
 			break;
 		}
@@ -446,17 +448,28 @@ namespace basecross{
 	//	class NumberSprite : public GameObject;
 	//	用途: 数字のスプライト
 	//--------------------------------------------------------------------------------------
-	NumberSprite::NumberSprite(const shared_ptr<Stage>& StagePtr,int numb,Vector2 pos,Vector2 Scale):
+	NumberSprite::NumberSprite(const shared_ptr<Stage>& StagePtr,int numb,Vector2 pos,Vector2 Scale,int layer):
 		GameObject(StagePtr),
 		m_num(numb),
 		m_pos(pos),
-		m_scale(Scale)
+		m_scale(Scale),
+		m_layer(layer)
 	{}
 
 	void NumberSprite::OnCreate()
 	{
+		//数字の大きさによって回数変更
+		int count = m_num;
+		do
+		{
+			count /= 10;
+			m_digit++;
+		} while (count > 0);
+
+		//数字のスプライト作成
 		for (int i = 0; i < 10; i++)
 		{
+
 			//頂点配列
 			vector<VertexPositionNormalTexture> vertices;
 			//インデックスを作成するための配列
@@ -486,18 +499,33 @@ namespace basecross{
 			//メッシュ作成
 			m_Mesh.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
 		}
-		
-		auto TranP = AddComponent<Transform>();
-		TranP->SetPosition(m_pos.x,m_pos.y, 0);
-		TranP->SetScale(m_scale.x,m_scale.y, 1);
-		TranP->SetRotation(0, 0, 0);
-		
-		auto DrawP = AddComponent<PCTSpriteDraw>();
-		DrawP->SetMeshResource(m_Mesh[m_num]);
-		DrawP->SetTextureResource(L"NUMBER_TX");
-		SetAlphaActive(true);
 
+		int masternum = m_num;
+		//桁分ループ
+		for (int j = 0; j < m_digit; j++)
+		{
+			int num = m_num;
+			int digi = (m_digit-1) - j;
+			num = masternum / pow(10, (digi));
+			masternum = masternum % (int)(pow(10, (digi)));
+
+			auto NumP = GetStage()->AddGameObject<GameObject>();
+
+			auto TranP = NumP->AddComponent<Transform>();
+			TranP->SetPosition(m_pos.x - (m_scale.x*j), m_pos.y, 0);
+			TranP->SetScale(m_scale.x, m_scale.y, 1);
+			TranP->SetRotation(0, 0, 0);
+
+			auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+			DrawP->SetMeshResource(m_Mesh[num]);
+			DrawP->SetTextureResource(L"NUMBER_TX");
+			SetAlphaActive(true);
+
+			NumP->SetDrawLayer(m_layer);
+			m_Numbers.push_back(NumP);
+		}
 	}
+
 	//--------------------------------------------------------------------------------------
 	//	class PauseMenu : public GameObject;
 	//	用途: ポーズメニュー

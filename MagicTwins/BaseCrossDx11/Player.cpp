@@ -297,6 +297,7 @@ namespace basecross {
 			{
 				ShotMagic();
 			}
+
 		}
 
 		//コンポーネントにやってもらう座標移動
@@ -312,6 +313,7 @@ namespace basecross {
 		auto CameraP = View->GetTargetCamera();
 		//カメラ移動
 		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		/*
 		//カメラとプレイヤーの差を計算
 		pos.z += -5.0f;
 		Vector3 Direction = pos - m_CameraPos;
@@ -356,8 +358,13 @@ namespace basecross {
 				m_CameraTargetVec.z += Direction.z;
 			}
 		}
-		m_CameraTargetVec.y = GetComponent<Transform>()->GetPosition().y;
-		m_CameraPos.y = m_CameraTargetVec.y + 5.0f;
+		*/
+		//m_CameraTargetVec.y = GetComponent<Transform>()->GetPosition().y;
+		m_CameraTargetVec = pos;
+		//m_CameraPos.y = m_CameraTargetVec.y + 5.0f;
+		m_CameraPos = m_CameraTargetVec;
+		m_CameraPos.y += 5.0f;
+		m_CameraPos.z += -8.0f;
 		CameraP->SetAt(m_CameraTargetVec);
 		CameraP->SetEye(m_CameraPos);
 	}
@@ -508,6 +515,8 @@ namespace basecross {
 		case IceFog:
 			txt += L"IceFog";
 			break;
+		case Wind:
+			txt += L"Wind";
 		default:
 			break;
 		}

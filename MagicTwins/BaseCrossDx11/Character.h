@@ -157,18 +157,25 @@ namespace basecross{
 	private:
 		//なんかしらんメッシュのリスト
 		vector<shared_ptr<MeshResource>> m_Mesh;
-		unsigned int m_num = 0;
+		int m_num = 0;
+		//桁数
+		int m_digit = 0;
+		//表示レイヤー
+		int m_layer = 0;
 		//大きさ
 		Vector2 m_scale;
 		//位置
 		Vector2 m_pos;
+		//数字分のvector配列
+		vector<shared_ptr<GameObject>> m_Numbers;
 	public :
-		NumberSprite(const shared_ptr<Stage>& StagePtr, int num,Vector2 pos,Vector2 scale);
+		NumberSprite(const shared_ptr<Stage>& StagePtr, int num,Vector2 pos,Vector2 scale,int layer);
 		
 		void OnCreate()override;
 
 		void SetNum(int num);
 	};
+
 	//--------------------------------------------------------------------------------------
 	//	class MenuIcon : public GameObject;
 	//	用途: メニューボタンのアイコン

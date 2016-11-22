@@ -64,6 +64,7 @@ namespace basecross
 		//魔導書
 		Vector3 FirePos;
 		Vector3 IceFogPos;
+		Vector3 WindPos;
 		//ギミック
 		//ギミック１(氷)
 		vector<Vector3> Gimmick1IcePos;
@@ -90,7 +91,6 @@ namespace basecross
 		vector<Vector3> Water3Pos;
 		vector<Vector3> Water3Scale;
 		//オブジェクトの情報入れとくはこ-----------------------------
-
 
 
 		//空(最後)になるまで繰り返す
@@ -243,10 +243,17 @@ namespace basecross
 				IceFogPos = pos;
 			}
 
+			if (StageMapVec[0] == L"MagicBookWind")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				WindPos = pos;
+			}
+
 			if (!Flgg)
 			{
 				throw BaseException(
-					L"CSVに指定されていない文字列が", L"設定されています", L""
+					L"CSVに指定されていない文字列が", L"設定されています", Util::IntToWStr(RowData) + L"行目"
 					);
 
 			}
@@ -315,10 +322,17 @@ namespace basecross
 		MBGroup->IntoGroup(MPt);
 		//アップデートグループ追加
 		SUG->IntoGroup(MPt);
+		//氷
 		MPt = st->AddGameObject<MagicBook>(IceFogPos, IceFog);
 		MBGroup->IntoGroup(MPt);
 		//アップデートグループ追加
 		SUG->IntoGroup(MPt);
+		//風
+		MPt = st->AddGameObject<MagicBook>(WindPos, Wind);
+		MBGroup->IntoGroup(MPt);
+		//アップデートグループ追加
+		SUG->IntoGroup(MPt);
+
 
 		//ギミック作成
 		//1

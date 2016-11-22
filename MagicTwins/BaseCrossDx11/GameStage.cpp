@@ -277,6 +277,7 @@ namespace basecross {
 			//ƒAƒCƒRƒ“ì¬
 			CreateIcons();
 
+			CreateSharedObjectGroup(L"obj1");
 		}
 		catch (...) {
 			throw;
