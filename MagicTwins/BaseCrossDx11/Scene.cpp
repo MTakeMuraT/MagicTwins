@@ -27,6 +27,8 @@ namespace basecross{
 		App::GetApp()->RegisterResource(L"MagicBook_Model", ModelMesh);
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Rock/Rock04.bmf");
 		App::GetApp()->RegisterResource(L"Rock_Model", ModelMesh);
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Fence/FENCE.bmf");
+		App::GetApp()->RegisterResource(L"Fence_Model", ModelMesh);
 
 		try {
 			//最初のアクティブステージの設定
@@ -40,14 +42,17 @@ namespace basecross{
 			
 			wstring strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameStageBGM.wav";
 			App::GetApp()->RegisterWav(L"GameStageBGM", strMusic);
-			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameStageBGM2.wav";
-			App::GetApp()->RegisterWav(L"GameStageBGM2", strMusic);
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/TitleBGM.wav";
+			App::GetApp()->RegisterWav(L"TitleBGM", strMusic);
 
 			//オーディオの初期化
-			m_AudioObjectPtr = ObjectFactory::Create<MultiAudioObject>();
-			m_AudioObjectPtr->AddAudioResource(L"GameStageBGM");
-			m_AudioObjectPtr->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.2f);
-			
+			m_AudioTitle = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioTitle->AddAudioResource(L"TitleBGM");
+			m_AudioTitle->Start(L"TitleBGM");
+
+			m_AudioGame = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioGame->AddAudioResource(L"GameStageBGM");
+
 		}
 		catch (...) {
 			throw;
@@ -58,33 +63,34 @@ namespace basecross{
 		//タイトル
 		if (event->m_MsgStr == L"Title")
 		{
+			m_AudioGame->Stop(L"GameStageBGM");
+			m_AudioTitle->Start(L"TitleBGM",XAUDIO2_LOOP_INFINITE,0.5f);
 			ResetActiveStage<Title>();
 		}
 		//ステージセレクト
 		else if (event->m_MsgStr == L"StageSelect")
 		{
-			//セレクト画面に入ったらGameStageBGMを止める
-			m_AudioObjectPtr->Stop(L"GameStageBGM");
+			//セレクト画面に入ったらTitleBGMを止める
+			m_AudioTitle->Stop(L"TitleBGM");
 			ResetActiveStage<StageSelect>();
 		}
 		//ゲーム中
 		else if (event->m_MsgStr == L"GameStage")
 		{
-			m_AudioObjectPtr->AddAudioResource(L"GameStageBGM2");
-			m_AudioObjectPtr->Start(L"GameStageBGM2", XAUDIO2_LOOP_INFINITE, 0.2f);
+			m_AudioGame->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
 			ResetActiveStage<GameStage>();
 		}
 		//クリア
 		else if (event->m_MsgStr == L"Result")
 		{
-			m_AudioObjectPtr->Stop(L"GameStageBGM2");
+			m_AudioGame->Stop(L"GameStageBGM");
 			ResetActiveStage<Result>();
 
 		}
 		//ゲームオーバー
 		else if (event->m_MsgStr == L"GameOver")
 		{
-			m_AudioObjectPtr->Stop(L"GameStageBGM2");
+			m_AudioGame->Stop(L"GameStageBGM");
 			ResetActiveStage<GameOver>();
 		}
 

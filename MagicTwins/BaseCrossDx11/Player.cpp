@@ -425,7 +425,7 @@ namespace basecross {
 		m_CameraTargetVec = pos;
 		//m_CameraPos.y = m_CameraTargetVec.y + 5.0f;
 		m_CameraPos = m_CameraTargetVec;
-		m_CameraPos.y += 5.0f;
+		m_CameraPos.y += 8.0f;
 		m_CameraPos.z += -8.0f;
 		CameraP->SetAt(m_CameraTargetVec);
 		CameraP->SetEye(m_CameraPos);
@@ -439,7 +439,7 @@ namespace basecross {
 		//自分がどっちか判定
 		if (m_myName == "Player1")
 		{
-
+			
 			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
 
 			//ライフ透明化＆表示 キャラUIも

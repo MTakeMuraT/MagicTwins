@@ -92,6 +92,55 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class Fence : public GameObject;
+	//	用途: 柵
+	//--------------------------------------------------------------------------------------
+	Fence::Fence(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, Vector3 rot) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_InitRot(rot)
+	{}
+
+	void Fence::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		m_InitScale *= 0.9f;
+		Ptr->SetScale(m_InitScale);
+		Ptr->SetRotation(m_InitRot);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+
+		// モデルとトランスフォームの間の差分行列
+		float angle = (-90) * (3.14159265f / 180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(0,0, 0),
+			Vector3(0, -0.5f, 0)
+			);
+
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"Fence_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"Fence_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+
+	//--------------------------------------------------------------------------------------
 	//	class Box : public GameObject;
 	//	用途: 箱
 	//--------------------------------------------------------------------------------------
@@ -125,7 +174,6 @@ namespace basecross{
 		SetAlphaActive(true);
 
 	}
-
 	//--------------------------------------------------------------------------------------
 	//	class Enemy : public GameObject;
 	//	用途: 敵
@@ -564,13 +612,14 @@ namespace basecross{
 		m_Black = BlackP;
 
 		//サイズ
-		Vector3 LogoScale = Vector3(500, 200, 1);
+		Vector3 LogoScale = Vector3(400, 400, 1);
 
 		//リトライロゴ
 		auto ReTryP = GetStage()->AddGameObject<GameObject>();
 		auto RTTP = ReTryP->AddComponent<Transform>();
-		RTTP->SetPosition(m_SelectX, 300, 0);
-		RTTP->SetScale(LogoScale);
+		//RTTP->SetPosition(m_SelectX, 300, 0);
+		RTTP->SetPosition(-500, -400, 0);
+		RTTP->SetScale(m_SelectScale);
 		RTTP->SetRotation(0, 0, 0);
 		auto RTDP = ReTryP->AddComponent<PCTSpriteDraw>();
 		RTDP->SetTextureResource(L"PAUSERETRY_TX");
@@ -579,6 +628,7 @@ namespace basecross{
 		ReTryP->SetDrawLayer(7);
 		m_ReTryLogo = ReTryP;
 
+		/*
 		//マップロゴ
 		auto MaPP = GetStage()->AddGameObject<GameObject>();
 		auto MTPP = MaPP->AddComponent<Transform>();
@@ -591,12 +641,14 @@ namespace basecross{
 		MaPP->SetDrawActive(false);
 		MaPP->SetDrawLayer(7);
 		m_mapLogo = MaPP;
+		*/
 
 		//ステージセレクトロゴ
 		auto SSP = GetStage()->AddGameObject<GameObject>();
 		auto SSTP = SSP->AddComponent<Transform>();
-		SSTP->SetPosition(m_NotSelectX, 0, 0);
-		SSTP->SetScale(LogoScale);
+		//SSTP->SetPosition(m_NotSelectX, 0, 0);
+		SSTP->SetPosition(0, -400, 0);
+		SSTP->SetScale(m_NotSelectScale);
 		SSTP->SetRotation(0, 0, 0);
 		auto SSDP = SSP->AddComponent<PCTSpriteDraw>();
 		SSDP->SetTextureResource(L"PAUSESTAGESELECTLOGO_TX");
@@ -608,8 +660,9 @@ namespace basecross{
 		//タイトルロゴ
 		auto TiP = GetStage()->AddGameObject<GameObject>();
 		auto TTP = TiP->AddComponent<Transform>();
-		TTP->SetPosition(m_NotSelectX, -150, 0);
-		TTP->SetScale(LogoScale);
+		//TTP->SetPosition(m_NotSelectX, -150, 0);
+		TTP->SetPosition(500, -400, 0);
+		TTP->SetScale(m_NotSelectScale);
 		TTP->SetRotation(0, 0, 0);
 		auto TDP = TiP->AddComponent<PCTSpriteDraw>();
 		TDP->SetTextureResource(L"PAUSETITLELOGO_TX");
@@ -649,7 +702,7 @@ namespace basecross{
 				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 				//決定押されたら
 				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
-				{
+				{/*
 					//マップじゃなければ
 					if (m_selectnum != 1)
 					{
@@ -664,39 +717,54 @@ namespace basecross{
 						m_Map->SetDrawActive(true);
 						m_selectMapFlg = true;
 					}
+					*/
+
+					//暗転状態へ
+					m_BlackOutFlg = true;
+
+					m_Black->SetDrawLayer(8);
+					return;
+
 				}
 				Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
 				if (!m_moveFlg)
 				{
-					if (inputXY.y < -0.8f)
+					if (inputXY.x > 0.8f)
 					{
 						m_moveFlg = true;
 						m_selectnum++;
-						if (m_selectnum > 3)
+						if (m_selectnum > 2)
 						{
 							m_selectnum = 0;
 						}
 					}
-					if (inputXY.y > 0.8f)
+					if (inputXY.x < -0.8f)
 					{
 						m_moveFlg = true;
 						m_selectnum--;
 						if (m_selectnum < 0)
 						{
-							m_selectnum = 3;
+							m_selectnum = 2;
 						}
 					}
 
 					//変更あったら
 					if (m_moveFlg)
 					{
-						Vector3 pos;
+						//Vector3 pos;
+						Vector3 scale;
 						switch (m_selectnum)
 						{
 						case 0:
+							m_ReTryLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+							m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+
+							/*
 							//前後の物を移動
 							//0なら(3,1)
 							//3
+
 							pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_NotSelectX;
 							m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
@@ -709,8 +777,14 @@ namespace basecross{
 							pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_SelectX;
 							m_ReTryLogo->GetComponent<Transform>()->SetPosition(pos);
+							*/
 							break;
 						case 1:
+							m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+							m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+
+							/*
 							//0
 							pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_NotSelectX;
@@ -723,9 +797,14 @@ namespace basecross{
 							pos = m_mapLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_SelectX;
 							m_mapLogo->GetComponent<Transform>()->SetPosition(pos);
-
+							*/
 							break;
 						case 2:
+							m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_TitleLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+
+							/*
 							//1
 							pos = m_mapLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_NotSelectX;
@@ -738,8 +817,11 @@ namespace basecross{
 							pos = m_StageSelectLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_SelectX;
 							m_StageSelectLogo->GetComponent<Transform>()->SetPosition(pos);
+							*/
 							break;
+							/*
 						case 3:
+							
 							//0
 							pos = m_ReTryLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_NotSelectX;
@@ -752,7 +834,9 @@ namespace basecross{
 							pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
 							pos.x = m_SelectX;
 							m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
+							
 							break;
+							*/
 						default:
 							throw BaseException(
 								L"(PauseMenu)変なの入ってる",
@@ -763,7 +847,7 @@ namespace basecross{
 						}
 					}
 				}
-				else if (inputXY.y < 0.1f && inputXY.y > -0.1f)
+				else if (inputXY.x < 0.1f && inputXY.x > -0.1f)
 				{
 					m_moveFlg = false;
 				}
@@ -793,11 +877,11 @@ namespace basecross{
 				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 
 				break;
-			case 2:
+			case 1:
 				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"StageSelect");
 
 				break;
-			case 3:
+			case 2:
 				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
 
 				break;
@@ -821,14 +905,20 @@ namespace basecross{
 		SetDrawActive(m_ActivePauseFlg);
 		m_Black->SetDrawActive(m_ActivePauseFlg);
 		m_ReTryLogo->SetDrawActive(m_ActivePauseFlg);
-		m_mapLogo->SetDrawActive(m_ActivePauseFlg);
+		//m_mapLogo->SetDrawActive(m_ActivePauseFlg);
 		m_StageSelectLogo->SetDrawActive(m_ActivePauseFlg);
 		m_TitleLogo->SetDrawActive(m_ActivePauseFlg);
 
-		m_Map->SetDrawActive(false);
+		m_Map->SetDrawActive(m_ActivePauseFlg);
 		m_selectMapFlg = false;
 		m_selectnum = 0;
 
+		//サイズ調整
+		m_ReTryLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+		m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+		m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+
+		/*
 		//位置調整
 		Vector3 pos;
 		//0
@@ -848,7 +938,7 @@ namespace basecross{
 		pos = m_TitleLogo->GetComponent<Transform>()->GetPosition();
 		pos.x = m_NotSelectX;
 		m_TitleLogo->GetComponent<Transform>()->SetPosition(pos);
-
+		*/
 
 	}
 	//--------------------------------------------------------------------------------------

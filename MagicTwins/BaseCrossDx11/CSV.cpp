@@ -52,6 +52,10 @@ namespace basecross
 		//岩
 		vector<Vector3> RockPos;
 		vector<Vector3> RockScale;
+		//柵
+		vector<Vector3> FencePos;
+		vector<Vector3> FenceScale;		
+		vector<Vector3> FenceRot;
 		//ゴール
 		Vector3 GoalPos;
 		Vector3 GoalScale;
@@ -114,6 +118,7 @@ namespace basecross
 				Vector3 rot = Vector3(_wtof(StageMapVec[7].c_str()), _wtof(StageMapVec[8].c_str()), _wtof(StageMapVec[9].c_str()));
 				BoxPoss.push_back(pos);
 				BoxScale.push_back(scale);
+				rot *= (3.14159265f / 180);
 				BoxRot.push_back(rot);
 			}
 			//岩
@@ -124,6 +129,18 @@ namespace basecross
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
 				RockPos.push_back(pos);
 				RockScale.push_back(scale);
+			}
+			//柵
+			if (StageMapVec[0] == L"Fence")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				Vector3 rot = Vector3(_wtof(StageMapVec[7].c_str()), _wtof(StageMapVec[8].c_str()), _wtof(StageMapVec[9].c_str()));
+				FencePos.push_back(pos);
+				FenceScale.push_back(scale);
+				rot *= (3.14159265f / 180);
+				FenceRot.push_back(rot);
 			}
 			//スコアアイテム
 			if (StageMapVec[0] == L"ScoreItem")
@@ -313,6 +330,16 @@ namespace basecross
 			//スケールは別で持ってくる
 			Vector3 scale = RockScale[count];
 			st->AddGameObject<Rock>(v, scale);
+			count++;
+		}
+		count = 0;
+		//柵作成
+		for (auto v : FencePos)
+		{
+			Vector3 scale = FenceScale[count];
+			Vector3 rot = FenceRot[count];
+			auto ptr = st->AddGameObject<Fence>(v, scale, rot);
+			MOG->IntoGroup(ptr);
 			count++;
 		}
 		count = 0;

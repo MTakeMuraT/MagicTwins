@@ -10,15 +10,18 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
 		strTexture = DataDir + L"sky.png";
 		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
-		//StegeSelect画像(仮)
-		strTexture = DataDir + L"BButton.png";
-		App::GetApp()->RegisterTexture(L"BBUTTON_TX", strTexture);
 		//左矢印画像(仮)
 		strTexture = DataDir + L"Left.png";
 		App::GetApp()->RegisterTexture(L"LEFT_TX", strTexture);
 		//右矢印画像(仮)
 		strTexture = DataDir + L"Right.png";
 		App::GetApp()->RegisterTexture(L"RIGHT_TX", strTexture);
+		//Bボタン
+		strTexture = DataDir + L"ButtonB.png";
+		App::GetApp()->RegisterTexture(L"BBUTTON_TX", strTexture);
+		//決定ロゴ
+		strTexture = DataDir + L"Kettei.png";
+		App::GetApp()->RegisterTexture(L"KETTEI_TX", strTexture);
 
 	}
 
@@ -99,30 +102,42 @@ namespace basecross {
 		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 	}
 
-	//ボタン説明
-	void StageSelect::CreaateStageSelect()
+	void StageSelect::CreateButtons()
 	{
-		auto StageSelect = AddGameObject<GameObject>();
-		StageSelect->AddComponent<Transform>();
-		auto PtrTransform = StageSelect->GetComponent<Transform>();
-		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(600, -400, 0);
-		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(500, 200, 1);
+		//Bボタン作成
+		auto obj1 = AddGameObject<GameObject>();
+		auto OT1 = obj1->AddComponent<Transform>();
+		OT1->SetPosition(300, -400, 0);
+		OT1->SetScale(100, 100, 1);
+		OT1->SetRotation(0, 0, 0);
+		auto OD1 = obj1->AddComponent<PCTSpriteDraw>();
+		OD1->SetTextureResource(L"BBUTTON_TX");
+		obj1->SetAlphaActive(true);
+		obj1->SetDrawLayer(3);
 
-		//スプライトを付ける
-		auto PtrSprite = StageSelect->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"BBUTTON_TX");
+		auto obj2 = AddGameObject<GameObject>();
+		auto OT2 = obj2->AddComponent<Transform>();
+		OT2->SetPosition(450, -400, 0);
+		OT2->SetScale(250, 160, 1);
+		OT2->SetRotation(0, 0, 0);
+		auto OD2 = obj2->AddComponent<PCTSpriteDraw>();
+		OD2->SetTextureResource(L"KETTEI_TX");
+		obj2->SetAlphaActive(true);
+		obj2->SetDrawLayer(3);
 
-		SetSharedGameObject(L"StageSelect", StageSelect);
+		/*
+		auto obj2 = AddGameObject<GameObject>();
+		auto OT2 = obj2->AddComponent<Transform>();
+		OT2->SetPosition(500, -400, 0);
+		OT2->SetScale(100, 100, 1);
+		OT2->SetRotation(0, 0, 0);
+		auto OD2 = obj2->AddComponent<PCTSpriteDraw>();
+		OD2->SetTextureResource(L"ABUTTON_TX");
+		obj2->SetAlphaActive(true);
+		obj2->SetDrawLayer(3);
+		*/
+	}
 
-		StageSelect->SetDrawLayer(2);
-
-		//透明度反映
-		StageSelect->SetAlphaActive(true);
-		GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
-
-}
 	//左矢印(仮)
 	void StageSelect::Left()
 	{
@@ -196,8 +211,8 @@ namespace basecross {
 			CreateBack();
 			//ロゴ作成
 			CreateSelectLogo();
-			//ステージセレクト(仮)
-			CreaateStageSelect();
+			//ボタン作成
+			CreateButtons();
 
 			//左矢印(仮)
 			Left();

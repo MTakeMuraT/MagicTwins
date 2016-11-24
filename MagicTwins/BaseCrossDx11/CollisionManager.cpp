@@ -228,7 +228,7 @@ namespace basecross {
 	{
 		if (num == 1)
 		{
-			bool HitFlg = false;
+			bool HitFlg = true;
 			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal1", false);
 			//氷のギミック
 			if (dynamic_pointer_cast<Gimmick1>(otherObj))
@@ -239,6 +239,10 @@ namespace basecross {
 					Ptr->Delete(MaBo->GetMagicType());
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
 			}
 			//風車
 			else if (dynamic_pointer_cast<Gimmick2>(otherObj))
@@ -248,6 +252,10 @@ namespace basecross {
 				{
 					Ptr->Delete(MaBo->GetMagicType());
 					HitFlg = true;
+				}
+				else
+				{
+					HitFlg = false;
 				}
 			}
 			//炎
@@ -259,6 +267,11 @@ namespace basecross {
 					Ptr->Delete(MaBo->GetMagicType());
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
+
 			}
 			//川のコア
 			else if (dynamic_pointer_cast<Gimmick3>(otherObj))
@@ -269,6 +282,11 @@ namespace basecross {
 					Ptr->HitMagic(MaBo->GetMagicType());
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
+
 			}
 			//エネミー
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
@@ -280,7 +298,13 @@ namespace basecross {
 					Ptr->StopEnemy();
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
+
 			}
+
 			if (HitFlg)
 			{
 				MaBo->SetActive(false, None);
@@ -288,7 +312,7 @@ namespace basecross {
 		}
 		else if (num == 2)
 		{
-			bool HitFlg = false;
+			bool HitFlg = true;
 			auto MaBo = GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false);
 			//氷のギミック
 			if (dynamic_pointer_cast<Gimmick1>(otherObj))
@@ -299,6 +323,10 @@ namespace basecross {
 					Ptr->Delete(MaBo->GetMagicType());
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
 			}
 			//風車
 			else if (dynamic_pointer_cast<Gimmick2>(otherObj))
@@ -308,6 +336,10 @@ namespace basecross {
 				{
 					Ptr->Delete(MaBo->GetMagicType());
 					HitFlg = true;
+				}
+				else
+				{
+					HitFlg = false;
 				}
 			}
 			//炎
@@ -319,6 +351,11 @@ namespace basecross {
 					Ptr->Delete(MaBo->GetMagicType());
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
+
 			}
 			//川のコア
 			else if (dynamic_pointer_cast<Gimmick3>(otherObj))
@@ -329,6 +366,11 @@ namespace basecross {
 					Ptr->HitMagic(MaBo->GetMagicType());
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
+
 			}
 			//エネミー
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
@@ -340,7 +382,13 @@ namespace basecross {
 					Ptr->StopEnemy();
 					HitFlg = true;
 				}
+				else
+				{
+					HitFlg = false;
+				}
+
 			}
+
 			if (HitFlg)
 			{
 				MaBo->SetActive(false, None);

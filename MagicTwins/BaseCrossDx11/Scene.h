@@ -19,7 +19,10 @@ namespace basecross{
 		//スコアアイテム取得数
 		unsigned int m_ScoreItemCount = 0;
 		//曲
-		shared_ptr<MultiAudioObject> m_AudioObjectPtr;
+		shared_ptr<MultiAudioObject> m_AudioTitle;
+		//ステージ
+		shared_ptr<MultiAudioObject> m_AudioGame;
+
 
 		//めんどいから直打ちで魔法の種類作る
 		const int m_MagicTypeLength = 2;

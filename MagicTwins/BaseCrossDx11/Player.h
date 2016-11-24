@@ -111,7 +111,7 @@ namespace basecross{
 		//À•W
 		Vector3 m_pos;
 		//‘å‚«‚³
-		Vector3 m_magicSize = Vector3(0.5f, 0.5f, 0.5f);
+		Vector3 m_magicSize = Vector3(0.25f, 0.25f, 0.25f);
 
 		//¶‚«‚Ä‚é‚©‚Ç‚¤‚©
 		bool m_ActiveFlg = false;

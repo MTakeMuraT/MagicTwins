@@ -37,6 +37,21 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
+	//	class Fence : public GameObject;
+	//	用途: 柵
+	//--------------------------------------------------------------------------------------
+	class Fence : public GameObject
+	{
+	private:
+		Vector3 m_InitPos;
+		Vector3 m_InitScale;
+		Vector3 m_InitRot;
+	public :
+		Fence(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, Vector3 rot);
+		void OnCreate() override;
+
+	};
+	//--------------------------------------------------------------------------------------
 	//	class Rock : public GameObject;
 	//用途：岩
 	//--------------------------------------------------------------------------------------
@@ -224,7 +239,7 @@ namespace basecross{
 	{
 	private:
 		shared_ptr<GameObject> m_ReTryLogo;
-		shared_ptr<GameObject> m_mapLogo;
+		//shared_ptr<GameObject> m_mapLogo;
 		shared_ptr<GameObject> m_StageSelectLogo;
 		shared_ptr<GameObject> m_TitleLogo;
 		shared_ptr<GameObject> m_Black;
@@ -240,6 +255,7 @@ namespace basecross{
 
 		//現在何選んでるかの数字
 		//0:retry1:map2:stageselect3:title
+		//改定後 0:retry 1:stageselect 2:title
 		int m_selectnum = 0;
 
 		//操作フラグ
@@ -249,6 +265,10 @@ namespace basecross{
 		const float m_SelectX = -750;
 		//非選択時X
 		const float m_NotSelectX = -850;
+
+		//選択時Scale
+		const Vector3 m_SelectScale = Vector3(500,500,1);
+		const Vector3 m_NotSelectScale = Vector3(400,400,1);
 
 		//暗転の透明度
 		float m_BlackAlpha = 0;
