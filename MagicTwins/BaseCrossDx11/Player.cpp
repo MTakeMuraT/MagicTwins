@@ -119,7 +119,7 @@ namespace basecross {
 			auto MUIT2 = MUI2->AddComponent<Transform>();
 			MUIT2->SetPosition(0, 420, 0);
 			MUIT2->SetRotation(0, 0, 0);
-			MUIT2->SetScale(100, 100, 0);
+			MUIT2->SetScale(150, 150, 0);
 			MUI2->SetAlphaActive(true);
 			MUI2->SetDrawLayer(4);
 			m_MagicUIIn = MUI2;

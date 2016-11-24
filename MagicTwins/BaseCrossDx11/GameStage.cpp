@@ -196,7 +196,7 @@ namespace basecross {
 	//§ŒÀŠÔì¬
 	void GameStage::CreateLimitTime()
 	{
-		auto LTP = AddGameObject<LimitTime>(1000);
+		auto LTP = AddGameObject<LimitTime>(90);
 		SetSharedGameObject(L"LimitTime", LTP);
 		GetSharedObjectGroup(L"SetUpdateObj")->IntoGroup(LTP);
 	}

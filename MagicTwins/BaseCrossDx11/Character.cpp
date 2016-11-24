@@ -549,11 +549,12 @@ namespace basecross{
 		}
 
 		int masternum = m_num;
+		
 		//Œ…•ªƒ‹[ƒv
-		for (int j = 0; j < m_digit; j++)
+		for (int j = m_digit-1; j >= 0; j--)
 		{
 			int num = m_num;
-			int digi = (m_digit-1) - j;
+			int digi = j;
 			num = masternum / pow(10, (digi));
 			masternum = masternum % (int)(pow(10, (digi)));
 
@@ -565,12 +566,64 @@ namespace basecross{
 			TranP->SetRotation(0, 0, 0);
 
 			auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
-			DrawP->SetMeshResource(m_Mesh[num]);
 			DrawP->SetTextureResource(L"NUMBER_TX");
-			SetAlphaActive(true);
+			DrawP->SetMeshResource(m_Mesh[num]);
+			NumP->SetAlphaActive(true);
 
 			NumP->SetDrawLayer(m_layer);
 			m_Numbers.push_back(NumP);
+		}
+	}
+
+	void NumberSprite::SetNum(int num)
+	{
+		m_num = num;
+		//“ü—Í‚³‚ê‚½Œ…‚Á‚Ä‚­‚é
+		int digit = 0;
+		int innum = num;
+		do
+		{
+			innum /= 10;
+			digit++;
+		} while (innum > 0);
+
+		//“ü—Í‚³‚ê‚½‚Ù‚¤‚ª‘å‚«‚©‚Á‚½‚ç
+		if (digit > m_digit)
+		{
+			//¶‚ÉŒ…’Ç‰Á
+			int digitDif = digit - m_digit;
+			for (int i = m_digit-1; i < digit-1; i++)
+			{
+				auto NumP = GetStage()->AddGameObject<GameObject>();
+
+				auto TranP = NumP->AddComponent<Transform>();
+				TranP->SetPosition(m_pos.x - (m_scale.x*i), m_pos.y, 0);
+				TranP->SetScale(m_scale.x, m_scale.y, 1);
+				TranP->SetRotation(0, 0, 0);
+
+				auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+				DrawP->SetTextureResource(L"NUMBER_TX");
+				DrawP->SetMeshResource(m_Mesh[0]);
+				NumP->SetAlphaActive(true);
+
+				NumP->SetDrawLayer(m_layer);
+				m_Numbers.push_back(NumP);
+			}
+
+			m_digit = digit;
+		}
+
+		//”š“ü‚ê‘Ö‚¦
+		int masternum = m_num;
+		for (int i = 0; i < m_digit; i++)
+		{
+			int setnum = m_num;
+			int num = m_num;
+			int digi = i;
+			num = masternum / pow(10, (digi));
+			masternum = masternum % (int)(pow(10, (digi)));
+
+			m_Numbers[i]->GetComponent<PCTSpriteDraw>()->SetMeshResource(m_Mesh[setnum]);
 		}
 	}
 

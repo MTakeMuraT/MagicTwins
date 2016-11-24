@@ -295,7 +295,7 @@ namespace basecross
 			if (!Flgg)
 			{
 				throw BaseException(
-					L"CSVに指定されていない文字列が", L"設定されています", Util::IntToWStr(RowData) + L"行目"
+					L"CSVに指定されていない文字列が", L"設定されています", Util::IntToWStr(RowData+1) + L"行目"
 					);
 
 			}
