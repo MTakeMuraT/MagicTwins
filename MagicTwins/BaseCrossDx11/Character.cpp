@@ -190,10 +190,11 @@ namespace basecross{
 	//	class Enemy : public GameObject;
 	//	—p“r: “G
 	//--------------------------------------------------------------------------------------
-	Enemy::Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+	Enemy::Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int num):
 		GameObject(StagePtr),
 		m_InitPos(pos),
-		m_Scale(scale)
+		m_Scale(scale),
+		m_TargetPlayernum(num)
 	{}
 
 	void Enemy::OnCreate()
@@ -216,40 +217,61 @@ namespace basecross{
 
 	void Enemy::OnUpdate()
 	{
+		//Ž€‚ñ‚Å‚½‚ç‚â‚ß
+		if (!m_ActiveFlg)
+		{
+			m_time += App::GetApp()->GetElapsedTime();
+			//•œŠˆ‚·‚é‚Ü‚ÅŒo‰ß‚µ‚½‚ç
+			if (m_time > m_ReSponTime)
+			{
+				m_ActiveFlg = true;
+				m_life = m_MaxLife;
+				m_speed = m_InitSpeed;
+				SetDrawActive(true);
+				GetComponent<Transform>()->SetPosition(m_InitPos);
+			}
+			return;
+		}
 		//Ž~‚Ü‚Á‚Ä‚È‚¯‚ê‚Î’Ç‚¤
 		if (!m_StopFlg)
 		{
+			
 			auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
 			auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
 
-			if (P1P->GetActive())
+			if (m_TargetPlayernum == 1)
 			{
-				Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
-				Vector3 nowpos = GetComponent<Transform>()->GetPosition();
-				Vector3 dir;
-				dir = topos - nowpos;
-				Vector2 velo = Vector2(dir.x, dir.z);
-				float angle = atan2(velo.y, velo.x);
-				velo.x = cos(angle);
-				velo.y = sin(angle);
-				nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
-				nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
-				GetComponent<Transform>()->SetPosition(nowpos);
+				if (P1P->GetActive())
+				{
+					Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+					Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+					Vector3 dir;
+					dir = topos - nowpos;
+					Vector2 velo = Vector2(dir.x, dir.z);
+					float angle = atan2(velo.y, velo.x);
+					velo.x = cos(angle);
+					velo.y = sin(angle);
+					nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
+					nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
+					GetComponent<Transform>()->SetPosition(nowpos);
+				}
 			}
-
-			else if (P2P->GetActive())
+			else if (m_TargetPlayernum == 2)
 			{
-				Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
-				Vector3 nowpos = GetComponent<Transform>()->GetPosition();
-				Vector3 dir;
-				dir = topos - nowpos;
-				Vector2 velo = Vector2(dir.x, dir.z);
-				float angle = atan2(velo.y, velo.x);
-				velo.x = cos(angle);
-				velo.y = sin(angle);
-				nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
-				nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
-				GetComponent<Transform>()->SetPosition(nowpos);
+				if (P2P->GetActive())
+				{
+					Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+					Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+					Vector3 dir;
+					dir = topos - nowpos;
+					Vector2 velo = Vector2(dir.x, dir.z);
+					float angle = atan2(velo.y, velo.x);
+					velo.x = cos(angle);
+					velo.y = sin(angle);
+					nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
+					nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
+					GetComponent<Transform>()->SetPosition(nowpos);
+				}
 			}
 		}
 		else
@@ -264,16 +286,33 @@ namespace basecross{
 		}
 	}
 
-	void Enemy::StopEnemy()
+	void Enemy::StopEnemy(int TargetNum)
 	{
-		m_StopFlg = true;
-		m_time = 0;
-		GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1,0.5f));
+		if (TargetNum == m_TargetPlayernum)
+		{
+			m_StopFlg = true;
+			m_life--;
+			m_time = 0;
+			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
+			m_speed *= 1.5f;
+
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos += Vector3(rand() % 10 - 5, 0, rand() % 10 - 5);
+			GetComponent<Transform>()->SetPosition(pos);
+
+			if (m_life <= 0)
+			{
+				SetDrawActive(false);
+				m_ActiveFlg = false;
+				GetComponent<Transform>()->SetPosition(0, -15, 0);
+			}
+		}
 	}
 
 	void Enemy::ResetPos()
 	{
+		m_speed = m_InitSpeed;
 		GetComponent<Transform>()->SetPosition(m_InitPos);
 	}
 

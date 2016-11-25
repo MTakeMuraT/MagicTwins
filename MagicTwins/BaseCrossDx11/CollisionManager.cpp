@@ -295,7 +295,7 @@ namespace basecross {
 				//Ptr->ResetPos();
 				if (!Ptr->GetStopFlg())
 				{
-					Ptr->StopEnemy();
+					Ptr->StopEnemy(1);
 					HitFlg = true;
 				}
 				else
@@ -379,7 +379,7 @@ namespace basecross {
 				//Ptr->ResetPos();
 				if (!Ptr->GetStopFlg())
 				{
-					Ptr->StopEnemy();
+					Ptr->StopEnemy(2);
 					HitFlg = true;
 				}
 				else

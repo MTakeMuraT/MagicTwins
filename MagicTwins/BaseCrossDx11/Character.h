@@ -78,19 +78,32 @@ namespace basecross{
 		Vector3 m_InitPos;
 		Vector3 m_Scale;
 		//速度
-		float m_speed = 2.0f;
-
+		float m_speed = 1.5f;
+		const float m_InitSpeed = 1.5f;
 		//停止状態
 		bool m_StopFlg = false;
 		//停止時間
-		const float m_StopTime = 3.0f;
+		const float m_StopTime = 0.5f;
+		//死んでる時間
+		const float m_ReSponTime = 10.0f;
 		//計算用
 		float m_time = 0;
+		//体力
+		int m_life = 10;
+		//初期体力
+		const int m_MaxLife = 10;
+		//狙ってるプレイヤー
+		int m_TargetPlayernum = 0;
+		//生きてるか死んでるか
+		bool m_ActiveFlg = true;
+		//ライフバー
+		shared_ptr<GameObject> m_lifeBar;
+
 	public :
-		Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
+		Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int targetNum);
 		void OnCreate() override;
 		void OnUpdate() override;
-		void StopEnemy();
+		void StopEnemy(int TargetNum);
 		void ResetPos();
 
 		bool GetStopFlg() { return m_StopFlg; }
