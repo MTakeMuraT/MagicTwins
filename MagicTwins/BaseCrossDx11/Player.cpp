@@ -700,6 +700,14 @@ namespace basecross {
 				m_DeleteFlg = true;
 				m_ActiveFlg = false;
 			}
+			//•X‚Í’Z‚­
+			if (m_MagicType == IceFog && m_lifeTime > m_shortLimitTime)
+			{
+				m_lifeTime = 0;
+				m_DeleteFlg = true;
+				m_ActiveFlg = false;
+
+			}
 		}
 		else if (m_DeleteFlg)
 		{

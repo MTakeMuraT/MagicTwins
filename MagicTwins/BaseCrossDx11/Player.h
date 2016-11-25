@@ -123,6 +123,7 @@ namespace basecross{
 		//¶‘¶ŠÔ
 		float m_lifeTime;
 		const float m_LifeTimeLimit = 1.0f;
+		const float m_shortLimitTime = 0.2f;
 
 		//Á–Åƒtƒ‰ƒO
 		bool m_DeleteFlg = false;
