@@ -136,7 +136,8 @@ namespace basecross {
 			CreateBlack();
 			//PRESS STARTçÏê¨
 			CreatePressStart();
-			
+		
+			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
 		}
 		catch (...) {
 			throw;
@@ -164,6 +165,9 @@ namespace basecross {
 				{
 					m_ConFlg = false;
 					GetSharedGameObject<Black>(L"Black", false)->StartBlack();
+
+					//SEçƒê∂
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectTitle");
 				}
 			}
 

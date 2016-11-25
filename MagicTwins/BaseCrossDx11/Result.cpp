@@ -294,6 +294,9 @@ namespace basecross
 			//empty3
 		    Createempty3();
 
+			//SEマネージャー
+			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
+
 
 			//文字表示テスト用
 			auto obj = AddGameObject<GameObject>();
@@ -314,15 +317,15 @@ namespace basecross
 			st1->SetTextRect(Rect2D<float>(900.0f, 200.0f, 1920.0f, 480.0f));
 			st1->SetFontColor(Color4(1, 1, 0, 1));
 			st1->SetFont(L"", 200);
-			if (num < 10)
+			if (num < 10 || (ScenePtr->GetScoreItemCount() > 0 && num < 30))
 			{
 				txt = L"S";
 			}
-			else if (num < 20)
+			else if (num < 20 || (ScenePtr->GetScoreItemCount() > 0 && num < 50))
 			{
 				txt = L"A";
 			}
-			else if (num < 40)
+			else if (num < 50)
 			{
 				txt = L"B";
 			}

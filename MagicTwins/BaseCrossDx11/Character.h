@@ -131,6 +131,8 @@ namespace basecross{
 		float m_ElaTime=0;
 		//ÄoŒ»ŠÔ
 		const float m_LimitTime = 3.0f;
+		//Œ³‚Ì‘å‚«‚³
+		Vector3 m_Scale = Vector3(0.5f,0.5f,0.5f);
 	public :
 		MagicBook(const shared_ptr<Stage>& StagePtr, Vector3 initPos,MagicType Magic);
 		void OnCreate();
@@ -297,6 +299,20 @@ namespace basecross{
 		void BlackOut();
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class SEManager : public GameObject;
+	//	—p“r: BGMˆÈŠO‚ÌSE‚ğ‚Ü‚Æ‚ß‚é‚à‚Ì
+	//--------------------------------------------------------------------------------------
+	class SEManager : public GameObject
+	{
+	private :
+		//‰¹
+		shared_ptr<MultiAudioObject> m_Se;
+	public :
+		SEManager(const shared_ptr<Stage>& StagePtr);
+		void OnCreate()override;
+		void OnSe(string name);
+	};
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	—p“r: •XB‰Š‚Ì–‚–@[Fire]‚Å—n‚©‚¹‚é

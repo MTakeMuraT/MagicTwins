@@ -22,6 +22,8 @@ namespace basecross{
 		shared_ptr<MultiAudioObject> m_AudioTitle;
 		//ステージ
 		shared_ptr<MultiAudioObject> m_AudioGame;
+		//リザルト
+		shared_ptr<MultiAudioObject> m_AudioResult;
 
 
 		//めんどいから直打ちで魔法の種類作る

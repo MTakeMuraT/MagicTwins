@@ -625,6 +625,8 @@ namespace basecross {
 		GetComponent<Rigidbody>()->SetVelocity(0, 10, 0);
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
+		//SEÄ¶
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Damege");
 		switch (m_life)
 		{
 		case 0:

@@ -67,6 +67,7 @@ namespace basecross{
 
 		//キャラUI
 		shared_ptr<GameObject> m_CharaUI;
+
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))

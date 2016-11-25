@@ -178,6 +178,10 @@ namespace basecross
 			//タイトルロゴ作成
 			CreateTitle();
 
+			//SEマネージャー
+			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
+
+
 		}
 		catch (...) {
 			throw;

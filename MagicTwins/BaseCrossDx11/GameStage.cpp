@@ -301,6 +301,9 @@ namespace basecross {
 			CreateIcons();
 
 			CreateSharedObjectGroup(L"obj1");
+			//SEマネージャー
+			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
+
 		}
 		catch (...) {
 			throw;

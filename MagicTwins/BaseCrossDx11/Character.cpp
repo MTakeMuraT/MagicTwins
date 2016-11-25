@@ -339,10 +339,12 @@ namespace basecross{
 	void MagicBook::OnCreate()
 	{
 		auto Ptr = GetComponent<Transform>();
-		Ptr->SetScale(0.5f, 0.5f, 0.5f);
+		Ptr->SetScale(m_Scale);
 		Ptr->SetRotation(0, 0, 0);
 		Ptr->SetPosition(m_InitPos);
 
+		/*
+		//丸用
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
@@ -368,7 +370,48 @@ namespace basecross{
 		default:
 			break;
 		}
+		*/
+		
+		//モデル用
+		// モデルとトランスフォームの間の差分行列
+		float angle = (-90) * (3.14159265f / 180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(0.5f, 0.5f, 0.5f),
+			Vector3(0, 0, 0),
+			Vector3(0, -0.5f, 0)
+			);
 
+		//影をつける（シャドウマップを描画する）
+		auto ShadowPtr = AddComponent<Shadowmap>();
+		//影の形（メッシュ）を設定
+		ShadowPtr->SetMeshResource(L"MagicBookFire_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"MagicBookFire_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+
+		switch (m_MagicContent)
+		{
+		case Fire:
+			ShadowPtr->SetMeshResource(L"MagicBookFire_Model");
+			PtrDraw->SetMeshResource(L"MagicBookFire_Model");
+			break;
+		case IceFog:
+			ShadowPtr->SetMeshResource(L"MagicBookIceFog_Model");
+			PtrDraw->SetMeshResource(L"MagicBookIceFog_Model");		
+			break;
+		case Wind:
+			ShadowPtr->SetMeshResource(L"MagicBookWind_Model");
+			PtrDraw->SetMeshResource(L"MagicBookWind_Model");	
+			break;
+		}
+		
 
 		/*//モデル版
 		// モデルとトランスフォームの間の差分行列
@@ -422,10 +465,12 @@ namespace basecross{
 		m_ElaTime += App::GetApp()->GetElapsedTime();
 		if (m_ElaTime >= m_LimitTime)
 		{
-			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+			GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
 			m_ElaTime = 0;
 			SetUpdateActive(false);
 			m_ActiveFlg = true;
+			GetComponent<Transform>()->SetScale(m_Scale);
+
 		}
 	}
 
@@ -435,9 +480,13 @@ namespace basecross{
 		if (m_ActiveFlg)
 		{
 			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(m_MagicContent);
-			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 0.1f));
+			GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 0.1f));
 			SetUpdateActive(true);
 			m_ActiveFlg = false;
+
+			//モデルにしたら透明化できなくなったから小さくする
+			Vector3 scale = m_Scale / 2;
+			GetComponent<Transform>()->SetScale(scale);
 		}
 	}
 
@@ -1105,7 +1154,49 @@ namespace basecross{
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
 		}
 	}
+	//--------------------------------------------------------------------------------------
+	//	class SEManager : public GameObject;
+	//	用途: BGM以外のSEをまとめるもの
+	//--------------------------------------------------------------------------------------
+	SEManager::SEManager(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
 
+	void SEManager::OnCreate()
+	{
+		m_Se = ObjectFactory::Create<MultiAudioObject>();
+	}
+
+	void SEManager::OnSe(string name)
+	{
+		//タイトル決定音
+		if (name == "SelectTitle")
+		{
+			m_Se->AddAudioResource(L"SelectTitleSE");
+			m_Se->Start(L"SelectTitleSE", 0.5f);
+		}
+		if (name == "Select")
+		{
+			m_Se->AddAudioResource(L"SelectSE");
+			m_Se->Start(L"SelectSE", 0.5f);
+		}
+		if (name == "Damege")
+		{
+			m_Se->AddAudioResource(L"DamageSE");
+			m_Se->Start(L"DamageSE", 0.5f);
+		}
+		if (name == "Water")
+		{
+			m_Se->AddAudioResource(L"WaterSE");
+			m_Se->Start(L"WaterSE", 0.5f);
+		}
+		if (name == "Freeze")
+		{
+			m_Se->AddAudioResource(L"FreezeSE");
+			m_Se->Start(L"FreezeSE", XAUDIO2_LOOP_INFINITE, 0.5f);
+		}
+
+	}
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	用途: 氷。炎の魔法[Fire]で溶かせる
@@ -1304,6 +1395,8 @@ namespace basecross{
 						for (auto v : WaterCoreGroupVec)
 						{
 							auto WCP = dynamic_pointer_cast<Gimmick3>(v.lock());
+							//SE再生
+							GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Water");
 							WCP->Flow();
 						}
 						//スコアアイテム消える
@@ -1501,6 +1594,8 @@ namespace basecross{
 		if (!m_FreezeFlg && MT == IceFog)
 		{
 			Freeze();	
+			//SE再生
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
 			m_FreezeFlg = true;
 		}
 	}

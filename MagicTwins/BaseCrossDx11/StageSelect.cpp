@@ -222,6 +222,9 @@ namespace basecross {
 			m_StageNum = 1;
 			m_flag = true;
 
+			//SEマネージャー
+			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
+
 		}
 		catch (...) {
 			throw;
