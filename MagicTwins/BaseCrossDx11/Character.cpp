@@ -1193,7 +1193,12 @@ namespace basecross{
 		if (name == "Freeze")
 		{
 			m_Se->AddAudioResource(L"FreezeSE");
-			m_Se->Start(L"FreezeSE", XAUDIO2_LOOP_INFINITE, 0.5f);
+			m_Se->Start(L"FreezeSE", 0.5f);
+		}
+		if (name == "MagicShot")
+		{
+			m_Se->AddAudioResource(L"FreezeSE");
+			m_Se->Start(L"FreezeSE", 0.5f);
 		}
 
 	}

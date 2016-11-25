@@ -720,6 +720,9 @@ namespace basecross {
 	{
 		if (!m_ActiveFlg && flg == true)
 		{
+			//SEÄ¶
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShot");
+
 			m_ActiveFlg = flg;
 			m_MagicType = mT;
 			switch (m_MagicType)
