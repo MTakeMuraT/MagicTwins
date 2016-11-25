@@ -104,40 +104,52 @@ namespace basecross{
 
 	void Fence::OnCreate()
 	{
-		auto Ptr = GetComponent<Transform>();
+
+		auto TranP = AddComponent<Transform>();
+		TranP->SetPosition(m_InitPos);
+		Vector3 scale = m_InitScale * 0.5f;
+		TranP->SetScale(scale);
+		TranP->SetRotation(m_InitRot);
+
+
+		//以下フェンス
+		auto obj = GetStage()->AddGameObject<GameObject>();
+		//衝突判定をつける
+		auto PtrCol = obj->AddComponent<CollisionObb>();
+
+		auto Ptr = obj->AddComponent<Transform>();
 		Ptr->SetPosition(m_InitPos);
-		m_InitScale *= 0.9f;
+		//Vector3 scale = m_InitScale * 0.7f;
 		Ptr->SetScale(m_InitScale);
 		Ptr->SetRotation(m_InitRot);
 
-		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionObb>();
 
 		// モデルとトランスフォームの間の差分行列
 		float angle = (-90) * (3.14159265f / 180);
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
-			Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(0.8f, 0.8f, 0.8f),
 			Vector3(0,0, 0),
 			Vector3(0, -0.5f, 0)
 			);
 
 		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
+		auto ShadowPtr = obj->AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
 		ShadowPtr->SetMeshResource(L"Fence_Model");
 		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
 
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		auto PtrDraw = obj->AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"Fence_Model");
 		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 		//透明処理
-		SetAlphaActive(true);
+		obj->SetAlphaActive(true);
 
+		m_FenceObj = obj;
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -450,10 +462,8 @@ namespace basecross{
 		default:
 		break;
 		}
-
-
-
 		*/
+
 		//透明処理
 		SetAlphaActive(true);
 

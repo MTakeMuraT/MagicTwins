@@ -740,7 +740,6 @@ namespace basecross {
 				break;
 			case Fire:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKFIRE_TX");
-				//GetComponent<PNTStaticDraw>()->SetTextureResource(L"FIREEF_TX");
 				break;
 			case IceFog:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKICEFOG_TX");

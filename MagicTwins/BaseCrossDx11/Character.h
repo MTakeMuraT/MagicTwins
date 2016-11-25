@@ -46,6 +46,8 @@ namespace basecross{
 		Vector3 m_InitPos;
 		Vector3 m_InitScale;
 		Vector3 m_InitRot;
+
+		shared_ptr<GameObject> m_FenceObj;
 	public :
 		Fence(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, Vector3 rot);
 		void OnCreate() override;
