@@ -136,8 +136,7 @@ namespace basecross {
 			CreateBlack();
 			//PRESS STARTçÏê¨
 			CreatePressStart();
-
-			AddGameObject<NumberSprite>(123, Vector2(0, 0), Vector2(200, 200),10);
+			
 		}
 		catch (...) {
 			throw;

@@ -144,26 +144,6 @@ namespace basecross{
 		Vector3 GetScale();
 	};
 
-	//--------------------------------------------------------------------------------------
-	//	class LimitTime : public GameObject;
-	//	用途: 制限時間
-	//--------------------------------------------------------------------------------------
-	class LimitTime : public GameObject
-	{
-	private :
-		//カウント時間
-		float m_nowTime=0;
-		//リミット時間引数で初期値決める
-		float m_LimitTime = 60.0f;
-	public :
-		LimitTime(const shared_ptr<Stage>& StagePtr,float LimitTime);
-		void OnCreate() override;
-		void OnUpdate() override;
-
-		void TimeOver();
-
-		int GetClearTime() { return (int)(m_LimitTime - m_nowTime); }
-	};
 
 	//--------------------------------------------------------------------------------------
 	//	class NumberSprite : public GameObject;
@@ -177,6 +157,8 @@ namespace basecross{
 		int m_num = 0;
 		//桁数
 		int m_digit = 0;
+		//生成されてる数字
+		int m_Constdigit = 0;
 		//表示レイヤー
 		int m_layer = 0;
 		//大きさ
@@ -191,6 +173,29 @@ namespace basecross{
 		void OnCreate()override;
 
 		void SetNum(int num);
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class LimitTime : public GameObject;
+	//	用途: 制限時間
+	//--------------------------------------------------------------------------------------
+	class LimitTime : public GameObject
+	{
+	private:
+		//カウント時間
+		float m_nowTime = 0;
+		//リミット時間引数で初期値決める
+		float m_LimitTime = 60.0f;
+		//数字スプライト
+		shared_ptr<NumberSprite> m_numberSp;
+	public:
+		LimitTime(const shared_ptr<Stage>& StagePtr, float LimitTime);
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void TimeOver();
+
+		int GetClearTime() { return (int)(m_LimitTime - m_nowTime); }
 	};
 
 	//--------------------------------------------------------------------------------------

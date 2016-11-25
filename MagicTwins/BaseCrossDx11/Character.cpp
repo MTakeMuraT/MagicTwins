@@ -477,13 +477,21 @@ namespace basecross{
 		PtrString->SetFont(L"", 80);
 		m_nowTime = m_LimitTime;
 		SetDrawLayer(5);
+
+		auto numobj = GetStage()->AddGameObject<NumberSprite>(0, Vector2(830, 470), Vector2(100, 100), 6);
+		m_numberSp = numobj;
 	}
 
 	void LimitTime::OnUpdate()
 	{
+		//wstring txt = Util::IntToWStr((int)m_nowTime);
+		//GetComponent<StringSprite>()->SetText(txt);
+
+		//時間経過処理
 		m_nowTime += -App::GetApp()->GetElapsedTime();
-		wstring txt = Util::IntToWStr((int)m_nowTime);
-		GetComponent<StringSprite>()->SetText(txt);
+
+		//スプライト変更
+		m_numberSp->SetNum((int)m_nowTime);
 
 		if (m_nowTime < 1)
 		{
@@ -553,15 +561,19 @@ namespace basecross{
 		//桁分ループ
 		for (int j = m_digit-1; j >= 0; j--)
 		{
-			int num = m_num;
+			//生成桁数追加
+			m_Constdigit++;
+
 			int digi = j;
-			num = masternum / pow(10, (digi));
+			int num = masternum / pow(10, (digi));
 			masternum = masternum % (int)(pow(10, (digi)));
 
 			auto NumP = GetStage()->AddGameObject<GameObject>();
 
+			float distance = m_scale.x / 1.8f;
+
 			auto TranP = NumP->AddComponent<Transform>();
-			TranP->SetPosition(m_pos.x - (m_scale.x*j), m_pos.y, 0);
+			TranP->SetPosition(m_pos.x - (distance*((m_digit-1)-j)), m_pos.y, 0);
 			TranP->SetScale(m_scale.x, m_scale.y, 1);
 			TranP->SetRotation(0, 0, 0);
 
@@ -590,37 +602,55 @@ namespace basecross{
 		//入力されたほうが大きかったら
 		if (digit > m_digit)
 		{
-			//左に桁追加
-			int digitDif = digit - m_digit;
-			for (int i = m_digit-1; i < digit-1; i++)
+			for (int j = 0; j < (digit - m_Constdigit); j++)
 			{
-				auto NumP = GetStage()->AddGameObject<GameObject>();
+				//左側に桁追加
+				int digitDif = digit - m_digit;
 
-				auto TranP = NumP->AddComponent<Transform>();
-				TranP->SetPosition(m_pos.x - (m_scale.x*i), m_pos.y, 0);
-				TranP->SetScale(m_scale.x, m_scale.y, 1);
-				TranP->SetRotation(0, 0, 0);
+					m_Constdigit++;
 
-				auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
-				DrawP->SetTextureResource(L"NUMBER_TX");
-				DrawP->SetMeshResource(m_Mesh[0]);
-				NumP->SetAlphaActive(true);
+					auto NumP = GetStage()->AddGameObject<GameObject>();
 
-				NumP->SetDrawLayer(m_layer);
-				m_Numbers.push_back(NumP);
+					float distance = m_scale.x / 1.8f;
+
+					auto TranP = NumP->AddComponent<Transform>();
+					TranP->SetPosition(m_pos.x - (distance*(m_digit)), m_pos.y, 0);
+					TranP->SetScale(m_scale.x, m_scale.y, 1);
+					TranP->SetRotation(0, 0, 0);
+
+					auto DrawP = NumP->AddComponent<PCTSpriteDraw>();
+					DrawP->SetTextureResource(L"NUMBER_TX");
+					DrawP->SetMeshResource(m_Mesh[0]);
+					NumP->SetAlphaActive(true);
+
+					NumP->SetDrawLayer(m_layer);
+					m_Numbers.push_back(NumP);
 			}
-
-			m_digit = digit;
+		
+			for (int i = 0; i < m_Constdigit; i++)
+			{
+				m_Numbers[i]->SetDrawActive(true);
+			}
 		}
+
+		//入力されたほうが小さい
+		if (digit < m_digit)
+		{
+			for (int i = m_digit - 1; i > digit - 1; i--)
+			{
+				m_Numbers[i]->SetDrawActive(false);
+			}
+		}
+
+		//桁更新
+		m_digit = digit;
 
 		//数字入れ替え
 		int masternum = m_num;
-		for (int i = 0; i < m_digit; i++)
+		for (int i = m_digit-1; i >= 0; i--)
 		{
-			int setnum = m_num;
-			int num = m_num;
 			int digi = i;
-			num = masternum / pow(10, (digi));
+			int setnum = masternum / pow(10, (digi));
 			masternum = masternum % (int)(pow(10, (digi)));
 
 			m_Numbers[i]->GetComponent<PCTSpriteDraw>()->SetMeshResource(m_Mesh[setnum]);
