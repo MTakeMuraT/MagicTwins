@@ -360,6 +360,12 @@ namespace basecross {
 				ShotMagic();
 			}
 
+			//L肩ボタンで位置固定
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+			{
+				m_velocity = Vector2(0, 0);
+			}
+
 		}
 
 		//コンポーネントにやってもらう座標移動
