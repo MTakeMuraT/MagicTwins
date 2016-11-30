@@ -288,6 +288,20 @@ namespace basecross {
 				}
 
 			}
+			//滝
+			else if (dynamic_pointer_cast<WaterFall>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<WaterFall>(otherObj);
+				if (Ptr->GetFlow())
+				{
+					Ptr->HitMagic(MaBo->GetMagicType());
+					HitFlg = true;
+				}
+				else
+				{
+					HitFlg = false;
+				}
+			}
 			//エネミー
 			else if (dynamic_pointer_cast<Enemy>(otherObj))
 			{
@@ -371,6 +385,20 @@ namespace basecross {
 					HitFlg = false;
 				}
 
+			}
+			//滝
+			else if (dynamic_pointer_cast<WaterFall>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<WaterFall>(otherObj);
+				if (Ptr->GetFlow())
+				{
+					Ptr->HitMagic(MaBo->GetMagicType());
+					HitFlg = true;
+				}
+				else
+				{
+					HitFlg = false;
+				}
 			}
 			//エネミー
 			else if (dynamic_pointer_cast<Enemy>(otherObj))

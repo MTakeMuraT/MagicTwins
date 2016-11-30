@@ -467,16 +467,9 @@ namespace basecross{
 		bool m_FreezeFlg = false;
 		//流れてるかどうか
 		bool m_FlowFlg = true;
-		//背番号
-		int m_myNum;
-		//見た目の部分
-		shared_ptr<GameObject> m_waterunder;
 	public:
-		WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int num);
+		WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
-
-		//番号取得
-		int GetmyNum() { return m_myNum; }
 
 		//凍らす
 		void Freeze();
@@ -487,6 +480,12 @@ namespace basecross{
 		//流す
 		void Flow();
 
+		//プレイヤーがいるかどうか
+		void OnPlayer();
+
+		bool GetFlow() { return m_FlowFlg; }
+
+		void HitMagic(MagicType mt);
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -507,6 +506,8 @@ namespace basecross{
 		bool m_FlowFlg = true;
 		//自分が影響を与える水の情報
 		vector<shared_ptr<Water>> m_waters;
+		//上の滝版
+		vector<shared_ptr<WaterFall>> m_waterfalls;
 		//見た目の部分
 		shared_ptr<GameObject> m_waterunder;
 	public:
@@ -526,9 +527,16 @@ namespace basecross{
 
 		void SetWaters(vector<shared_ptr<Water>> waters) { m_waters = waters; }
 
+		void SetWaterFalls(vector<shared_ptr<WaterFall>> waterfalls) { m_waterfalls = waterfalls; }
+
 		bool GetFlow() { return m_FlowFlg; }
 
 		bool GetFreeze() { return m_FreezeFlg; }
+
+		//プレイヤーがいるかどうか
+		void OnPlayer();
+
+
 	};
 
 	//--------------------------------------------------------------------------------------

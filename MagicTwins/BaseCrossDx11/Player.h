@@ -43,6 +43,8 @@ namespace basecross{
 		//ƒJƒƒ‰ˆÚ“®n‚ß‚é”ÍˆÍ
 		const float m_CameraMove = 3.0f;
 
+		//uŠÔˆÚ“®‚Å‚«‚È‚­‚È‚é‘Îˆ
+		bool m_WarpFlg = false;
 		//‘Ì—Í•\¦
 		shared_ptr<GameObject> m_LifeSprite;
 

@@ -1653,17 +1653,30 @@ namespace basecross{
 			//もしいたら地形ダメージ与える
 			PlayerPtr->PlayerTerrainDamege();
 		}
+
+		//2体目
+		//プレイヤーが上にいるかどうか判定
+		PlayerPtr = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+		Playerpos = PlayerPtr->GetComponent<Transform>()->GetPosition();
+		//座標から判定
+		if ((Playerpos.x < pos.x + scale.x && Playerpos.x > pos.x - scale.x) &&	/*X座標判定*/
+			(Playerpos.z < pos.z + scale.z && Playerpos.z > pos.z - scale.z) 	/*Z座標判定*/
+																				/*(Playerpos.y < pos.y + (scale.y * 3) && Playerpos.y > pos.y - scale.x)*/	/*Y座標判定*/
+			)
+		{
+			//もしいたら地形ダメージ与える
+			PlayerPtr->PlayerTerrainDamege();
+		}
 	}
 
 	//--------------------------------------------------------------------------------------
 	//	class WaterFall : public GameObject;
 	//	用途: 滝
 	//--------------------------------------------------------------------------------------
-	WaterFall::WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int num) :
+	WaterFall::WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
-		m_InitScale(scale),
-		m_myNum(num)
+		m_InitScale(scale)	
 	{}
 
 	void WaterFall::OnCreate()
@@ -1674,18 +1687,17 @@ namespace basecross{
 		Ptr->SetRotation(0, 0, 0);
 
 		//衝突判定をつける
-		auto PtrCol = AddComponent<CollisionObb>();
+		AddComponent<CollisionObb>();
 
-		auto ObjPtr = GetStage()->AddGameObject<GameObject>();
-		auto OPT = ObjPtr->AddComponent<Transform>();
+		GetStage()->AddGameObject<GameObject>();
+		auto OPT = AddComponent<Transform>();
 		OPT->SetPosition(m_InitPos);
 		OPT->SetScale(m_InitScale);
 		OPT->SetRotation(0, 0, 0);
-		auto OPD = ObjPtr->AddComponent<PNTStaticDraw>();
+		auto OPD = AddComponent<PNTStaticDraw>();
 		OPD->SetMeshResource(L"DEFAULT_CUBE");
 		OPD->SetTextureResource(L"WATER_TX");
 
-		m_waterunder = ObjPtr;
 
 
 	}
@@ -1694,42 +1706,92 @@ namespace basecross{
 	void WaterFall::Freeze()
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
-		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
 
 	}
 	//溶かす
 	void WaterFall::Melt()
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
-		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+		GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+
+		OnPlayer();
 
 	}
 	//止める
 	void WaterFall::Stop()
 	{
+		//アタリ消す
 		GetComponent<CollisionObb>()->SetUpdateActive(false);
+
+		m_FlowFlg = false;
 
 		//水の部分
 		SetDrawActive(false);
-		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		//pos.y += -m_InitScale.y;
-		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
 	}
 	//流す
 	void WaterFall::Flow()
 	{
-		//水の部分
-		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		//pos.y += m_InitScale.y;
-		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+		SetDrawActive(true);
 
-		SetDrawActive(false);
+		m_FlowFlg = true;
 
+		//当たり戻す
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
+
+		OnPlayer();
 	}
 
+	void WaterFall::OnPlayer()
+	{
 
+		//プレイヤーが上にいるかどうか判定
+		auto PlayerPtr = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+		Vector3 Playerpos = PlayerPtr->GetComponent<Transform>()->GetPosition();
+
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		scale /= 2;
+		//座標から判定
+		if ((Playerpos.x < pos.x + scale.x && Playerpos.x > pos.x - scale.x) &&	/*X座標判定*/
+			(Playerpos.z < pos.z + scale.z && Playerpos.z > pos.z - scale.z) 	/*Z座標判定*/
+																				/*(Playerpos.y < pos.y + (scale.y * 3) && Playerpos.y > pos.y - scale.x)*/	/*Y座標判定*/
+			)
+		{
+			//もしいたら地形ダメージ与える
+			PlayerPtr->PlayerTerrainDamege();
+		}
+
+		//2体目
+		//プレイヤーが上にいるかどうか判定
+		PlayerPtr = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+		Playerpos = PlayerPtr->GetComponent<Transform>()->GetPosition();
+		//座標から判定
+		if ((Playerpos.x < pos.x + scale.x && Playerpos.x > pos.x - scale.x) &&	/*X座標判定*/
+			(Playerpos.z < pos.z + scale.z && Playerpos.z > pos.z - scale.z) 	/*Z座標判定*/
+																				/*(Playerpos.y < pos.y + (scale.y * 3) && Playerpos.y > pos.y - scale.x)*/	/*Y座標判定*/
+			)
+		{
+			//もしいたら地形ダメージ与える
+			PlayerPtr->PlayerTerrainDamege();
+		}
+
+	}
+
+	void WaterFall::HitMagic(MagicType mt)
+	{
+		if (mt == IceFog && !m_FreezeFlg)
+		{
+			m_FreezeFlg = true;
+			Freeze();
+		}
+		else if (mt == Fire && m_FreezeFlg)
+		{
+			m_FreezeFlg = false;
+			Melt();
+		}
+	}
 
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick3 : public GameObject;
@@ -1808,6 +1870,11 @@ namespace basecross{
 		{
 			v->Freeze();
 		}
+
+		for (auto v : m_waterfalls)
+		{
+			v->Freeze();
+		}
 	}
 
 	//溶かす
@@ -1819,6 +1886,12 @@ namespace basecross{
 		{
 			v->Melt();
 		}
+
+		for (auto v : m_waterfalls)
+		{
+			v->Melt();
+		}
+		OnPlayer();
 	}
 
 	//止める
@@ -1837,6 +1910,10 @@ namespace basecross{
 		{
 			v->Stop();
 		}
+			for (auto v : m_waterfalls)
+			{
+				v->Stop();
+			}
 	}
 
 	//流す
@@ -1857,9 +1934,47 @@ namespace basecross{
 		{
 			v->Flow();
 		}
+		for (auto v : m_waterfalls)
+		{
+			v->Flow();
+		}
+		OnPlayer();
 	}
 
+	void Gimmick3::OnPlayer()
+	{
 
+		//プレイヤーが上にいるかどうか判定
+		auto PlayerPtr = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+		Vector3 Playerpos = PlayerPtr->GetComponent<Transform>()->GetPosition();
+
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		scale /= 2;
+		//座標から判定
+		if ((Playerpos.x < pos.x + scale.x && Playerpos.x > pos.x - scale.x) &&	/*X座標判定*/
+			(Playerpos.z < pos.z + scale.z && Playerpos.z > pos.z - scale.z) 	/*Z座標判定*/
+																				/*(Playerpos.y < pos.y + (scale.y * 3) && Playerpos.y > pos.y - scale.x)*/	/*Y座標判定*/
+			)
+		{
+			//もしいたら地形ダメージ与える
+			PlayerPtr->PlayerTerrainDamege();
+		}
+
+		//2体目
+		//プレイヤーが上にいるかどうか判定
+		PlayerPtr = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+		Playerpos = PlayerPtr->GetComponent<Transform>()->GetPosition();
+		//座標から判定
+		if ((Playerpos.x < pos.x + scale.x && Playerpos.x > pos.x - scale.x) &&	/*X座標判定*/
+			(Playerpos.z < pos.z + scale.z && Playerpos.z > pos.z - scale.z) 	/*Z座標判定*/
+																				/*(Playerpos.y < pos.y + (scale.y * 3) && Playerpos.y > pos.y - scale.x)*/	/*Y座標判定*/
+			)
+		{
+			//もしいたら地形ダメージ与える
+			PlayerPtr->PlayerTerrainDamege();
+		}
+	}
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick5 : public GameObject;
 	//	用途: 炎。氷の魔法[Icefog]で消せる

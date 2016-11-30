@@ -235,6 +235,15 @@ namespace basecross {
 
 	//更新
 	void Player::OnUpdate() {
+		if (m_WarpFlg)
+		{
+			m_WarpFlg = false;
+			//アタリ一式戻す
+			GetComponent<CollisionSphere>()->SetUpdateActive(true);
+			GetComponent<Rigidbody>()->SetUpdateActive(true);
+			GetComponent<Gravity>()->SetUpdateActive(true);
+
+		}
 		if (m_endFrame)
 		{
 			m_endFrame = false;
@@ -245,6 +254,7 @@ namespace basecross {
 			CameraTarget();
 			active();
 		}
+		
 	}
 
 	//操作できる状態
@@ -658,11 +668,18 @@ namespace basecross {
 	{
 		//移動するためアタリ消す
 		GetComponent<CollisionSphere>()->SetUpdateActive(false);
-		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		GetComponent<Rigidbody>()->SetUpdateActive(false);
+		GetComponent<Gravity>()->SetUpdateActive(false);
+
+		//移動
+		Vector3 pos = m_InitPos;
+		pos.y += 2;
 		GetComponent<Transform>()->SetPosition(pos);
 
-		GetComponent<CollisionSphere>()->SetUpdateActive(true);
+		//移動後にアタリ判定一式を治す
+		m_WarpFlg = true;
 
+		//ライフ現象
 		m_life--;
 
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
