@@ -207,8 +207,6 @@ namespace basecross{
 
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
-		//横部分のみ反発
-		PtrCol->SetIsHitAction(IsHitAction::Stop);
 
 		//描画コンポーネントの設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();

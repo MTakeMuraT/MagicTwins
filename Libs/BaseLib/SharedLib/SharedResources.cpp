@@ -227,8 +227,8 @@ namespace basecross {
 		float m_CameraUpDownSpeed;
 		//カメラを下げる下限角度
 		float m_CameraUnderRot;
-		float	m_Arm;
 		//腕の長さの設定
+		float m_ArmLen;
 		float m_MaxArm;
 		float m_MinArm;
 		//回転スピード
@@ -243,7 +243,7 @@ namespace basecross {
 			m_RadXZ(0),
 			m_CameraUpDownSpeed(0.02f),
 			m_CameraUnderRot(0.1f),
-			m_Arm(5.0f),
+			m_ArmLen(5.0f),
 			m_MaxArm(20.0f),
 			m_MinArm(2.0f),
 			m_RotSpeed(1.0f),
@@ -284,6 +284,23 @@ namespace basecross {
 		pImpl->m_ToTargetLerp = f;
 	}
 
+	float LookAtCamera::GetArmLengh() const {
+		return pImpl->m_ArmLen;
+	}
+
+	void LookAtCamera::UpdateArmLengh() {
+		auto Vec = GetEye() - GetAt();
+		pImpl->m_ArmLen = Vec.Length();
+		if (pImpl->m_ArmLen >= pImpl->m_MaxArm) {
+			//m_MaxArm以上離れないようにする
+			pImpl->m_ArmLen = pImpl->m_MaxArm;
+		}
+		if (pImpl->m_ArmLen <= pImpl->m_MinArm) {
+			//m_MinArm以下近づかないようにする
+			pImpl->m_ArmLen = pImpl->m_MinArm;
+		}
+	}
+
 	float LookAtCamera::GetMaxArm() const {
 		return pImpl->m_MaxArm;
 
@@ -298,6 +315,14 @@ namespace basecross {
 		pImpl->m_MinArm = f;
 	}
 
+	float LookAtCamera::GetRotSpeed() const {
+		return pImpl->m_RotSpeed;
+
+	}
+	void LookAtCamera::SetRotSpeed(float f) {
+		pImpl->m_RotSpeed = abs(f);
+	}
+
 	Vector3 LookAtCamera::GetTargetToAt() const {
 		return pImpl->m_TargetToAt;
 
@@ -305,6 +330,25 @@ namespace basecross {
 	void LookAtCamera::SetTargetToAt(const Vector3& v) {
 		pImpl->m_TargetToAt = v;
 	}
+
+	void LookAtCamera::SetAt(const Vector3& At) {
+		Camera::SetAt(At);
+		Vector3 ArmVec = GetEye() - GetAt();
+		ArmVec.Normalize();
+		ArmVec *= pImpl->m_ArmLen;
+		Vector3 NewEye = GetAt() + ArmVec;
+		SetEye(NewEye);
+	}
+	void LookAtCamera::SetAt(float x, float y, float z) {
+		Camera::SetAt(x,y,z);
+		Vector3 ArmVec = GetEye() - GetAt();
+		ArmVec.Normalize();
+		ArmVec *= pImpl->m_ArmLen;
+		Vector3 NewEye = GetAt() + ArmVec;
+		SetEye(NewEye);
+
+	}
+
 
 	void LookAtCamera::OnUpdate() {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
@@ -363,37 +407,37 @@ namespace basecross {
 			auto TargetPtr = GetTargetObject();
 			if (TargetPtr) {
 				//目指したい場所
-				Matrix4X4 ToAtMat = TargetPtr->GetComponent<Transform>()->GetWorldMatrix();
-				Vector3 ToAt = ToAtMat.PosInMatrixSt();
-				NewAt += pImpl->m_TargetToAt;
+				Vector3 ToAt = TargetPtr->GetComponent<Transform>()->GetPosition();
+				ToAt += pImpl->m_TargetToAt;
 				NewAt = Lerp::CalculateLerp(GetAt(), ToAt, 0, 1.0f, 1.0, Lerp::Linear);
 			}
 			//アームの変更
 			//Dパッド下
 			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_DOWN) {
 				//カメラ位置を引く
-				pImpl->m_Arm += pImpl->m_ZoomSpeed;
-				if (pImpl->m_Arm >= pImpl->m_MaxArm) {
+				pImpl->m_ArmLen += pImpl->m_ZoomSpeed;
+				if (pImpl->m_ArmLen >= pImpl->m_MaxArm) {
 					//m_MaxArm以上離れないようにする
-					pImpl->m_Arm = pImpl->m_MaxArm;
+					pImpl->m_ArmLen = pImpl->m_MaxArm;
 				}
 			}
 			//Dパッド上
 			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_UP) {
 				//カメラ位置を寄る
-				pImpl->m_Arm -= pImpl->m_ZoomSpeed;
-				if (pImpl->m_Arm <= pImpl->m_MinArm) {
+				pImpl->m_ArmLen -= pImpl->m_ZoomSpeed;
+				if (pImpl->m_ArmLen <= pImpl->m_MinArm) {
 					//m_MinArm以下近づかないようにする
-					pImpl->m_Arm = pImpl->m_MinArm;
+					pImpl->m_ArmLen = pImpl->m_MinArm;
 				}
 			}
 			////目指したい場所にアームの値と腕ベクトルでEyeを調整
-			Vector3 ToEye = NewAt + ArmVec * pImpl->m_Arm;
+			Vector3 ToEye = NewAt + ArmVec * pImpl->m_ArmLen;
 			NewEye = Lerp::CalculateLerp(GetEye(), ToEye, 0, 1.0f, pImpl->m_ToTargetLerp, Lerp::Linear);
-//			NewEye = NewAt + ArmVec * pImpl->m_Arm;
+//			NewEye = NewAt + ArmVec * ArmLen;
 		}
-		SetEye(NewEye);
 		SetAt(NewAt);
+		SetEye(NewEye);
+		UpdateArmLengh();
 		Camera::OnUpdate();
 	}
 
@@ -492,9 +536,139 @@ namespace basecross {
 		return pImpl->m_ViewItem.m_Viewport;
 	}
 
+	//--------------------------------------------------------------------------------------
+	///	struct MultiView::Impl;
+	//--------------------------------------------------------------------------------------
+	struct MultiView::Impl {
+		vector<ViewItem> m_ViewItemVec;
+		size_t m_TargetIndex;
+		Impl():
+			m_TargetIndex(0)
+		{
+		}
+		~Impl() {}
+	};
+
+	MultiView::MultiView(const shared_ptr<Stage>& StagePtr) :
+		ViewBase(StagePtr), pImpl(new Impl())
+	{}
+
+	MultiView::~MultiView() {}
+
+	size_t MultiView::AddView(const Viewport& v, const shared_ptr<Camera>& c) {
+		ViewItem Item;
+		Item.m_Viewport = v;
+		Item.m_Camera = c;
+		size_t ret = pImpl->m_ViewItemVec.size();
+		pImpl->m_ViewItemVec.push_back(Item);
+		return ret;
+	}
+	size_t MultiView::GetViewSize()const {
+		return pImpl->m_ViewItemVec.size();
+	}
+	void MultiView::SetViewport(size_t Index, const Viewport& v) {
+		if (Index >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(Index),
+				L"MultiView::SetViewport()"
+			);
+		}
+		pImpl->m_ViewItemVec[Index].m_Viewport = v;
+	}
+	const Viewport& MultiView::GetViewport(size_t Index) const {
+		if (Index >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(Index),
+				L"MultiView::GetViewport()"
+			);
+		}
+		return pImpl->m_ViewItemVec[Index].m_Viewport;
+	}
+	void MultiView::SetCamera(size_t Index, const shared_ptr<Camera>& c) {
+		if (Index >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(Index),
+				L"MultiView::SetCamera()"
+			);
+		}
+		pImpl->m_ViewItemVec[Index].m_Camera = c;
+	}
+	const shared_ptr<Camera>& MultiView::GetCamera(size_t Index)const {
+		if (Index >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(Index),
+				L"MultiView::GetCamera()"
+			);
+		}
+		return pImpl->m_ViewItemVec[Index].m_Camera;
+	}
+	size_t MultiView::GetTargetIndex()const {
+		if (pImpl->m_ViewItemVec.empty()) {
+			throw BaseException(
+				L"ビューが設定されてないのでこのコマンドは無意味です",
+				L"if (pImpl->m_ViewItemVec.empty())",
+				L"MultiView::GetTargetIndex()"
+			);
+		}
+		return pImpl->m_TargetIndex;
+	}
+	void MultiView::SetTargetIndex(size_t Index) {
+		if (Index >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(Index),
+				L"MultiView::SetTargetIndex()"
+			);
+		}
+		pImpl->m_TargetIndex = Index;
+	}
+	void MultiView::ChangeNextView() {
+		pImpl->m_TargetIndex++;
+		if (pImpl->m_TargetIndex >= pImpl->m_ViewItemVec.size()) {
+			pImpl->m_TargetIndex = 0;
+		}
+	}
+	const shared_ptr<Camera>& MultiView::GetTargetCamera() const {
+		if (pImpl->m_TargetIndex >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(pImpl->m_TargetIndex),
+				L"MultiView::GetTargetCamera()"
+			);
+		}
+		return pImpl->m_ViewItemVec[pImpl->m_TargetIndex].m_Camera;
+	}
+	const Viewport& MultiView::GetTargetViewport() const {
+		if (pImpl->m_TargetIndex >= pImpl->m_ViewItemVec.size()) {
+			throw BaseException(
+				L"インデックスが範囲外です。",
+				Util::UintToWStr(pImpl->m_TargetIndex),
+				L"MultiView::GetTargetViewport()"
+			);
+		}
+		return pImpl->m_ViewItemVec[pImpl->m_TargetIndex].m_Viewport;
+	}
+
+	void MultiView::OnCreate() {
+	}
+	void MultiView::OnUpdate() {
+		for (auto& v : pImpl->m_ViewItemVec) {
+			v.m_Camera->OnUpdate();
+		}
+	}
+
+
+
+
+
+
 
 	//--------------------------------------------------------------------------------------
-	///	struct ViewBase::Impl;
+	///	struct LightBase::Impl;
 	//--------------------------------------------------------------------------------------
 	struct LightBase::Impl {
 		weak_ptr<Stage> m_Stage;

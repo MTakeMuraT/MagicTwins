@@ -72,6 +72,11 @@ namespace basecross {
 		return dynamic_pointer_cast<CollisionObb>(pImpl->m_Collision);
 	}
 
+	shared_ptr<CollisionRect> GameObject::GetCollisionRect()const {
+		return dynamic_pointer_cast<CollisionRect>(pImpl->m_Collision);
+	}
+
+
 	void GameObject::SetRigidbody(const shared_ptr<Rigidbody>& Ptr) {
 		Ptr->AttachGameObject(GetThis<GameObject>());
 		pImpl->m_Rigidbody = Ptr;
@@ -93,6 +98,12 @@ namespace basecross {
 		Ptr->AttachGameObject(GetThis<GameObject>());
 		pImpl->m_Collision = Ptr;
 	}
+
+	void GameObject::SetCollisionRect(const shared_ptr<CollisionRect>& Ptr) {
+		Ptr->AttachGameObject(GetThis<GameObject>());
+		pImpl->m_Collision = Ptr;
+	}
+
 
 	void GameObject::SetTransform(const shared_ptr<Transform>& Ptr) {
 		Ptr->AttachGameObject(GetThis<GameObject>());
@@ -232,16 +243,6 @@ namespace basecross {
 		if (CollisionPtr && CollisionPtr->IsUpdateActive()) {
 			//CollisionがあればUpdate()
 			CollisionPtr->OnUpdate();
-		}
-	}
-
-	void GameObject::CollisionGravityChk() {
-		auto CollisionPtr = GetComponent<Collision>(false);
-		if (CollisionPtr && !CollisionPtr->IsOnObject()) {
-			auto GravityPtr = GetComponent<Gravity>(false);
-			if (GravityPtr) {
-				GravityPtr->SetGravityDefault();
-			}
 		}
 	}
 
@@ -798,10 +799,13 @@ namespace basecross {
 		map<const wstring, shared_ptr<GameObjectGroup> >  m_SharedGroupMap;
 		vector< shared_ptr<Stage> > m_ChildStageVec;	//子供ステージの配列
 		weak_ptr<Stage> m_ParentStage;		//親ステージ
+		//シャドウマップを使うかどうか
+		bool m_IsShadowmapDraw;
 
 		Impl() :
 			m_UpdateActive(true),
-			m_DrawViewIndex(0)
+			m_DrawViewIndex(0),
+			m_IsShadowmapDraw(true)
 		{}
 		~Impl() {}
 	};
@@ -1044,12 +1048,7 @@ namespace basecross {
 				ptr2->SetToBefore();
 			}
 		}
-		//配置オブジェクトのコンポーネント更新1
-		for (auto ptr : GetGameObjectVec()) {
-			if (ptr->IsUpdateActive()) {
-				ptr->ComponentUpdate();
-			}
-		}
+
 		//配置オブジェクトの更新1
 		for (auto ptr : GetGameObjectVec()) {
 			if (ptr->IsUpdateActive()) {
@@ -1060,10 +1059,14 @@ namespace basecross {
 		if (IsUpdateActive()) {
 			OnUpdate();
 		}
+		//配置オブジェクトのコンポーネント更新1
+		for (auto ptr : GetGameObjectVec()) {
+			if (ptr->IsUpdateActive()) {
+				ptr->ComponentUpdate();
+			}
+		}
 		//衝突判定の更新（ステージから呼ぶ）
 		UpdateCollision();
-		//衝突による重力の変化の更新
-		UpdateCollisionGravity();
 		//自身のビューをアップデート
 		if (IsUpdateActive() && pImpl->m_ViewBase) {
 			pImpl->m_ViewBase->OnUpdate();
@@ -1101,16 +1104,6 @@ namespace basecross {
 		}
 	}
 
-	void Stage::UpdateCollisionGravity() {
-		//配置オブジェクトの衝突重力更新チェック
-		for (auto ptr : GetGameObjectVec()) {
-			if (ptr->IsUpdateActive()) {
-				ptr->CollisionGravityChk();
-			}
-		}
-
-	}
-
 	void Stage::UpdateMessageCollision() {
 		//配置オブジェクトの衝突メッセージ発行
 		for (auto ptr : GetGameObjectVec()) {
@@ -1121,16 +1114,25 @@ namespace basecross {
 
 	}
 
-
-
-	void Stage::DrawShadowmapStage() {
-		for (auto ptr : pImpl->m_GameObjectVec) {
-			ptr->DrawShadowmap();
-		}
+	//シャドウマップを使うかどうか
+	bool Stage::IsShadowmapDraw() const {
+		return pImpl->m_IsShadowmapDraw;
+	}
+	void Stage::SetShadowmapDraw(bool b) {
+		pImpl->m_IsShadowmapDraw = b;
 	}
 
 
-	//ステージ内の描画（シーンからよばれる）
+	//ステージ内のシャドウマップ描画（ステージからよばれる）
+	void Stage::DrawShadowmapStage() {
+		for (auto ptr : pImpl->m_GameObjectVec) {
+			if (ptr->IsDrawActive()) {
+				ptr->DrawShadowmap();
+			}
+		}
+	}
+
+	//ステージ内の描画（ステージからよばれる）
 	void Stage::DrawStage() {
 		//レイヤーの取得と設定
 		set<int> DrawLayers;
@@ -1252,11 +1254,52 @@ namespace basecross {
 		pImpl->m_SpriteVec.clear();
 		pImpl->m_Object3DNormalVec.clear();
 		pImpl->m_Object3DAlphaVec.clear();
+	}
+
+	//ステージ内のすべての描画（シーンからよばれる）
+	void Stage::RenderStage() {
+		//描画デバイスの取得
+		auto Dev = App::GetApp()->GetDeviceResources();
+		auto MultiPtr = dynamic_pointer_cast<MultiView>(GetView());
+		if (MultiPtr) {
+			for (size_t i = 0; i < MultiPtr->GetViewSize(); i++) {
+				MultiPtr->SetTargetIndex(i);
+				if (IsShadowmapDraw()) {
+					Dev->ClearShadowmapViews();
+					Dev->StartShadowmapDraw();
+					DrawShadowmapStage();
+					Dev->EndShadowmapDraw();
+				}
+				//デフォルト描画の開始
+				Dev->StartDefultDraw();
+				RsSetViewport(MultiPtr->GetTargetViewport());
+				DrawStage();
+				//デフォルト描画の終了
+				Dev->EndDefultDraw();
+			}
+			//描画が終わったら更新処理用に先頭のカメラにターゲットを設定する
+			MultiPtr->SetTargetIndex(0);
+		}
+		else {
+			if (IsShadowmapDraw()) {
+				Dev->ClearShadowmapViews();
+				Dev->StartShadowmapDraw();
+				DrawShadowmapStage();
+				Dev->EndShadowmapDraw();
+			}
+			//デフォルト描画の開始
+			Dev->StartDefultDraw();
+			RsSetViewport(GetView()->GetTargetViewport());
+			DrawStage();
+			//デフォルト描画の終了
+			Dev->EndDefultDraw();
+		}
 		//子供ステージの描画
 		for (auto PtrChileStage : pImpl->m_ChildStageVec) {
-			PtrChileStage->DrawStage();
+			PtrChileStage->RenderStage();
 		}
 	}
+
 
 
 	//--------------------------------------------------------------------------------------
@@ -1315,6 +1358,17 @@ namespace basecross {
 			}
 			App::GetApp()->RegisterResource(L"DEFAULT_PC_SPHERE", MeshResource::CreateMeshResource(new_vertices, indices, false));
 
+			vertices.clear();
+			new_vertices.clear();
+			indices.clear();
+			MeshUtill::CreateSquare(1.0f,vertices, indices);
+			for (size_t i = 0; i < vertices.size(); i++) {
+				VertexPositionColor new_v;
+				new_v.position = vertices[i].position;
+				new_v.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				new_vertices.push_back(new_v);
+			}
+			App::GetApp()->RegisterResource(L"DEFAULT_PC_SQUARE", MeshResource::CreateMeshResource(new_vertices, indices, false));
 
 			
 
@@ -1351,16 +1405,7 @@ namespace basecross {
 			//描画デバイスの取得
 			auto Dev = App::GetApp()->GetDeviceResources();
 			Dev->ClearDefultViews(Color4(0, 0, 0, 1.0));
-			Dev->ClearShadowmapViews();
-			Dev->StartShadowmapDraw();
-			pImpl->m_ActiveStage->DrawShadowmapStage();
-			Dev->EndShadowmapDraw();
-			//デフォルト描画の開始
-			Dev->StartDefultDraw();
-			pImpl->m_ActiveStage->DrawStage();
-			//デフォルト描画の終了
-			Dev->EndDefultDraw();
-
+			pImpl->m_ActiveStage->RenderStage();
 
 		}
 	}
