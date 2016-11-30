@@ -35,6 +35,20 @@ namespace basecross{
 		Box(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,Vector3 rot);
 		void OnCreate() override;
 	};
+	//--------------------------------------------------------------------------------------
+	//	class PlaneP : public GameObject;
+	//	用途: 地面
+	//--------------------------------------------------------------------------------------
+	class PlaneP : public GameObject
+	{
+	private:
+		Vector3 m_InitPos;
+		Vector3 m_InitScale;
+		Vector3 m_InitRot;
+	public :
+		PlaneP(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, Vector3 rot);
+		void OnCreate() override;
+	};
 
 	//--------------------------------------------------------------------------------------
 	//	class Fence : public GameObject;
@@ -89,9 +103,9 @@ namespace basecross{
 		//計算用
 		float m_time = 0;
 		//体力
-		int m_life = 10;
+		int m_life = 3;
 		//初期体力
-		const int m_MaxLife = 10;
+		const int m_MaxLife = 3;
 		//狙ってるプレイヤー
 		int m_TargetPlayernum = 0;
 		//生きてるか死んでるか
@@ -433,6 +447,46 @@ namespace basecross{
 		//流す
 		void Flow();
 
+		//プレイヤーがいるかどうか
+		void OnPlayer();
+
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class WaterFall : public GameObject;
+	//	用途: 滝
+	//--------------------------------------------------------------------------------------
+	class WaterFall : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos;
+		//大きさ
+		Vector3 m_InitScale;
+		//凍ってるかどうか
+		bool m_FreezeFlg = false;
+		//流れてるかどうか
+		bool m_FlowFlg = true;
+		//背番号
+		int m_myNum;
+		//見た目の部分
+		shared_ptr<GameObject> m_waterunder;
+	public:
+		WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int num);
+		void OnCreate() override;
+
+		//番号取得
+		int GetmyNum() { return m_myNum; }
+
+		//凍らす
+		void Freeze();
+		//溶かす
+		void Melt();
+		//止める
+		void Stop();
+		//流す
+		void Flow();
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -473,6 +527,8 @@ namespace basecross{
 		void SetWaters(vector<shared_ptr<Water>> waters) { m_waters = waters; }
 
 		bool GetFlow() { return m_FlowFlg; }
+
+		bool GetFreeze() { return m_FreezeFlg; }
 	};
 
 	//--------------------------------------------------------------------------------------

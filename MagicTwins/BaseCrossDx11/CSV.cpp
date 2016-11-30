@@ -49,6 +49,10 @@ namespace basecross
 		vector<Vector3> BoxPoss;
 		vector<Vector3> BoxScale;
 		vector<Vector3> BoxRot;
+		//地面
+		vector<Vector3> PlanePos;
+		vector<Vector3> PlaneScale;
+		vector<Vector3> PlaneRot;
 		//岩
 		vector<Vector3> RockPos;
 		vector<Vector3> RockScale;
@@ -86,13 +90,19 @@ namespace basecross
 		Vector3 Gimmick2_1WaterGatePos;
 		Vector3 Gimmick2_1WaterGateScale;
 		//ギミック３(川のコア)最大３個まで対応
-		Vector3 WaterCore1Pos;
-		Vector3 WaterCore2Pos;
-		Vector3 WaterCore3Pos;
+		vector<Vector3> WaterCore1Pos;
+		vector<Vector3> WaterCore2Pos;
+		vector<Vector3> WaterCore3Pos;
+		//Vector3 WaterCore1Pos;
+		//Vector3 WaterCore2Pos;
+		//Vector3 WaterCore3Pos;
 
-		Vector3 WaterCore1Scale;
-		Vector3 WaterCore2Scale;
-		Vector3 WaterCore3Scale;
+		vector<Vector3> WaterCore1Scale;
+		vector<Vector3> WaterCore2Scale;
+		vector<Vector3> WaterCore3Scale;
+		//Vector3 WaterCore1Scale;
+		//Vector3 WaterCore2Scale;
+		//Vector3 WaterCore3Scale;
 		//ギミック５(炎)
 		vector<Vector3> Gimmick5FirePos;
 		vector<Vector3> Gimmick5FireScale;
@@ -123,6 +133,16 @@ namespace basecross
 				BoxScale.push_back(scale);
 				rot *= (3.14159265f / 180);
 				BoxRot.push_back(rot);
+			}
+			if (StageMapVec[0] == L"Plane")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				Vector3 rot = Vector3(_wtof(StageMapVec[7].c_str()), _wtof(StageMapVec[8].c_str()), _wtof(StageMapVec[9].c_str()));
+				PlanePos.push_back(pos);
+				PlaneScale.push_back(scale);
+				PlaneRot.push_back(rot);
 			}
 			//岩
 			if (StageMapVec[0] == L"Rock")
@@ -230,24 +250,26 @@ namespace basecross
 				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
-				WaterCore1Pos = pos;
-				WaterCore1Scale = scale;
+				//WaterCore1Pos = pos;
+				//WaterCore1Scale = scale;
+				WaterCore1Pos.push_back(pos);
+				WaterCore1Scale.push_back(scale);
 			}
 			if (StageMapVec[0] == L"Gimmick32")
 			{
 				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
-				WaterCore2Pos = pos;
-				WaterCore2Scale = scale;
+				WaterCore2Pos.push_back(pos);
+				WaterCore2Scale.push_back(scale);
 			}
 			if (StageMapVec[0] == L"Gimmick33")
 			{
 				Flgg = true;
 				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
 				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
-				WaterCore3Pos = pos;
-				WaterCore3Scale = scale;
+				WaterCore3Pos.push_back(pos);
+				WaterCore3Scale.push_back(scale);
 			}
 			//ギミック５
 			if (StageMapVec[0] == L"Gimmick5")
@@ -337,6 +359,16 @@ namespace basecross
 			count++;
 		}
 		count = 0;
+		for (auto v : PlanePos)
+		{
+			//スケールと回転は別で持ってくる
+			Vector3 scale = PlaneScale[count];
+			Vector3 rot = PlaneRot[count];
+			st->AddGameObject<PlaneP>(v, scale, rot);
+			count++;
+		}
+		count = 0;
+
 		//岩作成
 		for (auto v : RockPos)
 		{
@@ -408,21 +440,29 @@ namespace basecross
 		st->SetSharedGameObject(L"Goal",st->AddGameObject<Goal>(GoalPos, GoalScale));
 		//魔導書作成
 		auto MBGroup = st->CreateSharedObjectGroup(L"MagicBook");
-		auto MPt = st->AddGameObject<MagicBook>(FirePos, Fire);
-		MBGroup->IntoGroup(MPt);
-		//アップデートグループ追加
-		SUG->IntoGroup(MPt);
+		if (FirePos != Vector3(0,0,0))
+		{
+			auto MPt = st->AddGameObject<MagicBook>(FirePos, Fire);
+			MBGroup->IntoGroup(MPt);
+			//アップデートグループ追加
+			SUG->IntoGroup(MPt);
+		}
 		//氷
-		MPt = st->AddGameObject<MagicBook>(IceFogPos, IceFog);
-		MBGroup->IntoGroup(MPt);
-		//アップデートグループ追加
-		SUG->IntoGroup(MPt);
+		if (IceFogPos != Vector3(0, 0, 0))
+		{
+			auto MPt = st->AddGameObject<MagicBook>(IceFogPos, IceFog);
+			MBGroup->IntoGroup(MPt);
+			//アップデートグループ追加
+			SUG->IntoGroup(MPt);
+		}
 		//風
-		MPt = st->AddGameObject<MagicBook>(WindPos, Wind);
-		MBGroup->IntoGroup(MPt);
-		//アップデートグループ追加
-		SUG->IntoGroup(MPt);
-
+		if (WindPos != Vector3(0, 0, 0))
+		{
+			auto MPt = st->AddGameObject<MagicBook>(WindPos, Wind);
+			MBGroup->IntoGroup(MPt);
+			//アップデートグループ追加
+			SUG->IntoGroup(MPt);
+		}
 
 		//ギミック作成
 		//1
@@ -482,6 +522,55 @@ namespace basecross
 		//3
 		//水門用グループ
 		auto WaterGateGroup = st->CreateSharedObjectGroup(L"WaterCoreGate");
+		auto WaterCoreGroup = st->CreateSharedObjectGroup(L"WaterCore");
+
+		for (auto v : WaterCore1Pos)
+		{
+			Vector3 scale = WaterCore1Scale[count];
+			auto Gimi3P = st->AddGameObject<Gimmick3>(v, scale);
+			//コアに関連する水を追加
+			Gimi3P->SetWaters(Water1Vec);
+			//魔法が当たるオブジェクトに設定
+			MOG->IntoGroup(Gimi3P);
+			//アップデートグループ追加
+			SUG->IntoGroup(Gimi3P);
+			WaterGateGroup->IntoGroup(Gimi3P);
+			WaterCoreGroup->IntoGroup(Gimi3P);
+			count++;
+		}
+		count = 0;
+		for (auto v : WaterCore2Pos)
+		{
+			Vector3 scale = WaterCore2Scale[count];
+			auto Gimi3P = st->AddGameObject<Gimmick3>(v, scale);
+			//コアに関連する水を追加
+			Gimi3P->SetWaters(Water2Vec);
+			//魔法が当たるオブジェクトに設定
+			MOG->IntoGroup(Gimi3P);
+			//アップデートグループ追加
+			SUG->IntoGroup(Gimi3P);
+			WaterGateGroup->IntoGroup(Gimi3P);
+			WaterCoreGroup->IntoGroup(Gimi3P);
+			count++;
+		}
+		count = 0;
+
+		for (auto v : WaterCore3Pos)
+		{
+			Vector3 scale = WaterCore3Scale[count];
+			auto Gimi3P = st->AddGameObject<Gimmick3>(v, scale);
+			//コアに関連する水を追加
+			Gimi3P->SetWaters(Water3Vec);
+			//魔法が当たるオブジェクトに設定
+			MOG->IntoGroup(Gimi3P);
+			//アップデートグループ追加
+			SUG->IntoGroup(Gimi3P);
+			WaterGateGroup->IntoGroup(Gimi3P);
+			WaterCoreGroup->IntoGroup(Gimi3P);
+			count++;
+		}
+		count = 0;
+		/*
 		auto Gimi3P = st->AddGameObject<Gimmick3>(WaterCore1Pos, WaterCore1Scale);
 		//コアに関連する水を追加
 		Gimi3P->SetWaters(Water1Vec);
@@ -491,20 +580,22 @@ namespace basecross
 		SUG->IntoGroup(Gimi3P);
 		WaterGateGroup->IntoGroup(Gimi3P);
 		//以下同
-
-		Gimi3P = st->AddGameObject<Gimmick3>(WaterCore2Pos, WaterCore2Scale);
+		*/
+		/*
+		//3の２
+		auto Gimi3P = st->AddGameObject<Gimmick3>(WaterCore2Pos, WaterCore2Scale);
 		Gimi3P->SetWaters(Water2Vec);
 		MOG->IntoGroup(Gimi3P);
 		SUG->IntoGroup(Gimi3P);
 		WaterGateGroup->IntoGroup(Gimi3P);
 
-
+		//3の3
 		Gimi3P = st->AddGameObject<Gimmick3>(WaterCore3Pos, WaterCore3Scale);
 		Gimi3P->SetWaters(Water3Vec);
 		MOG->IntoGroup(Gimi3P);
 		SUG->IntoGroup(Gimi3P);
 		WaterGateGroup->IntoGroup(Gimi3P);
-
+		*/
 
 		//
 

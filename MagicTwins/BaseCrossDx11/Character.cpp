@@ -46,6 +46,41 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class Plane : public GameObject;
+	//	用途: 地面
+	//--------------------------------------------------------------------------------------
+
+	PlaneP::PlaneP(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, Vector3 rot):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_InitRot(rot)
+	{}
+
+	void PlaneP::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_InitScale);
+		Ptr->SetRotation(m_InitRot);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+		//横部分のみ反発
+		PtrCol->SetIsHitAction(IsHitAction::AutoOnObjectRepel);
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		//描画するテクスチャを設定
+		PtrDraw->SetTextureResource(L"PANEL_TX");
+
+		//透明処理
+		SetAlphaActive(true);
+
+	}
+	//--------------------------------------------------------------------------------------
 	//	class Rock : public GameObject;
 	//	用途：岩
 	//--------------------------------------------------------------------------------------
@@ -295,7 +330,7 @@ namespace basecross{
 			m_time = 0;
 			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
-			m_speed *= 1.5f;
+			m_speed *= 2.0f;
 
 			Vector3 pos = GetComponent<Transform>()->GetPosition();
 			pos += Vector3(rand() % 10 - 5, 0, rand() % 10 - 5);
@@ -1073,7 +1108,7 @@ namespace basecross{
 		}
 		else
 		{
-			m_BlackAlpha += +0.01f;
+			m_BlackAlpha += 1 * App::GetApp()->GetElapsedTime();
 			m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
 		}
 	}
@@ -1176,7 +1211,7 @@ namespace basecross{
 
 
 		//****仮	
-		Kieru();
+		//Kieru();
 		//****仮
 	}
 
@@ -1488,6 +1523,19 @@ namespace basecross{
 				//閉じる
 				else
 				{
+					//もし凍ってるコアがあれば流すの中止
+					auto WaterCoreGroup = GetStage()->GetSharedObjectGroup(L"WaterCore");
+					for (auto v : WaterCoreGroup->GetGroupVector())
+					{
+						auto Ptr = dynamic_pointer_cast<Gimmick3>(v.lock());
+						if (Ptr)
+						{
+							if (Ptr->GetFreeze())
+							{
+								return;
+							}
+						}
+					}
 					Vector3 pos = GetComponent<Transform>()->GetPosition();
 					m_targetY = pos.y + -m_Scale.y;
 
@@ -1561,6 +1609,7 @@ namespace basecross{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
 
+		OnPlayer();
 	}
 	//止める
 	void Water::Stop()
@@ -1568,18 +1617,116 @@ namespace basecross{
 		GetComponent<CollisionObb>()->SetUpdateActive(false);
 
 		//水の部分
-		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		pos.y += -m_InitScale.y;
-		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
-
+		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		//pos.y += -m_InitScale.y;
+		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+		m_waterunder->SetDrawActive(false);
 	}
 	//流す
 	void Water::Flow()
 	{
 		//水の部分
-		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		pos.y += m_InitScale.y;
-		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		//pos.y += m_InitScale.y;
+		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+		m_waterunder->SetDrawActive(true);
+
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
+
+		OnPlayer();
+	}
+
+	void Water::OnPlayer() 
+	{
+
+		//プレイヤーが上にいるかどうか判定
+		auto PlayerPtr = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+		Vector3 Playerpos = PlayerPtr->GetComponent<Transform>()->GetPosition();
+
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		scale /= 2;
+		//座標から判定
+		if ((Playerpos.x < pos.x + scale.x && Playerpos.x > pos.x - scale.x) &&	/*X座標判定*/
+			(Playerpos.z < pos.z + scale.z && Playerpos.z > pos.z - scale.z) 	/*Z座標判定*/
+																				/*(Playerpos.y < pos.y + (scale.y * 3) && Playerpos.y > pos.y - scale.x)*/	/*Y座標判定*/
+			)
+		{
+			//もしいたら地形ダメージ与える
+			PlayerPtr->PlayerTerrainDamege();
+		}
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class WaterFall : public GameObject;
+	//	用途: 滝
+	//--------------------------------------------------------------------------------------
+	WaterFall::WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int num) :
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_myNum(num)
+	{}
+
+	void WaterFall::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_InitScale);
+		Ptr->SetRotation(0, 0, 0);
+
+		//衝突判定をつける
+		auto PtrCol = AddComponent<CollisionObb>();
+
+		auto ObjPtr = GetStage()->AddGameObject<GameObject>();
+		auto OPT = ObjPtr->AddComponent<Transform>();
+		OPT->SetPosition(m_InitPos);
+		OPT->SetScale(m_InitScale);
+		OPT->SetRotation(0, 0, 0);
+		auto OPD = ObjPtr->AddComponent<PNTStaticDraw>();
+		OPD->SetMeshResource(L"DEFAULT_CUBE");
+		OPD->SetTextureResource(L"WATER_TX");
+
+		m_waterunder = ObjPtr;
+
+
+	}
+
+	//凍らす
+	void WaterFall::Freeze()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
+		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+
+	}
+	//溶かす
+	void WaterFall::Melt()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(true);
+		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+
+	}
+	//止める
+	void WaterFall::Stop()
+	{
+		GetComponent<CollisionObb>()->SetUpdateActive(false);
+
+		//水の部分
+		SetDrawActive(false);
+		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		//pos.y += -m_InitScale.y;
+		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+
+	}
+	//流す
+	void WaterFall::Flow()
+	{
+		//水の部分
+		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		//pos.y += m_InitScale.y;
+		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+
+		SetDrawActive(false);
 
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 	}
@@ -1683,10 +1830,11 @@ namespace basecross{
 		GetComponent<CollisionObb>()->SetUpdateActive(false);
 
 		//水の部分
-		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		pos.y += -m_InitScale.y;
-		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		//pos.y += -m_InitScale.y;
+		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
+		m_waterunder->SetDrawActive(false);
 			for (auto v : m_waters)
 		{
 			v->Stop();
@@ -1700,9 +1848,11 @@ namespace basecross{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 
 		//水の部分
-		Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		pos.y += m_InitScale.y;
-		m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+		//pos.y += m_InitScale.y;
+		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+
+		m_waterunder->SetDrawActive(true);
 
 
 		for (auto v : m_waters)

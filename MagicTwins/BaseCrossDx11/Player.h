@@ -96,6 +96,9 @@ namespace basecross{
 		//ダメージ処理
 		void PlayerDamege();
 
+		//地形ダメージ
+		void PlayerTerrainDamege();
+
 		//ライフ表示
 		void DispUI() { m_LifeSprite->SetDrawActive(true); m_CharaUI->SetDrawActive(true); }
 	};

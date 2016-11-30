@@ -290,7 +290,7 @@ namespace basecross {
 			//CSV作成
 			AddGameObject<CSVReader>();
 			//プレートの作成
-			CreatePlate();
+			//CreatePlate();
 			//制限時間の作成
 			CreateLimitTime();
 			//ポーズメニュー作成

@@ -8,7 +8,7 @@ namespace basecross {
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring strTexture = DataDir + L"StageSelectLogo.png";
 		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
-		strTexture = DataDir + L"sky.png";
+		strTexture = DataDir + L"StageSelect_Back.png";
 		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
 		//¶–îˆó‰æ‘œ(‰¼)
 		strTexture = DataDir + L"Left.png";

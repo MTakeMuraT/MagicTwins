@@ -598,7 +598,13 @@ namespace basecross {
 	//ターンの最終更新時
 	void Player::OnLastUpdate()
 	{
-
+		if (m_myName == "Player1")
+		{
+			wstring txt;
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			txt += L"X = " + Util::FloatToWStr(pos.x) + L"\nY = " + Util::FloatToWStr(pos.y) + L"\nZ = " + Util::FloatToWStr(pos.z);
+			GetComponent<StringSprite>()->SetText(txt);
+		}
 		/*
 		wstring txt;
 		//回転とってる
@@ -648,6 +654,39 @@ namespace basecross {
 			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE2_TX");
 			break;
 		}
+	}
+
+	void Player::PlayerTerrainDamege()
+	{
+		//移動するためアタリ消す
+		GetComponent<CollisionSphere>()->SetUpdateActive(false);
+		Vector3 pos = GetComponent<Transform>()->GetPosition();
+		GetComponent<Transform>()->SetPosition(pos);
+
+		GetComponent<CollisionSphere>()->SetUpdateActive(true);
+
+		m_life--;
+
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+
+		//SE再生
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Damege");
+		switch (m_life)
+		{
+		case 0:
+			//しんだ
+			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE0_TX");
+			//ゲームオーバーに遷移
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+			break;
+		case 1:
+			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE1_TX");
+			break;
+		case 2:
+			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE2_TX");
+			break;
+		}
+
 	}
 
 	//--------------------------------------------------------------------------------------
