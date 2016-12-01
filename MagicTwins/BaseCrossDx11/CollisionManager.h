@@ -50,7 +50,7 @@ namespace basecross {
 		//プレイヤーとゴールの当たった処理
 		void PlayerToGoal();
 		//プレイヤーと魔導書の当たった処理
-		void PlayerToMagicBook(int count);
+		void PlayerToMagicBook(int count,int Playercount);
 		//プレイヤーとエネミーが当たった処理
 		void PlayerToEnemy(int Playernum);
 		//魔法とオブジェクトの当たった処理

@@ -24,6 +24,8 @@ namespace basecross{
 		shared_ptr<MultiAudioObject> m_AudioGame;
 		//リザルト
 		shared_ptr<MultiAudioObject> m_AudioResult;
+		//ゲームオーバー
+		shared_ptr<MultiAudioObject> m_AudioGameOver;
 
 
 		//めんどいから直打ちで魔法の種類作る
@@ -31,6 +33,9 @@ namespace basecross{
 
 		//ステージの番号
 		unsigned int m_stageNum = 1;
+
+		//音全停止
+		void StopBGM();
 	public:
 		Scene() :SceneBase(){}
 		virtual ~Scene(){}

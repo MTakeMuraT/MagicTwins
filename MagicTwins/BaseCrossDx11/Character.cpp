@@ -1218,6 +1218,8 @@ namespace basecross{
 		m_Active = false;
 		SetDrawActive(false);
 		GetComponent<Transform>()->SetPosition(0, -10, 0);
+		//SEÄ¶
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("ScoreItemGet");
 
 	}
 
@@ -1235,54 +1237,6 @@ namespace basecross{
 		{
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
 		}
-	}
-	//--------------------------------------------------------------------------------------
-	//	class SEManager : public GameObject;
-	//	—p“r: BGMˆÈŠO‚ÌSE‚ð‚Ü‚Æ‚ß‚é‚à‚Ì
-	//--------------------------------------------------------------------------------------
-	SEManager::SEManager(const shared_ptr<Stage>& StagePtr):
-		GameObject(StagePtr)
-	{}
-
-	void SEManager::OnCreate()
-	{
-		m_Se = ObjectFactory::Create<MultiAudioObject>();
-	}
-
-	void SEManager::OnSe(string name)
-	{
-		//ƒ^ƒCƒgƒ‹Œˆ’è‰¹
-		if (name == "SelectTitle")
-		{
-			m_Se->AddAudioResource(L"SelectTitleSE");
-			m_Se->Start(L"SelectTitleSE", 0.5f);
-		}
-		if (name == "Select")
-		{
-			m_Se->AddAudioResource(L"SelectSE");
-			m_Se->Start(L"SelectSE", 0.5f);
-		}
-		if (name == "Damege")
-		{
-			m_Se->AddAudioResource(L"DamageSE");
-			m_Se->Start(L"DamageSE", 0.5f);
-		}
-		if (name == "Water")
-		{
-			m_Se->AddAudioResource(L"WaterSE");
-			m_Se->Start(L"WaterSE", 0.5f);
-		}
-		if (name == "Freeze")
-		{
-			m_Se->AddAudioResource(L"FreezeSE");
-			m_Se->Start(L"FreezeSE", 0.5f);
-		}
-		if (name == "MagicShot")
-		{
-			m_Se->AddAudioResource(L"FreezeSE");
-			m_Se->Start(L"FreezeSE", 0.5f);
-		}
-
 	}
 	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
@@ -1328,7 +1282,9 @@ namespace basecross{
 			SetDrawActive(false);
 			GetComponent<CollisionObb>()->SetUpdateActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
-			
+			//SEÄ¶
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("FireDamage");
+
 		}
 	}
 
@@ -1390,6 +1346,9 @@ namespace basecross{
 			SetDrawActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
 			m_ActiveFlg = false;
+			//SEÄ¶
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("FireDamage");
+
 		}
 
 		if (MT == Wind)
@@ -1599,6 +1558,8 @@ namespace basecross{
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(false);
 		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+		//SEÄ¶
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
 
 	}
 	//—n‚©‚·
@@ -1606,6 +1567,8 @@ namespace basecross{
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+		//SEÄ¶
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Water");
 
 		OnPlayer();
 	}
@@ -1707,6 +1670,8 @@ namespace basecross{
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+		//SEÄ¶
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
 
 	}
 	//—n‚©‚·
@@ -1714,6 +1679,8 @@ namespace basecross{
 	{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 		GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+		//SEÄ¶
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Water");
 
 		OnPlayer();
 
@@ -1848,6 +1815,7 @@ namespace basecross{
 		if (m_FreezeFlg && MT == Fire)
 		{
 			Melt();
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Water");
 			m_FreezeFlg = false;
 		}
 
@@ -2019,6 +1987,8 @@ namespace basecross{
 			SetDrawActive(false);
 			GetComponent<CollisionObb>()->SetUpdateActive(false);
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
+			//SEÄ¶
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
 
 		}
 	}

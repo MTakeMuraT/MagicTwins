@@ -329,20 +329,6 @@ namespace basecross{
 	};
 
 	//--------------------------------------------------------------------------------------
-	//	class SEManager : public GameObject;
-	//	ópìr: BGMà»äOÇÃSEÇÇ‹Ç∆ÇﬂÇÈÇ‡ÇÃ
-	//--------------------------------------------------------------------------------------
-	class SEManager : public GameObject
-	{
-	private :
-		//âπ
-		shared_ptr<MultiAudioObject> m_Se;
-	public :
-		SEManager(const shared_ptr<Stage>& StagePtr);
-		void OnCreate()override;
-		void OnSe(string name);
-	};
-	//--------------------------------------------------------------------------------------
 	//	class Gimmick1 : public GameObject;
 	//	ópìr: ïXÅBâäÇÃñÇñ@[Fire]Ç≈ónÇ©ÇπÇÈ
 	//--------------------------------------------------------------------------------------

@@ -22,6 +22,9 @@ namespace basecross {
 		//決定ロゴ
 		strTexture = DataDir + L"Kettei.png";
 		App::GetApp()->RegisterTexture(L"KETTEI_TX", strTexture);
+		//ステージイメージ枠
+		strTexture = DataDir + L"Frame.png";
+		App::GetApp()->RegisterTexture(L"FRAME_TX", strTexture);
 
 	}
 
@@ -93,6 +96,22 @@ namespace basecross {
 		//透明度反映
 		SelectLogo->SetAlphaActive(true);
 
+	}
+
+	void StageSelect::CreateStageImage()
+	{
+		auto StageImage = AddGameObject<GameObject>();
+		auto SITranform = StageImage->AddComponent<Transform>();
+		SITranform->SetPosition(0,0,0);
+		SITranform->SetScale(1200,1200,1);
+		SITranform->SetRotation(0, 0, 0);
+
+		auto SIDraw = StageImage->AddComponent<PCTSpriteDraw>();
+		SIDraw->SetTextureResource(L"FRAME_TX");
+
+		StageImage->SetAlphaActive(true);
+
+		StageImage->SetDrawLayer(3);
 	}
 
 	void StageSelect::SceneChange()
@@ -213,7 +232,8 @@ namespace basecross {
 			CreateSelectLogo();
 			//ボタン作成
 			CreateButtons();
-
+			//ステージイメージ作成
+			CreateStageImage();
 			//左矢印(仮)
 			Left();
 			//右矢印(仮)
@@ -257,7 +277,8 @@ namespace basecross {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
-			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B||
+				CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
 			{
 				SceneChange();
 			}

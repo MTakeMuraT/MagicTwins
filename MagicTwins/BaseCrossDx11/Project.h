@@ -18,3 +18,4 @@
 #include "Player.h"
 #include "CollisionManager.h"
 #include "CSV.h"
+#include "Semanager.h"

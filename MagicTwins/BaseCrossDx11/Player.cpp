@@ -363,7 +363,7 @@ namespace basecross {
 			}
 
 			//Xボタン押したら魔法発射
-			if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_X)
+			if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_A)
 			{
 				ShotMagic();
 			}
@@ -562,6 +562,7 @@ namespace basecross {
 
 		if (m_myName == "Player1")
 		{
+
 			//魔法UI変更
 			switch (MT)
 			{
@@ -570,12 +571,18 @@ namespace basecross {
 				break;
 			case Fire:
 				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"FIREUI_TX");
+				//SE再生
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicGet");
 				break;
 			case IceFog:
 				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"ICEUI_TX");
+				//SE再生
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicGet")
 				break;
 			case Wind:
 				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"WINDUI_TX");
+				//SE再生
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicGet");
 			default:
 				break;
 			}
@@ -606,6 +613,7 @@ namespace basecross {
 	//ターンの最終更新時
 	void Player::OnLastUpdate()
 	{
+		/*
 		if (m_myName == "Player1")
 		{
 			wstring txt;
@@ -613,6 +621,7 @@ namespace basecross {
 			txt += L"X = " + Util::FloatToWStr(pos.x) + L"\nY = " + Util::FloatToWStr(pos.y) + L"\nZ = " + Util::FloatToWStr(pos.z);
 			GetComponent<StringSprite>()->SetText(txt);
 		}
+		*/
 		/*
 		wstring txt;
 		//回転とってる
@@ -685,7 +694,8 @@ namespace basecross {
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
 		//SE再生
-		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Damege");
+		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("TerrainDamage");
+
 		switch (m_life)
 		{
 		case 0:
@@ -788,8 +798,6 @@ namespace basecross {
 	{
 		if (!m_ActiveFlg && flg == true)
 		{
-			//SE再生
-			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShot");
 
 			m_ActiveFlg = flg;
 			m_MagicType = mT;
@@ -800,18 +808,23 @@ namespace basecross {
 				break;
 			case Fire:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKFIRE_TX");
+				//SE再生
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShotFire");
 				break;
 			case IceFog:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKICEFOG_TX");
+				//SE再生
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShotIce");
 				break;
 			case Wind:
 				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKWIND_TX");
+				//SE再生
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShotWind");
 				break;
 			default:
 				break;
 			}
 			SetVelo();
-
 		}
 		//生きてるときにフラグおられたら
 		if (m_ActiveFlg && flg == false)

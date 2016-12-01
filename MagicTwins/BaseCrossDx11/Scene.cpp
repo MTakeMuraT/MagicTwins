@@ -58,25 +58,45 @@ namespace basecross{
 			App::GetApp()->RegisterWav(L"TitleBGM", strMusic);
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/ResultBGM.wav";
 			App::GetApp()->RegisterWav(L"ResultBGM", strMusic);
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"bgm/GameOverBGM.wav";
+			App::GetApp()->RegisterWav(L"GameOverBGM", strMusic);
 
 
 			//SE
-			//
+			//ダメ
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Damage.wav";
 			App::GetApp()->RegisterWav(L"DamageSE", strMusic);
-			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Ice.wav";
+			//地形ダメ
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/TerrainDamage.wav";
+			App::GetApp()->RegisterWav(L"TerrainDamageSE", strMusic);
+			//凍る音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Freeze.wav";
 			App::GetApp()->RegisterWav(L"FreezeSE", strMusic);
-
+			//タイトルの選択音
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Key1.wav";
 			App::GetApp()->RegisterWav(L"SelectTitleSE", strMusic);
-
+			//選択音
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Key2.wav";
 			App::GetApp()->RegisterWav(L"SelectSE", strMusic);
-
+			//水流れる音
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Water.wav";
 			App::GetApp()->RegisterWav(L"WaterSE", strMusic);
-
-
+			//魔法撃つ音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Fire.wav";
+			App::GetApp()->RegisterWav(L"FireSE", strMusic);
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Ice.wav";
+			App::GetApp()->RegisterWav(L"IceSE", strMusic);
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Wind.wav";
+			App::GetApp()->RegisterWav(L"WindSE", strMusic);
+			//炎くらう音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/FireDamage.wav";
+			App::GetApp()->RegisterWav(L"FireDamageSE", strMusic);
+			//魔導書取得音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/MagicGet.wav";
+			App::GetApp()->RegisterWav(L"MagicGetSE", strMusic);
+			//スコアアイテム取得音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/ItemGet.wav";
+			App::GetApp()->RegisterWav(L"ScoreItemGetSE", strMusic);
 
 			//オーディオの初期化
 			m_AudioTitle = ObjectFactory::Create<MultiAudioObject>();
@@ -89,18 +109,29 @@ namespace basecross{
 			m_AudioResult = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioResult->AddAudioResource(L"ResultBGM");
 
+			m_AudioGameOver = ObjectFactory::Create<MultiAudioObject>();
+			m_AudioGameOver->AddAudioResource(L"GameOverBGM");
+
 		}
 		catch (...) {
 			throw;
 		}
 	}
 
+	void Scene::StopBGM()
+	{
+		m_AudioGame->Stop(L"GameStageBGM");
+		m_AudioResult->Stop(L"ResultBGM");
+		m_AudioGameOver->Stop(L"GameOverBGM");
+		m_AudioTitle->Stop(L"TitleBGM");
+	}
+
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
 		//タイトル
 		if (event->m_MsgStr == L"Title")
 		{
-			m_AudioGame->Stop(L"GameStageBGM");
-			m_AudioResult->Stop(L"ResultBGM");
+			//音全停止
+			StopBGM();
 			//再生
 			m_AudioTitle->Start(L"TitleBGM",XAUDIO2_LOOP_INFINITE,0.5f);
 			ResetActiveStage<Title>();
@@ -108,15 +139,15 @@ namespace basecross{
 		//ステージセレクト
 		else if (event->m_MsgStr == L"StageSelect")
 		{
-			//セレクト画面に入ったらTitleBGMを止める
-			m_AudioTitle->Stop(L"TitleBGM");
-			m_AudioResult->Stop(L"ResultBGM");
+			//音全停止
+			StopBGM();
 			ResetActiveStage<StageSelect>();
 		}
 		//ゲーム中
 		else if (event->m_MsgStr == L"GameStage")
 		{
-			m_AudioResult->Stop(L"ResultBGM");
+			//音全停止
+			StopBGM();
 			//再生
 			m_AudioGame->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
 			ResetActiveStage<GameStage>();
@@ -124,7 +155,8 @@ namespace basecross{
 		//クリア
 		else if (event->m_MsgStr == L"Result")
 		{
-			m_AudioGame->Stop(L"GameStageBGM");
+			//音全停止
+			StopBGM();
 			//再生
 			m_AudioResult->Start(L"ResultBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
 			ResetActiveStage<Result>();
@@ -133,9 +165,10 @@ namespace basecross{
 		//ゲームオーバー
 		else if (event->m_MsgStr == L"GameOver")
 		{
-			//なってる可能性あるもの
-			//ゲーム中、
-			m_AudioGame->Stop(L"GameStageBGM");
+			//音全停止
+			StopBGM();
+			//再生
+			m_AudioGameOver->Start(L"GameOverBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
 			ResetActiveStage<GameOver>();
 		}
 

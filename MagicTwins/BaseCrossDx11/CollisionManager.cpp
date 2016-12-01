@@ -42,10 +42,18 @@ namespace basecross {
 		//プレイヤーと魔導書の判定
 		for (auto v : MagicBooksPos)
 		{	
-			if (CollisionTest(PlayerPos1, PlayerScale1, MagicBooksPos[count],MagicBooksScale[count] ) ||
-				CollisionTest(PlayerPos2, PlayerScale2, MagicBooksPos[count], MagicBooksScale[count]))
+			//どっち当たってるか
+			int PlayerCount = 0;
+			if (CollisionTest(PlayerPos1, PlayerScale1, MagicBooksPos[count],MagicBooksScale[count]))
 			{
-				PlayerToMagicBook(count);
+				PlayerToMagicBook(count,PlayerCount);
+			}
+
+			PlayerCount++;
+
+			if(CollisionTest(PlayerPos2, PlayerScale2, MagicBooksPos[count], MagicBooksScale[count]))
+			{
+				PlayerToMagicBook(count, PlayerCount);
 			}
 			count++;
 		}
@@ -200,11 +208,17 @@ namespace basecross {
 	}
 
 	//プレイヤーと魔導書の当たった処理
-	void CollisionManager::PlayerToMagicBook(int count)
+	void CollisionManager::PlayerToMagicBook(int count,int Playercount)
 	{
 		auto MBGroup = GetStage()->GetSharedObjectGroup(L"MagicBook");
 		auto MBGVec = MBGroup->GetGroupVector();
-		dynamic_pointer_cast<MagicBook>(MBGVec[count].lock())->GetPlayer();
+		//プレイヤーがアクティブなら取得
+		bool P1 = GetStage()->GetSharedGameObject<Player>(L"Player1", false)->GetActive();
+		bool P2 = GetStage()->GetSharedGameObject<Player>(L"Player2", false)->GetActive();
+		if ((Playercount == 0 && P1) || (Playercount == 1 && P2))
+		{
+			dynamic_pointer_cast<MagicBook>(MBGVec[count].lock())->GetPlayer();
+		}
 	}
 
 	//プレイヤーとエネミーが当たった処理

@@ -161,13 +161,16 @@ namespace basecross {
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 			if (CntlVec[0].bConnected)
 			{
-				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B ||
+					CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
 				{
 					m_ConFlg = false;
 					GetSharedGameObject<Black>(L"Black", false)->StartBlack();
 
 					//SEçƒê∂
 					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectTitle");
+					//GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("TerrainDamage");
+
 				}
 			}
 
