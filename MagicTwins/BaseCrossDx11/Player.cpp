@@ -242,7 +242,6 @@ namespace basecross {
 			GetComponent<CollisionSphere>()->SetUpdateActive(true);
 			GetComponent<Rigidbody>()->SetUpdateActive(true);
 			GetComponent<Gravity>()->SetUpdateActive(true);
-
 		}
 		if (m_endFrame)
 		{
@@ -253,6 +252,11 @@ namespace basecross {
 		{
 			CameraTarget();
 			active();
+		}
+		//無敵中計算
+		if (m_InviFlg)
+		{
+			Invincible();
 		}
 		
 	}
@@ -541,6 +545,36 @@ namespace basecross {
 		m_endFrame = true;
 	}
 
+	//無敵時間中の関数
+	void Player::Invincible()
+	{
+		float ElaTime = App::GetApp()->GetElapsedTime();
+
+		//点滅
+		m_Flashingtime += ElaTime;
+		if (m_Flashingtime > m_FlashingTimeInterval)
+		{
+			m_FlashingFlg = !m_FlashingFlg;
+			SetDrawActive(m_FlashingFlg);
+			m_Flashingtime = 0;
+		}
+		//無敵時間カウント
+		m_InvTime += ElaTime;
+
+		//設定時間経過したら
+		if (m_InvTime > m_InvincibleTime)
+		{
+			//無敵解除
+			m_InvTime = 0;
+			SetDrawActive(true);
+			m_InviFlg = false;
+
+			//点滅初期化
+			m_Flashingtime = 0;
+			m_FlashingFlg = false;
+		}
+	}
+
 	//魔法を記憶するこれ常に1のほう呼ばれる
 	void Player::SetMagic(MagicType MT)
 	{
@@ -650,26 +684,40 @@ namespace basecross {
 
 	void Player::PlayerDamege()
 	{
-		m_life--;
-		GetComponent<Rigidbody>()->SetVelocity(0, 10, 0);
-		auto ScenePtr = App::GetApp()->GetScene<Scene>();
-
-		//SE再生
-		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Damege");
-		switch (m_life)
+		if (!m_InviFlg)
 		{
-		case 0:
-			//しんだ
-			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE0_TX");
-			//ゲームオーバーに遷移
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
-			break;
-		case 1:
-			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE1_TX");
-			break;
-		case 2:
-			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE2_TX");
-			break;
+			m_InviFlg = true;
+			m_life--;
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			//移動するためアタリ消す
+			GetComponent<CollisionSphere>()->SetUpdateActive(false);
+			GetComponent<Rigidbody>()->SetUpdateActive(false);
+			GetComponent<Gravity>()->SetUpdateActive(false);
+
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos.y += 0.25f;
+			GetComponent<Transform>()->SetPosition(pos);
+
+			//移動後にアタリ判定一式を治す
+			m_WarpFlg = true;
+
+			//SE再生
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Damege");
+			switch (m_life)
+			{
+			case 0:
+				//しんだ
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE0_TX");
+				//ゲームオーバーに遷移
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+				break;
+			case 1:
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE1_TX");
+				break;
+			case 2:
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE2_TX");
+				break;
+			}
 		}
 	}
 

@@ -64,25 +64,37 @@ namespace basecross {
 		auto EGV = EG->GetGroupVector();
 		for (auto v : EGV)
 		{
-			auto Ptr = dynamic_pointer_cast<Enemy>(v.lock());
+			auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
 			Vector3 PPos = Ptr->GetComponent<Transform>()->GetPosition();
 			Vector3 PScale = Ptr->GetComponent<Transform>()->GetScale();
 			//プレイヤー１が当たる
-			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale) && !Ptr->GetStopFlg())
+			if (CollisionTest(PlayerPos1, PlayerScale1, PPos, PScale))
 			{
 				if (GetStage()->GetSharedGameObject<Player>(L"Player1")->GetActive())
 				{
+					//プレイヤー側の処理
 					PlayerToEnemy(1);
-					Ptr->ResetPos();
+					//エネミー側の処理、エネミーの種類が増えたら追加する
+					auto enemyPtr = dynamic_pointer_cast<Enemy>(v.lock());
+					if (enemyPtr && !enemyPtr->GetStopFlg())
+					{
+						enemyPtr->ResetPos();
+					}
 				}
 			}
 			//プレイヤー２が当たる
-			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale) && !Ptr->GetStopFlg())
+			else if (CollisionTest(PlayerPos2, PlayerScale2, PPos, PScale))
 			{
 				if (GetStage()->GetSharedGameObject<Player>(L"Player2")->GetActive())
 				{
+					//プレイヤー側の処理
 					PlayerToEnemy(2);
-					Ptr->ResetPos();
+					//エネミー側の処理、エネミーの種類が増えたら追加する
+					auto enemyPtr = dynamic_pointer_cast<Enemy>(v.lock());
+					if (enemyPtr && !enemyPtr->GetStopFlg())
+					{
+						enemyPtr->ResetPos();
+					}
 				}
 			}
 		}

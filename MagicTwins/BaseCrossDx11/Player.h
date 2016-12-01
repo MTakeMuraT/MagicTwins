@@ -43,6 +43,25 @@ namespace basecross{
 		//カメラ移動始める範囲
 		const float m_CameraMove = 3.0f;
 
+		//無敵時間
+		const float m_InvincibleTime = 2.0f;
+		//無敵時間計算用
+		float m_InvTime = 0;
+		//無敵フラグ
+		bool m_InviFlg = false;
+
+		//無敵点滅時間
+		float m_Flashingtime = 0;
+		//透明 感覚
+		const float m_FlashingTimeInterval = 0.1f;
+		//透明調整
+		bool m_FlashingFlg = false;
+
+
+
+		//無敵時間中の関数
+		void Invincible();
+
 		//瞬間移動できなくなる対処
 		bool m_WarpFlg = false;
 		//体力表示

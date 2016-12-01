@@ -265,8 +265,8 @@ namespace basecross{
 			}
 			return;
 		}
-		//Ž~‚Ü‚Á‚Ä‚È‚¯‚ê‚Î’Ç‚¤
-		if (!m_StopFlg)
+		//Ž~‚Ü‚Á‚Ä‚È‚¢A‚©‚Â’Ç‚¤ó‘Ô‚È‚ç
+		if (!m_StopFlg && m_ChaceFlg)
 		{
 			
 			auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
@@ -307,7 +307,8 @@ namespace basecross{
 				}
 			}
 		}
-		else
+		//Ž~‚Ü‚Á‚Ä‚éó‘Ô
+		else if(m_StopFlg)
 		{
 			m_time += App::GetApp()->GetElapsedTime();
 			if (m_time > m_StopTime)
@@ -315,6 +316,41 @@ namespace basecross{
 				m_StopFlg = false;
 				m_time = 0;
 				GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+			}
+		}
+		//Ž~‚Ü‚Á‚Ä‚È‚­‚Ä’Ç‚Á‚Ä‚È‚¢ó‘Ô‚È‚ç
+		else if (!m_ChaceFlg)
+		{
+			auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+			auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+			if (m_TargetPlayernum == 1)
+			{
+				if (P1P->GetActive())
+				{
+					Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+					Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+					Vector3 dir;
+					dir = topos - nowpos;
+					if (dir.Length() < m_ChaceDir)
+					{
+						m_ChaceFlg = true;
+					}
+				}
+			}
+			else if (m_TargetPlayernum == 2)
+			{
+				if (P2P->GetActive())
+				{
+					Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+					Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+					Vector3 dir;
+					dir = topos - nowpos;
+					if (dir.Length() < m_ChaceDir)
+					{
+						m_ChaceFlg = true;
+					}
+				}
 			}
 		}
 	}
@@ -338,6 +374,7 @@ namespace basecross{
 			{
 				SetDrawActive(false);
 				m_ActiveFlg = false;
+				m_ChaceFlg = false;
 				GetComponent<Transform>()->SetPosition(0, -15, 0);
 			}
 		}
@@ -346,6 +383,7 @@ namespace basecross{
 	void Enemy::ResetPos()
 	{
 		m_speed = m_InitSpeed;
+		m_ChaceFlg = false;
 		GetComponent<Transform>()->SetPosition(m_InitPos);
 	}
 

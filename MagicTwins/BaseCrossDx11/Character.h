@@ -100,6 +100,10 @@ namespace basecross{
 		const float m_StopTime = 0.5f;
 		//死んでる時間
 		const float m_ReSponTime = 10.0f;
+		//追うフラグ
+		bool m_ChaceFlg = false;
+		//追う距離
+		const float m_ChaceDir = 3.0f;
 		//計算用
 		float m_time = 0;
 		//体力
