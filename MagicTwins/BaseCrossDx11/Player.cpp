@@ -577,7 +577,7 @@ namespace basecross {
 			case IceFog:
 				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"ICEUI_TX");
 				//SEÄ¶
-				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicGet")
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicGet");
 				break;
 			case Wind:
 				m_MagicUIIn->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"WINDUI_TX");

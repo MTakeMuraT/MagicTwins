@@ -1,0 +1,10 @@
+Char1
+px -706
+py -158
+sx 788
+sy 786
+Char2
+px684
+py-158
+sx 788
+sy 786

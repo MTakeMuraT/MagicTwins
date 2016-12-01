@@ -17,8 +17,8 @@ namespace basecross {
 		strTexture = DataDir + L"Right.png";
 		App::GetApp()->RegisterTexture(L"RIGHT_TX", strTexture);
 		//Bボタン
-		strTexture = DataDir + L"ButtonB.png";
-		App::GetApp()->RegisterTexture(L"BBUTTON_TX", strTexture);
+		strTexture = DataDir + L"ButtonA.png";
+		App::GetApp()->RegisterTexture(L"ABUTTON_TX", strTexture);
 		//決定ロゴ
 		strTexture = DataDir + L"Kettei.png";
 		App::GetApp()->RegisterTexture(L"KETTEI_TX", strTexture);
@@ -123,14 +123,14 @@ namespace basecross {
 
 	void StageSelect::CreateButtons()
 	{
-		//Bボタン作成
+		//Aボタン作成
 		auto obj1 = AddGameObject<GameObject>();
 		auto OT1 = obj1->AddComponent<Transform>();
 		OT1->SetPosition(300, -400, 0);
 		OT1->SetScale(100, 100, 1);
 		OT1->SetRotation(0, 0, 0);
 		auto OD1 = obj1->AddComponent<PCTSpriteDraw>();
-		OD1->SetTextureResource(L"BBUTTON_TX");
+		OD1->SetTextureResource(L"ABUTTON_TX");
 		obj1->SetAlphaActive(true);
 		obj1->SetDrawLayer(3);
 

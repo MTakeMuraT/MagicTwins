@@ -1,0 +1,12 @@
+タイトル決定音 : Key1
+決定音 : Key2
+魔導書取得音 : MagicGet
+炎発射音 : Fire
+氷発射音 : Ice
+風発射音 : Wind
+ダメージ音 : Damage
+地形ダメージ音 : TerrainDamage
+水流れる音 : Water
+凍る音 : Freeze
+燃やす音 : FireDamage
+スコアアイテム取る音 : ItemGet
