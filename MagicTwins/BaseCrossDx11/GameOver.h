@@ -5,12 +5,6 @@ namespace basecross
 {
 	class GameOver : public Stage
 	{
-		
-		shared_ptr<GameObject> m_ReTryLogo;
-		shared_ptr<GameObject> m_StageSelectLogo;
-		shared_ptr<GameObject> m_TitleLogo;
-		shared_ptr<GameObject> m_Map;
-
 		//リソースの作成
 		void CreateResourses();
 		//ビューの作成
@@ -25,6 +19,9 @@ namespace basecross
 		void CreateStageSelect();
 		//タイトルの作成
 		void CreateTitle();
+		//キャラ作成
+		void CreateChar();
+
 
 		//シーン遷移
 		void SceneChange();
@@ -32,12 +29,14 @@ namespace basecross
 		int m_selectnum = 0;
 		//操作フラグ
 		bool m_moveFlg = false;
-		bool m_selectMapFlg = false;
-		//選択時X
-		const float m_SelectX = -750;
-		//非選択時X
-		const float m_NotSelectX = -850;
 		
+		//リトライロゴ
+		shared_ptr<GameObject> m_ReTryLogo;
+		//セレクトロゴ
+		shared_ptr<GameObject> m_SelectLogo;
+		//タイトルロゴ
+		shared_ptr<GameObject> m_TitleLogo;
+
 
 		//選択時Scale
 		const Vector3 m_SelectScale = Vector3(500, 500, 1);

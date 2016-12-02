@@ -7,16 +7,28 @@ namespace basecross
 	{
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"GameOverLogo.png";
-		App::GetApp()->RegisterTexture(L"GAMEOVERLOGO_TX", strTexture);
-		strTexture = DataDir + L"OverBack.png";
+		wstring strTexture;
+		//背景
+		strTexture = DataDir + L"GameOver_Back.png";
 		App::GetApp()->RegisterTexture(L"GAMEOVERBACK_TX", strTexture);
-		strTexture = DataDir + L"PauseReTryLogo.png";
-		App::GetApp()->RegisterTexture(L"PAUSERETRYLOGO_TX", strTexture);
-		strTexture = DataDir + L"PauseStageSelect.png";
-		App::GetApp()->RegisterTexture(L"PAUSESTAGESELECT_TX",strTexture);
-		strTexture = DataDir + L"PauseTitleLogo.png";
-		App::GetApp()->RegisterTexture(L"PAUSETITLELOGO_TX", strTexture);
+		//ゲームオーバーロゴ
+		strTexture = DataDir + L"GemeOver_Logo.png";
+		App::GetApp()->RegisterTexture(L"GAMEOVERLOGO_TX", strTexture);
+		//リトライロゴ
+		strTexture = DataDir + L"ReTryLogo.png";
+		App::GetApp()->RegisterTexture(L"RETRYLOGO_TX", strTexture);
+		//セレクトロゴ
+		strTexture = DataDir + L"SelectBackLogo.png";
+		App::GetApp()->RegisterTexture(L"SELECTLOGO_TX", strTexture);
+		//タイトルロゴ
+		strTexture = DataDir + L"TitleBackLogo.png";
+		App::GetApp()->RegisterTexture(L"TITLELOGO_TX", strTexture);
+		//キャラ１ロゴ
+		strTexture = DataDir + L"GameOver_Chara1.png";
+		App::GetApp()->RegisterTexture(L"GAMEOVERCHARA1_TX", strTexture);
+		//キャラ２ロゴ
+		strTexture = DataDir + L"GameOver_Chara2.png";
+		App::GetApp()->RegisterTexture(L"GAMEOVERCHARA2_TX", strTexture);
 
 	}
 
@@ -51,14 +63,8 @@ namespace basecross
 		//スプライトをつける
 		auto PtrSprite = SelectBack->AddComponent<PCTSpriteDraw>();
 		PtrSprite->SetTextureResource(L"GAMEOVERBACK_TX");
-
-		//透明度反映
-		SelectBack->SetAlphaActive(true);
-
+		
 		SelectBack->SetDrawLayer(1);
-
-		SetSharedGameObject(L"OvBa", SelectBack);
-
 
 	}
 
@@ -67,16 +73,13 @@ namespace basecross
 		auto OverLogo = AddGameObject<GameObject>();
 		OverLogo->AddComponent<Transform>();
 		auto PtrTransform = OverLogo->GetComponent<Transform>();
-		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(350, WindowSize.y / 2.5f, 0);
+		PtrTransform->SetPosition(0, 400, 0);
 		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(1100, 300, 1);
+		PtrTransform->SetScale(1100, 700, 1);
 
 		//スプライトをつける
 		auto PtrSprite = OverLogo->AddComponent<PCTSpriteDraw>();
 		PtrSprite->SetTextureResource(L"GAMEOVERLOGO_TX");
-
-		SetSharedGameObject(L"OvLo", OverLogo);
 
 		OverLogo->SetDrawLayer(2);
 
@@ -91,16 +94,13 @@ namespace basecross
 		auto RetryLogo = AddGameObject<GameObject>();
 		RetryLogo->AddComponent<Transform>();
 		auto PtrTransform = RetryLogo->GetComponent<Transform>();
-		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(-600, WindowSize.y / 3.5f, 0);
+		PtrTransform->SetPosition(-600, -350, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(500, 500, 1);
 
 		//スプライトをつける
 		auto PtrSprite = RetryLogo->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"PAUSERETRYLOGO_TX");
-
-		SetSharedGameObject(L"PauseReTryLogo", RetryLogo);
+		PtrSprite->SetTextureResource(L"RETRYLOGO_TX");
 
 		RetryLogo->SetDrawLayer(2);
 
@@ -110,29 +110,26 @@ namespace basecross
 		m_ReTryLogo = RetryLogo;
 	}
 
-	//ステージセレクトロゴ作成
+	//セレクトロゴ作成
 	void GameOver::CreateStageSelect()
 	{
 		auto StageSelectLogo = AddGameObject<GameObject>();
 		StageSelectLogo->AddComponent<Transform>();
 		auto PtrTransform = StageSelectLogo->GetComponent<Transform>();
-		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(-600, WindowSize.y / 9.5f, 0);
+		PtrTransform->SetPosition(0, -350, 0);
 		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(500, 500, 1);
+		PtrTransform->SetScale(500, 500, 500);
 
 		//スプライトをつける
 		auto PtrSprite = StageSelectLogo->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"PAUSESTAGESELECT_TX");
-
-		SetSharedGameObject(L"PauseStageSelect", StageSelectLogo);
+		PtrSprite->SetTextureResource(L"SELECTLOGO_TX");
 
 		StageSelectLogo->SetDrawLayer(2);
 
 		//透明度反映
 		StageSelectLogo->SetAlphaActive(true);
 
-		m_StageSelectLogo = StageSelectLogo;
+		m_SelectLogo = StageSelectLogo;
 	}
 
 	//タイトルロゴ作成
@@ -141,16 +138,13 @@ namespace basecross
 		auto TitleLogo = AddGameObject<GameObject>();
 		TitleLogo->AddComponent<Transform>();
 		auto PtrTransform = TitleLogo->GetComponent<Transform>();
-		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(-600,-80, 0);
+		PtrTransform->SetPosition(600,-350, 0);
 		PtrTransform->SetRotation(0, 0, 0);
 		PtrTransform->SetScale(500, 500, 1);
 
 		//スプライトをつける
 		auto PtrSprite = TitleLogo->AddComponent<PCTSpriteDraw>();
-		PtrSprite->SetTextureResource(L"PAUSETITLELOGO_TX");
-
-		SetSharedGameObject(L"PauseTitleLogo", TitleLogo);
+		PtrSprite->SetTextureResource(L"TITLELOGO_TX");
 
 		TitleLogo->SetDrawLayer(2);
 
@@ -159,12 +153,35 @@ namespace basecross
 
 		m_TitleLogo = TitleLogo;
 	}
+	//キャラ作成
+	void GameOver::CreateChar()
+	{
+		auto CharPtr = AddGameObject<GameObject>();
+		auto CPTrans = CharPtr->AddComponent<Transform>();
+		CPTrans->SetPosition(-200, 0, 0);
+		CPTrans->SetScale(500, 500, 1);
+		CPTrans->SetRotation(0, 0, 0);
+
+		auto CPDraw = CharPtr->AddComponent<PCTSpriteDraw>();
+		CPDraw->SetTextureResource(L"GAMEOVERCHARA1_TX");
+		CharPtr->SetAlphaActive(true);
+		CharPtr->SetDrawLayer(2);
+
+		CharPtr = AddGameObject<GameObject>();
+		CPTrans = CharPtr->AddComponent<Transform>();
+		CPTrans->SetPosition(200, 0, 0);
+		CPTrans->SetScale(500, 500, 1);
+		CPTrans->SetRotation(0, 0, 0);
+
+		CPDraw = CharPtr->AddComponent<PCTSpriteDraw>();
+		CPDraw->SetTextureResource(L"GAMEOVERCHARA2_TX");
+		CharPtr->SetAlphaActive(true);
+		CharPtr->SetDrawLayer(2);
+
+	}
 
 	void GameOver::SceneChange()
 	{
-		/*auto ScenePtr = App::GetApp()->GetScene<Scene>();
-		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");*/
-
 		if (m_selectnum == 0)
 		{
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
@@ -200,6 +217,8 @@ namespace basecross
 			CreateStageSelect();
 			//タイトルロゴ作成
 			CreateTitle();
+			//キャラ作成
+			CreateChar();
 
 			//SEマネージャー
 			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
@@ -216,7 +235,7 @@ namespace basecross
 
 			//大きさ調整
 			m_ReTryLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
-			m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+			m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 			m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 
 
@@ -248,22 +267,22 @@ namespace basecross
 		Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
 		if (!m_moveFlg)
 		{
-			if (inputXY.y < -0.8f)
-			{
-				m_moveFlg = true;
-				m_selectnum++;
-				if (m_selectnum > 2)
-				{
-					m_selectnum = 0;
-				}
-			}
-			if (inputXY.y > 0.8f)
+			if (inputXY.x < -0.8f)
 			{
 				m_moveFlg = true;
 				m_selectnum--;
 				if (m_selectnum < 0)
 				{
 					m_selectnum = 2;
+				}
+			}
+			if (inputXY.x > 0.8f)
+			{
+				m_moveFlg = true;
+				m_selectnum++;
+				if (m_selectnum > 2)
+				{
+					m_selectnum = 0;
 				}
 			}
 
@@ -276,21 +295,21 @@ namespace basecross
 				{
 				case 0:
 					m_ReTryLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
-					m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+					m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 					m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 
 
 					break;
 				case 1:
 					m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-					m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+					m_SelectLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
 					m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 
 
 					break;
 				case 2:
 					m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-					m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+					m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 					m_TitleLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
 
 					break;
@@ -298,7 +317,8 @@ namespace basecross
 				}
 			}
 		}
-		else if (inputXY.y < 0.1f && inputXY.y > -0.1f)
+		else if (inputXY.x < 0.1f && inputXY.x > -0.1f && 
+			inputXY.y < 0.1f && inputXY.y > -0.1f)
 		{
 			m_moveFlg = false;
 		}

@@ -103,13 +103,13 @@ namespace basecross {
 		//ポーズメニュー
 		strTexture = DataDir + L"PauseLogo.png";
 		App::GetApp()->RegisterTexture(L"PAUSELOGO_TX", strTexture);
-		strTexture = DataDir + L"PauseReTryLogo.png";
+		strTexture = DataDir + L"ReTryLogo.png";
 		App::GetApp()->RegisterTexture(L"PAUSERETRY_TX", strTexture);
-		strTexture = DataDir + L"PauseMapLogo.png";
-		App::GetApp()->RegisterTexture(L"PAUSEMAPLOGO_TX", strTexture);
-		strTexture = DataDir + L"PauseStageSelect.png";
+		//strTexture = DataDir + L"PauseMapLogo.png";
+		//App::GetApp()->RegisterTexture(L"PAUSEMAPLOGO_TX", strTexture);
+		strTexture = DataDir + L"SelectBackLogo.png";
 		App::GetApp()->RegisterTexture(L"PAUSESTAGESELECTLOGO_TX", strTexture);
-		strTexture = DataDir + L"PauseTitleLogo.png";
+		strTexture = DataDir + L"TitleBackLogo.png";
 		App::GetApp()->RegisterTexture(L"PAUSETITLELOGO_TX", strTexture);
 		strTexture = DataDir + L"map/map.png";
 		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
