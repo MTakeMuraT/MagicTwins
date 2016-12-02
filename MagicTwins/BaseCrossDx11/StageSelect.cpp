@@ -239,7 +239,7 @@ namespace basecross {
 			//右矢印(仮)
 			Right();
 			//左右シーン遷移(仮)
-			m_StageNum = 1;
+			m_StageNum = 0;
 			m_flag = true;
 
 			//SEマネージャー

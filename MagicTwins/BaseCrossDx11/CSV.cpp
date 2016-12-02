@@ -479,6 +479,31 @@ namespace basecross
 			MBGroup->IntoGroup(MPt);
 			//アップデートグループ追加
 			SUG->IntoGroup(MPt);
+
+			//----------------------------------------
+			//絶対消せ
+			Vector3 pos = FirePos;
+			pos.x += 0.5f;
+			pos.y += -0.2;
+			pos.z += -0.3f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f,0.3f,1),"F");
+			pos = FirePos;
+			pos.x += -0.2f;
+			pos.y += 0.2f;
+			pos.z += 0.4f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "F");
+			pos = FirePos;
+			pos.x += 0;
+			pos.y += 0;
+			pos.z += 0.1f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "F");
+			pos = FirePos;
+			pos.x += 0.3f;
+			pos.y += 0.2f;
+			pos.z += -0.1f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "F");
+			//----------------------------------------
+
 		}
 		//氷
 		if (IceFogPos != Vector3(0, 0, 0))
@@ -487,6 +512,30 @@ namespace basecross
 			MBGroup->IntoGroup(MPt);
 			//アップデートグループ追加
 			SUG->IntoGroup(MPt);
+			//----------------------------------------
+			//絶対消せ
+			Vector3 pos = IceFogPos;
+			pos.x += 0.5f;
+			pos.y += -0.2;
+			pos.z += -0.3f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "I");
+			pos = IceFogPos;
+			pos.x += -0.2f;
+			pos.y += 0.2f;
+			pos.z += 0.4f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "I");
+			pos = IceFogPos;
+			pos.x += 0;
+			pos.y += 0;
+			pos.z += 0.1f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "I");
+			pos = IceFogPos;
+			pos.x += 0.3f;
+			pos.y += 0.2f;
+			pos.z += -0.1f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "I");
+			//----------------------------------------
+
 		}
 		//風
 		if (WindPos != Vector3(0, 0, 0))
@@ -495,6 +544,30 @@ namespace basecross
 			MBGroup->IntoGroup(MPt);
 			//アップデートグループ追加
 			SUG->IntoGroup(MPt);
+			//----------------------------------------
+			//絶対消せ
+			Vector3 pos = WindPos;
+			pos.x += 0.5f;
+			pos.y += -0.2;
+			pos.z += -0.3f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "W");
+			pos = WindPos;
+			pos.x += -0.2f;
+			pos.y += 0.2f;
+			pos.z += 0.4f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "W");
+			pos = WindPos;
+			pos.x += 0;
+			pos.y += 0;
+			pos.z += 0.1f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "W");
+			pos = WindPos;
+			pos.x += 0.3f;
+			pos.y += 0.2f;
+			pos.z += -0.1f;
+			st->AddGameObject<MPPP>(pos, Vector3(0.3f, 0.3f, 1), "W");
+			//----------------------------------------
+
 		}
 
 		//ギミック作成

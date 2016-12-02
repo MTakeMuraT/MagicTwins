@@ -7,6 +7,160 @@
 #include "stdafx.h"
 
 namespace basecross{
+	/*暇なとき作る
+	//--------------------------------------------------------------------------------------
+	//	class MagicParticle : public GameObject;
+	//	用途: パーティクル
+	//	使い方：(Vec3座標,Vec3大きさ,Vec3位置範囲,Vec3Velocity,stringテクスチャの名前,作成数,作成間隔,一度に作成する数,生存時間,レイヤー)
+	//--------------------------------------------------------------------------------------
+	class MagicParticle : public GameObject
+	{
+	private:
+		//初期位置
+		Vector3 m_InitPos = Vector3(0, 0, 0);
+		//大きさ
+		Vector3 m_InitScale = Vector3(0, 0, 0);
+		//生成されるときの位置の振れ幅
+		Vector3 m_RandRange = Vector3(0, 0, 0);
+		//移動速度
+		Vector3 m_velocity = Vector3(0, 0, 0);
+		//テクスチャの名前
+		string m_TextureName = "None";
+		//パーティクルフラグ
+		bool m_NowParticleFlg = false;
+		//合計作成数
+		int m_CreateCount = 0;
+		//作成間隔
+		float m_Interval = 0;
+		//一回に出す数
+		int m_OnceCreateCount = 0;
+		//動いてる時間
+		float m_MoveingTime = 0;
+		vector<shared_ptr<GameObject>> m_Particle;
+		//表示レイヤー
+		int m_DispLayer = 0;
+
+		//それぞれのカウント
+		vector<float> m_TimeCount;
+		//起動するかどうかのフラグ
+		vector<bool> m_OnFlg;
+	public:
+		MagicParticle(const shared_ptr<Stage>& StagePtr);
+		void OnCreate()override ;
+		//↑二つは使わないかもしれない
+		void OnUpdate()override ;
+
+		//(Vec3座標,Vec3大きさ,Vec3位置範囲,Vec3Velocity,stringテクスチャの名前,作成数,作成間隔,一度に作成する数,生存時間,レイヤー)
+		void OnParticle(Vector3 pos, Vector3 scale, Vector3 randrange, Vector3 velo, string texturename,
+			int createcount,float interval,int oncecreatecount,float moveingtime,int displayer);
+
+		//パーティクル出してるかどうか、これがtrue(出てる)状態なら新しく作るようにしてもらう
+		bool GetNowParticle() { return m_NowParticleFlg; }
+	};
+	*/
+
+	//--------------------------------------------------------------------------------------
+	//	class MagicParticleProt : public GameObject;
+	//	用途: パーティクル(試作版)
+	//--------------------------------------------------------------------------------------
+	class MagicParticleProt : public GameObject
+	{
+	private:
+		Vector3 m_InitPos;
+		Vector3 m_InitScale;
+		vector<shared_ptr<GameObject>> m_Particle;
+		string m_TextureName;
+		int m_Layer = 0;
+
+		//起動してるかどうか
+		bool m_OnFlg = true;
+
+		//作成間隔
+		const float m_Interval = 0.5f;
+		//時間
+		float m_time = 0;
+	public :
+		//座標、大きさ
+		MagicParticleProt(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale,string txt,int layer);
+		void OnCreate()override;
+		void OnUpdate()override;
+
+		void SetActiveParticle(bool flg) { m_OnFlg = flg; };
+	};
+
+	//--------------------------------------------------------------------------------------
+	//	class MPPP : public GameObject;
+	//	用途: パーティクル簡易
+	//--------------------------------------------------------------------------------------
+	class MPPP : public GameObject
+	{
+	private :
+		Vector3 m_InitPos;
+		Vector3 m_InitScale;
+		string m_txt;
+		vector<shared_ptr<GameObject>> m_Particle;
+	public :
+		MPPP(const shared_ptr<Stage>& StagePtr,Vector3 pos , Vector3 scale,string txt) : GameObject(StagePtr),m_InitPos(pos),m_InitScale(scale),m_txt(txt){};
+		void OnCreate()
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto objTrans = obj->AddComponent<Transform>();
+				Vector3 pos = m_InitPos;
+				//位置ちょっとずらす
+				int random = rand() % 100;
+				pos.x += random / 100;
+				random = rand() % 100;
+				pos.y += random / 100;
+				random = rand() % 100;
+				pos.z += random / 100;
+				objTrans->SetPosition(pos);
+				objTrans->SetScale(m_InitScale);
+				objTrans->SetRotation(0, 0, 0);
+
+				auto objDraw = obj->AddComponent<PNTStaticDraw>();
+				objDraw->SetMeshResource(L"DEFAULT_SQUARE");
+				objDraw->SetTextureResource(L"FIREEF_TX");
+				if (m_txt == "F")
+				{
+					objDraw->SetTextureResource(L"FIREEF_TX");
+				}
+				else if (m_txt == "I")
+				{
+					objDraw->SetTextureResource(L"I_TX");
+				}
+				else if (m_txt == "W")
+				{
+					objDraw->SetTextureResource(L"W_TX");
+				}
+
+
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(5);
+
+				m_Particle.push_back(obj);
+			}
+			SetAlphaActive(true);
+		}
+
+		void OnUpdate()
+		{
+
+			for(auto v : m_Particle)
+			{
+				auto Tra = v->GetComponent<Transform>();
+				Vector3 pos = Tra->GetPosition();
+				pos.y += (rand()%2) * App::GetApp()->GetElapsedTime();
+				Tra->SetPosition(pos);
+				if (pos.y > m_InitPos.y + (m_InitScale.y * 3))
+				{
+					pos.y = m_InitPos.y;
+					Tra->SetPosition(pos);
+				}
+			}
+		}
+	};
 	//--------------------------------------------------------------------------------------
 	//	class Goal : public GameObject;
 	//	用途: ゴール

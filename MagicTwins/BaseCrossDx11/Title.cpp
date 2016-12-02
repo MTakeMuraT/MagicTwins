@@ -85,9 +85,9 @@ namespace basecross {
 		TitleLogo->AddComponent<Transform>();
 		auto PtrTransform = TitleLogo->GetComponent<Transform>();
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
-		PtrTransform->SetPosition(0, WindowSize.y/4, 0);
+		PtrTransform->SetPosition(0, WindowSize.y/5, 0);
 		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(1500, 400, 1);
+		PtrTransform->SetScale(1500, 600, 1);
 
 		//スプライトをつける
 		auto PtrSprite = TitleLogo->AddComponent<PCTSpriteDraw>();
@@ -110,7 +110,7 @@ namespace basecross {
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
 		PtrTransform->SetPosition(0, -WindowSize.y / 4, 0);
 		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(800, 200, 1);
+		PtrTransform->SetScale(800, 300, 1);
 
 		//スプライトをつける
 		auto PtrSprite = PressLogo->AddComponent<PCTSpriteDraw>();
@@ -581,7 +581,7 @@ namespace basecross {
 			break;
 		}
 
-		wstring txt = Util::IntToWStr(m_AnimationState);
+		//wstring txt = Util::IntToWStr(m_AnimationState);
 		/*位置調整用
 		if (m_AnimationState == 2)
 		{
@@ -606,7 +606,7 @@ namespace basecross {
 			txt += L"\nYSc = " + Util::FloatToWStr(SIscale.x);
 		}
 		*/
-		m_String->GetComponent<StringSprite>()->SetText(txt);
+		//m_String->GetComponent<StringSprite>()->SetText(txt);
 
 	}
 

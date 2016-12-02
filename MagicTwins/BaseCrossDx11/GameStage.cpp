@@ -114,7 +114,15 @@ namespace basecross {
 		strTexture = DataDir + L"map/map.png";
 		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
 
-		
+		//-----------------------------
+		//絶対消せ
+		strTexture = DataDir + L"W.png";
+		App::GetApp()->RegisterTexture(L"W_TX", strTexture);
+		strTexture = DataDir + L"I.png";
+		App::GetApp()->RegisterTexture(L"I_TX", strTexture);
+
+		//-----------------------------
+
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
 		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);
@@ -309,6 +317,7 @@ namespace basecross {
 			CreateSharedObjectGroup(L"obj1");
 			//SEマネージャー
 			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
+
 
 		}
 		catch (...) {

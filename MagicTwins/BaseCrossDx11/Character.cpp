@@ -7,6 +7,234 @@
 #include "Project.h"
 
 namespace basecross{
+	/*暇なとき作る
+	//--------------------------------------------------------------------------------------
+	//	class MagicParticle : public GameObject;
+	//	用途: パーティクル
+	//	使い方：(Vec3座標,Vec3大きさ,Vec3位置範囲,Vec3Velocity,stringテクスチャの名前,作成数,作成間隔,一度に作成する数,生存時間,レイヤー)
+	//--------------------------------------------------------------------------------------
+	MagicParticle::MagicParticle(const shared_ptr<Stage>& StagePtr):
+	GameObject(StagePtr)
+	{}
+	void MagicParticle::OnCreate(){}
+	//上二つ使わない予想…
+
+	//パーティクルを動かす
+	void MagicParticle::OnUpdate()
+	{
+		//起動中
+		if (m_NowParticleFlg)
+		{
+			//数分ループ
+			for (int i = 0; i < m_CreateCount; i++)
+			{
+				//描画されてたら
+				if (m_Particle[i]->GetDrawActive())
+				{
+					//最初の更新時
+					if (m_TimeCount[i] == 0)
+					{
+						m_Particle[i]->GetComponent<Transform>()->SetPosition(m_InitPos);
+					}
+
+					//位置更新
+					auto Trans = m_Particle[i]->GetComponent<Transform>();
+					Vector3 pos = Trans->GetPosition();
+					pos.x += rand() % (int)(m_RandRange.x / 2) - m_RandRange.x / 2;
+					pos.y += rand() % (int)(m_RandRange.y / 2) - m_RandRange.y / 2;
+					pos.z += rand() % (int)(m_RandRange.z / 2) - m_RandRange.z / 2;
+
+					//時間更新
+					m_TimeCount[i] += App::GetApp()->GetElapsedTime();
+					if (m_TimeCount[i] > m_MoveingTime)
+					{
+						//生存時間を越えたら消す
+						m_Particle[i]->SetDrawActive(false);
+					}
+				}
+			}
+		}
+	}
+
+	//パーティクル登録
+	void MagicParticle::OnParticle(Vector3 pos, Vector3 scale, Vector3 randrange, Vector3 velo, string texturename,
+		int createcount, float interval, int oncecreatecount,float moveingTime,int displayer)
+	{
+		//パーティクル出していない状態なら
+		if (!m_NowParticleFlg)
+		{
+			//初期位置
+			m_InitPos = pos;
+			//大きさ
+			m_InitScale = scale;
+			//生成されるときの位置の振れ幅
+			m_RandRange = randrange;
+			//移動速度
+			m_velocity = velo;
+			//テクスチャの名前
+			m_TextureName = texturename;
+			//合計作成数
+			m_CreateCount = createcount;
+			//作成感覚
+			m_Interval = interval;
+			//一回に出す数
+			m_OnceCreateCount = oncecreatecount;
+			//動いてる時間
+			m_MoveingTime = moveingTime;
+			//表示レイヤー
+			m_DispLayer = displayer;
+			//パーティクルフラグOn
+			m_NowParticleFlg = false;
+
+			//作成数分作成
+			//ここで作成間隔で割るのもありだけど時間的に余裕ないから飛ばす
+			//最後のほうで時間余ったらやる
+			for (int i = 0; i < m_CreateCount; i++)
+			{
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				
+				auto objTrans = obj->AddComponent<Transform>();
+				objTrans->SetPosition(0,-100,0);
+				objTrans->SetScale(m_InitScale);
+				objTrans->SetRotation(0,0,0);
+
+				auto objDraw = obj->AddComponent<PNTStaticDraw>();
+				objDraw->SetMeshResource(L"DEFAULT_SQUARE");
+				objDraw->SetTextureResource(L"BOX_TX");
+				if (m_TextureName == "FireEf")
+				{
+					objDraw->SetTextureResource(L"FIREEF_TX");
+				}
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(m_DispLayer);
+
+				m_Particle.push_back(obj);
+
+
+				//管理用の時間もリセット
+				m_TimeCount.push_back(0);
+				//フラグリセット
+				m_OnFlg.push_back(false);
+			}
+		}
+	}
+	*/
+
+	//--------------------------------------------------------------------------------------
+	//	class MagicParticleProt : public GameObject;
+	//	用途: パーティクル(試作版)
+	//--------------------------------------------------------------------------------------
+	MagicParticleProt::MagicParticleProt(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, string txt,int layer):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_InitScale(scale),
+		m_TextureName(txt),
+		m_Layer(layer)
+		{}
+
+	void MagicParticleProt::OnCreate()
+	{
+		//とりあえず三個生成
+		for (int i = 0; i < 3; i++)
+		{
+			auto obj = GetStage()->AddGameObject<GameObject>();
+			auto objTrans = obj->AddComponent<Transform>();
+			Vector3 pos = m_InitPos;
+			//位置ちょっとずらす
+			pos.x += (rand() % 150 - 75) / 100;
+			pos.z += (rand() % 150 - 75) / 100;
+			objTrans->SetPosition(pos);
+			objTrans->SetScale(m_InitScale);
+			objTrans->SetRotation(0, 0, 0);
+
+			auto objDraw = AddComponent<PNTStaticDraw>();
+			objDraw->SetMeshResource(L"DEFAULT_SQUARE");
+			objDraw->SetTextureResource(L"BOX_TX");
+			//名前ごとに分ける
+			if (m_TextureName == "FireEF")
+			{
+				objDraw->SetTextureResource(L"FIREEF_TX");
+			}
+			obj->SetAlphaActive(true);
+			obj->SetDrawLayer(m_Layer);
+
+			m_Particle.push_back(obj);
+		}
+		SetAlphaActive(true);
+
+	}
+
+	void MagicParticleProt::OnUpdate()
+	{
+		/*
+		if (m_OnFlg)
+		{
+		*/
+			m_time += App::GetApp()->GetElapsedTime();
+			if (m_time > m_Interval)
+			{
+				m_time = 0;
+				for (auto v : m_Particle)
+				{
+					//空いてるオブジェクトあれば
+					if (!v->GetDrawActive())
+					{
+						v->SetDrawActive(true);
+						Vector3 pos = m_InitPos;
+						pos.x += (rand() % 150 - 75) / 100;
+						pos.z += (rand() % 150 - 75) / 100;
+						v->GetComponent<Transform>()->SetPosition(pos);
+						v->GetComponent<Transform>()->SetScale(m_InitScale);
+						return;
+					}
+				}
+				//なければ生成
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto objTrans = obj->AddComponent<Transform>();
+				Vector3 pos = m_InitPos;
+				//位置ちょっとずらす
+				pos.x += (rand() % 150 - 75) / 100;
+				pos.z += (rand() % 150 - 75) / 100;
+				objTrans->SetPosition(pos);
+				objTrans->SetScale(m_InitScale);
+				objTrans->SetRotation(0, 0, 0);
+
+				auto objDraw = AddComponent<PNTStaticDraw>();
+				objDraw->SetMeshResource(L"DEFAULT_SQUARE");
+				objDraw->SetTextureResource(L"BOX_TX");
+				if (m_TextureName == "FireEF")
+				{
+					objDraw->SetTextureResource(L"FIREEF_TX");
+				}
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(m_Layer);
+
+				m_Particle.push_back(obj);
+			}
+
+			//位置更新
+			for (auto v : m_Particle)
+			{
+				//表示されてれば
+				if (v->GetDrawActive())
+				{
+					Vector3 pos = v->GetComponent<Transform>()->GetPosition();
+					pos.y += 3 * App::GetApp()->GetElapsedTime();
+					v->GetComponent<Transform>()->SetPosition(pos);
+					Vector3 scale = GetComponent<Transform>()->GetScale();
+					scale *= 0.98f;
+					v->GetComponent<Transform>()->SetScale(scale);
+
+					//座標が最初の位置から初期の大きさの2倍の高さに行ったら
+					if (pos.y > m_InitPos.y + (m_InitScale.y * 2))
+					{
+						v->SetDrawActive(false);
+					}
+				}
+			}
+		//}
+	}
+
 	//--------------------------------------------------------------------------------------
 	//	class Goal : public GameObject;
 	//	用途: ゴール
@@ -645,7 +873,7 @@ namespace basecross{
 		PtrString->SetTextRect(Rect2D<float>(1700.0f, 15.0f, 2000.0f, 300.0f));
 		PtrString->SetFont(L"", 80);
 		m_nowTime = m_LimitTime;
-		SetDrawLayer(5);
+		SetDrawLayer(4);
 
 		auto numobj = GetStage()->AddGameObject<NumberSprite>(0, Vector2(830, 470), Vector2(100, 100), 6);
 		m_numberSp = numobj;
@@ -846,7 +1074,7 @@ namespace basecross{
 		DrawP->SetTextureResource(L"PAUSELOGO_TX");
 		SetAlphaActive(true);
 		SetDrawActive(false);
-		SetDrawLayer(7);
+		SetDrawLayer(8);
 
 		//暗転
 		auto BlackP = GetStage()->AddGameObject<GameObject>();
@@ -858,7 +1086,7 @@ namespace basecross{
 		BDrawP->SetTextureResource(L"BLACK_TX");
 		BDrawP->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
-		BlackP->SetDrawLayer(6);
+		BlackP->SetDrawLayer(7);
 		BlackP->SetAlphaActive(true);
 		BlackP->SetDrawActive(false);
 		m_Black = BlackP;
@@ -877,7 +1105,7 @@ namespace basecross{
 		RTDP->SetTextureResource(L"PAUSERETRY_TX");
 		ReTryP->SetAlphaActive(true);
 		ReTryP->SetDrawActive(false);
-		ReTryP->SetDrawLayer(7);
+		ReTryP->SetDrawLayer(8);
 		m_ReTryLogo = ReTryP;
 
 		/*
@@ -891,7 +1119,7 @@ namespace basecross{
 		MDPP->SetTextureResource(L"PAUSEMAPLOGO_TX");
 		MaPP->SetAlphaActive(true);
 		MaPP->SetDrawActive(false);
-		MaPP->SetDrawLayer(7);
+		MaPP->SetDrawLayer(8);
 		m_mapLogo = MaPP;
 		*/
 
@@ -906,7 +1134,7 @@ namespace basecross{
 		SSDP->SetTextureResource(L"PAUSESTAGESELECTLOGO_TX");
 		SSP->SetAlphaActive(true);
 		SSP->SetDrawActive(false);
-		SSP->SetDrawLayer(7);
+		SSP->SetDrawLayer(8);
 		m_StageSelectLogo = SSP;
 
 		//タイトルロゴ
@@ -920,7 +1148,7 @@ namespace basecross{
 		TDP->SetTextureResource(L"PAUSETITLELOGO_TX");
 		TiP->SetAlphaActive(true);
 		TiP->SetDrawActive(false);
-		TiP->SetDrawLayer(7);
+		TiP->SetDrawLayer(8);
 		m_TitleLogo = TiP;
 
 		//マップ画像
@@ -933,7 +1161,7 @@ namespace basecross{
 		MaTDP->SetTextureResource(L"MAP_TX");
 		MaP->SetAlphaActive(true);
 		MaP->SetDrawActive(false);
-		MaP->SetDrawLayer(7);
+		MaP->SetDrawLayer(8);
 		m_Map = MaP;
 
 	}
