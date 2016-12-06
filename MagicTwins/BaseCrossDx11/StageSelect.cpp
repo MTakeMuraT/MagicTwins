@@ -26,6 +26,11 @@ namespace basecross {
 		strTexture = DataDir + L"Frame.png";
 		App::GetApp()->RegisterTexture(L"FRAME_TX", strTexture);
 
+
+		//”š
+		strTexture = DataDir + L"Number.png";
+		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
+
 	}
 
 	void StageSelect::CreateViewLight()
@@ -257,8 +262,6 @@ namespace basecross {
 
 	void StageSelect::OnUpdate()
 	{
-
-
 		//¶‰E‚ÅƒV[ƒ“‘JˆÚ(‰¼)
 		auto ShareObject = GetSharedGameObject<GameObject>(L"TiBa", false);
 		auto ShareString = ShareObject->GetComponent<StringSprite>();

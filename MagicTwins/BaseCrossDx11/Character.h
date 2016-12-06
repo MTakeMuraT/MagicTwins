@@ -361,6 +361,10 @@ namespace basecross{
 		
 		void OnCreate()override;
 
+		//à íuí≤êÆ
+		void SetPositionVec2(Vector2 pos);
+		//ëÂÇ´Ç≥í≤êÆ
+		void SetScaleVec2(Vector2 scale);
 		void SetNum(int num);
 	};
 
@@ -384,6 +388,8 @@ namespace basecross{
 
 		void TimeOver();
 
+		int GetReamingTime() { return (int)m_nowTime; }
+		int GetLimitTime() { return (int)m_LimitTime; }
 		int GetClearTime() { return (int)(m_LimitTime - m_nowTime); }
 	};
 

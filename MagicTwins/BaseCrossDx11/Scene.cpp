@@ -46,8 +46,8 @@ namespace basecross{
 			//最初のアクティブステージの設定
 			//ResetActiveStage<GameStage>();
 			//ResetActiveStage<Title>();
-			//ResetActiveStage<StageSelect>();
-			ResetActiveStage<GameOver>();
+			ResetActiveStage<StageSelect>();
+			//ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
 
 			//BGM

@@ -58,6 +58,9 @@ namespace basecross {
 
 		//アタリ判定計算関数(球体)
 		bool CollisionTest(Vector3 pos1, Vector3 scale1, Vector3 pos2, Vector3 scale2);
+
+		//スコアアイテム数取得
+		unsigned int GetScoreItem() { return m_scoreItemCount; }
 	};
 
 }

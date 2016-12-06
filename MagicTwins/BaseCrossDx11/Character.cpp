@@ -135,8 +135,8 @@ namespace basecross{
 	void MagicParticleProt::OnCreate()
 	{
 		//とりあえず三個生成
-		for (int i = 0; i < 3; i++)
-		{
+		//for (int i = 0; i < 3; i++)
+		//{
 			auto obj = GetStage()->AddGameObject<GameObject>();
 			auto objTrans = obj->AddComponent<Transform>();
 			Vector3 pos = m_InitPos;
@@ -159,7 +159,7 @@ namespace basecross{
 			obj->SetDrawLayer(m_Layer);
 
 			m_Particle.push_back(obj);
-		}
+		//}
 		SetAlphaActive(true);
 
 	}
@@ -585,6 +585,7 @@ namespace basecross{
 
 	void Enemy::StopEnemy(int TargetNum)
 	{
+
 		if (TargetNum == m_TargetPlayernum)
 		{
 			m_StopFlg = true;
@@ -970,7 +971,7 @@ namespace basecross{
 			float distance = m_scale.x / 1.8f;
 
 			auto TranP = NumP->AddComponent<Transform>();
-			TranP->SetPosition(m_pos.x - (distance*((m_digit-1)-j)), m_pos.y, 0);
+			TranP->SetPosition(m_pos.x - (distance*j), m_pos.y, 0);
 			TranP->SetScale(m_scale.x, m_scale.y, 1);
 			TranP->SetRotation(0, 0, 0);
 
@@ -984,25 +985,43 @@ namespace basecross{
 		}
 	}
 
+	void NumberSprite::SetPositionVec2(Vector2 pos)
+	{
+		int count = 0;
+		for (auto v : m_Numbers)
+		{
+			v->GetComponent<Transform>()->SetPosition(m_pos.x,m_pos.y,0);
+			count++;
+		}
+	}
+
+	void NumberSprite::SetScaleVec2(Vector2 scale)
+	{
+
+	}
+
 	void NumberSprite::SetNum(int num)
 	{
-		m_num = num;
-		//入力された桁持ってくる
-		int digit = 0;
-		int innum = num;
-		do
+		//マイナス弾く
+		if (m_num >= 0)
 		{
-			innum /= 10;
-			digit++;
-		} while (innum > 0);
-
-		//入力されたほうが大きかったら
-		if (digit > m_digit)
-		{
-			for (int j = 0; j < (digit - m_Constdigit); j++)
+			m_num = num;
+			//入力された桁持ってくる
+			int digit = 0;
+			int innum = num;
+			do
 			{
-				//左側に桁追加
-				int digitDif = digit - m_digit;
+				innum /= 10;
+				digit++;
+			} while (innum > 0);
+
+			//入力されたほうが大きかったら
+			if (digit > m_digit)
+			{
+				for (int j = 0; j < (digit - m_Constdigit); j++)
+				{
+					//左側に桁追加
+					int digitDif = digit - m_digit;
 
 					m_Constdigit++;
 
@@ -1022,35 +1041,36 @@ namespace basecross{
 
 					NumP->SetDrawLayer(m_layer);
 					m_Numbers.push_back(NumP);
+				}
+
+				for (int i = 0; i < m_Constdigit; i++)
+				{
+					m_Numbers[i]->SetDrawActive(true);
+				}
 			}
-		
-			for (int i = 0; i < m_Constdigit; i++)
+
+			//入力されたほうが小さい
+			if (digit < m_digit)
 			{
-				m_Numbers[i]->SetDrawActive(true);
+				for (int i = m_digit - 1; i > digit - 1; i--)
+				{
+					m_Numbers[i]->SetDrawActive(false);
+				}
 			}
-		}
 
-		//入力されたほうが小さい
-		if (digit < m_digit)
-		{
-			for (int i = m_digit - 1; i > digit - 1; i--)
+			//桁更新
+			m_digit = digit;
+
+			//数字入れ替え
+			int masternum = m_num;
+			for (int i = m_digit - 1; i >= 0; i--)
 			{
-				m_Numbers[i]->SetDrawActive(false);
+				int digi = i;
+				int setnum = masternum / pow(10, (digi));
+				masternum = masternum % (int)(pow(10, (digi)));
+
+				m_Numbers[i]->GetComponent<PCTSpriteDraw>()->SetMeshResource(m_Mesh[setnum]);
 			}
-		}
-
-		//桁更新
-		m_digit = digit;
-
-		//数字入れ替え
-		int masternum = m_num;
-		for (int i = m_digit-1; i >= 0; i--)
-		{
-			int digi = i;
-			int setnum = masternum / pow(10, (digi));
-			masternum = masternum % (int)(pow(10, (digi)));
-
-			m_Numbers[i]->GetComponent<PCTSpriteDraw>()->SetMeshResource(m_Mesh[setnum]);
 		}
 	}
 

@@ -221,6 +221,8 @@ namespace basecross {
 	{
 		//アタリ判定管理オブジェクト作成
 		auto ColManP = AddGameObject<CollisionManager>();
+		SetSharedGameObject(L"ColMan", ColManP);
+
 	}
 	
 	//アイコン作成
@@ -235,15 +237,888 @@ namespace basecross {
 		SetSharedGameObject(L"PauseMenu", AddGameObject<PauseMenu>());
 	}
 
+	//ゴールした後の処理
+	void GameStage::GoalState()
+	{
+		if (m_GoalState == 0)
+		{
+			wstring DataDir;
+			App::GetApp()->GetDataDirectory(DataDir);
+			wstring strTexture = DataDir + L"Result/Result_Logo.png";
+			App::GetApp()->RegisterTexture(L"RESULTLOGO_TX", strTexture);
+			strTexture = DataDir + L"Result/BookTexture.png";
+			App::GetApp()->RegisterTexture(L"BOOK_TX", strTexture);
+			strTexture = DataDir + L"Result/Time_Logo.png";
+			App::GetApp()->RegisterTexture(L"TIMELOGO_TX", strTexture);
+			strTexture = DataDir + L"Result/Time_Logo.png";
+			App::GetApp()->RegisterTexture(L"TIMELOGO_TX", strTexture);
+			strTexture = DataDir + L"Result/item_Logo.png";
+			App::GetApp()->RegisterTexture(L"ITEMLOGO_TX", strTexture);
+			strTexture = DataDir + L"Result/Rank_Logo.png";
+			App::GetApp()->RegisterTexture(L"RANKLOGO_TX", strTexture);
+
+			strTexture = DataDir + L"Result/Rank_S.png";
+			App::GetApp()->RegisterTexture(L"RANKS_TX", strTexture);
+			strTexture = DataDir + L"Result/Result_Chara1.png";
+			App::GetApp()->RegisterTexture(L"RESULTCHAR1_TX", strTexture);
+			strTexture = DataDir + L"Result/Result_Chara2.png";
+			App::GetApp()->RegisterTexture(L"RESULTCHAR2_TX", strTexture);
+
+			//選択項目
+			strTexture = DataDir + L"Result/NextStage_Logo.png";
+			App::GetApp()->RegisterTexture(L"GONEXTSTAGELOGO_TX", strTexture);
+
+		}
+
+
+		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+		bool SkipFlg = false;
+		switch (m_GoalState)
+		{
+			//ゴールロゴ作成
+		case 0:
+			//なんかこれだといけるっぽい
+			if (true)
+			{
+				auto obj = AddGameObject<GameObject>();
+				auto objTrans = obj->AddComponent<Transform>();
+				objTrans->SetPosition(0,425,0);
+				objTrans->SetScale(2,1.5f,1);
+				objTrans->SetRotation(0, 0, 0);
+				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+				objDraw->SetTextureResource(L"RESULTLOGO_TX");
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(7);
+				m_GoalLogo = obj;
+			}
+			m_GoalState = 1;
+			break;
+			//ゴールロゴサイズ大きく
+		case 1:
+			if (true)
+			{
+
+				Vector3 scale = m_GoalLogo->GetComponent<Transform>()->GetScale();
+				if (scale.x < 800)
+				{
+					scale *= 1.1f;
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					scale.x = 800;
+					scale.y = 600;
+					m_GoalState = 2;
+					//次で使う本の画像作成
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(-1500,0, 0);
+					objTrans->SetScale(1000, 650, 1);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"BOOK_TX");
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_Book = obj;
+
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						scale.x = 800;
+						scale.y = 600;
+						m_GoalState = 2;
+						//次で使う本の画像作成
+						auto obj = AddGameObject<GameObject>();
+						auto objTrans = obj->AddComponent<Transform>();
+						objTrans->SetPosition(-1500, 0, 0);
+						objTrans->SetScale(1000, 650, 1);
+						objTrans->SetRotation(0, 0, 0);
+						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+						objDraw->SetTextureResource(L"BOOK_TX");
+						obj->SetAlphaActive(true);
+						obj->SetDrawLayer(7);
+						m_Book = obj;
+					}
+				}
+				m_GoalLogo->GetComponent<Transform>()->SetScale(scale);
+
+			}
+			break;
+			//左から本の画像持ってくる
+		case 2:
+			if (true)
+			{
+				Vector3 pos = m_Book->GetComponent<Transform>()->GetPosition();
+				if (pos.x < -400)
+				{
+					pos.x += 1500 * App::GetApp()->GetElapsedTime();
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_GoalState = 3;
+
+					//タイムロゴ作成
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(-700, 200, 0);
+					objTrans->SetScale(300, 300, 1);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"TIMELOGO_TX");
+					objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_TimeLogo = obj;
+
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						pos.x = -400;
+
+						m_GoalState = 3;
+
+						//タイムロゴ作成
+						auto obj = AddGameObject<GameObject>();
+						auto objTrans = obj->AddComponent<Transform>();
+						objTrans->SetPosition(-700, 200, 0);
+						objTrans->SetScale(300, 300, 1);
+						objTrans->SetRotation(0, 0, 0);
+						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+						objDraw->SetTextureResource(L"TIMELOGO_TX");
+						objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+						obj->SetAlphaActive(true);
+						obj->SetDrawLayer(7);
+						m_TimeLogo = obj;
+
+					}
+				}
+
+				m_Book->GetComponent<Transform>()->SetPosition(pos);
+
+			}
+			break;
+			//タイム書き込み
+		case 3:
+			if (true)
+			{
+				if (m_alpha < 1.0f)
+				{
+					m_alpha += 1.0f * App::GetApp()->GetElapsedTime();
+					m_TimeLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1,m_alpha));
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_TimeLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+					//状態変更＆透明度0
+					m_alpha = 0;
+					m_GoalState = 4;
+					//残り時間計算用初期化
+					m_RemainingTime = 0;
+					m_LimitTimeGoal = GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetReamingTime();
+					m_LimitTimeMax = GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetLimitTime();
+					//加算量(大体60fpsで1秒)
+					m_AmountTime = (float)(m_LimitTimeMax) / 60;
+
+					//アイテムロゴ作成
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(-680, 50, 0);
+					objTrans->SetScale(300, 300, 1);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"ITEMLOGO_TX");
+					objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_ScoreItemLogo = obj;
+
+					SetSharedGameObject(L"RemainingNumberSprite",AddGameObject<NumberSprite>(0,Vector2(-250,210),Vector2(100,100),8));
+				}
+
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						m_TimeLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+						//状態変更＆透明度0
+						m_alpha = 0;
+						m_GoalState = 4;
+						//残り時間計算用初期化
+						m_RemainingTime = 0;
+						m_LimitTimeGoal = GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetReamingTime();
+						m_LimitTimeMax = GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetLimitTime();
+						//加算量(大体60fpsで0.5秒)
+						m_AmountTime = (float)(m_LimitTimeMax) / 30;
+
+						//アイテムロゴ作成
+						auto obj = AddGameObject<GameObject>();
+						auto objTrans = obj->AddComponent<Transform>();
+						objTrans->SetPosition(-680, 50, 0);
+						objTrans->SetScale(300, 300, 1);
+						objTrans->SetRotation(0, 0, 0);
+						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+						objDraw->SetTextureResource(L"ITEMLOGO_TX");
+						objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+						obj->SetAlphaActive(true);
+						obj->SetDrawLayer(7);
+						m_ScoreItemLogo = obj;
+
+						SetSharedGameObject(L"RemainingNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-250, 210), Vector2(100, 100), 8));
+
+					}
+				}
+
+			}
+			break;
+			//残りタイム書き込み
+		case 4:
+			if (true)
+			{
+				auto RNS = GetSharedGameObject<NumberSprite>(L"RemainingNumberSprite", false);
+				if (m_RemainingTime < m_LimitTimeGoal)
+				{
+					RNS->SetNum((int)(m_RemainingTime += m_AmountTime));
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_RemainingTime = m_LimitTimeGoal;
+					RNS->SetNum(m_LimitTimeGoal);
+					m_GoalState = 5;
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						m_RemainingTime = m_LimitTimeGoal;
+						RNS->SetNum(m_LimitTimeGoal);
+						m_GoalState = 5;
+
+					}
+				}
+			}
+			break;
+			//アイテム書き込み
+		case 5:
+			if (true)
+			{				
+				if (m_alpha < 1.0f)
+				{
+					m_alpha += 1.0f * App::GetApp()->GetElapsedTime();
+					m_ScoreItemLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_alpha));
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_alpha = 0;
+					m_GoalState = 6;
+					m_ScoreItemLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+
+					//スコア取得数書き込み
+					m_ScoreItemCount = GetSharedGameObject<CollisionManager>(L"ColMan",false)->GetScoreItem();
+					m_AmountScoreCount = (float)(m_ScoreItemCount) / 90;
+					//スコア初期化
+					m_ScoreItemCountCal = 0;
+
+					SetSharedGameObject(L"ScoreCountNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-250, 50), Vector2(100, 100), 8));
+				}
+
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						m_alpha = 0;
+						m_GoalState = 6;
+						m_ScoreItemLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+
+						//スコア取得数書き込み
+						m_ScoreItemCount = GetSharedGameObject<CollisionManager>(L"ColMan", false)->GetScoreItem();
+						//1秒
+						m_AmountScoreCount = (float)(m_ScoreItemCount) / 60;
+						//スコア初期化
+						m_ScoreItemCountCal = 0;
+
+						SetSharedGameObject(L"ScoreCountNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-250, 50), Vector2(100, 100), 8));
+
+					}
+				}
+				
+			}
+			break;
+			//取得数書き込み
+		case 6:
+			if (true)
+			{
+				auto SCNP = GetSharedGameObject<NumberSprite>(L"ScoreCountNumberSprite", false);
+
+				if (m_ScoreItemCountCal < m_ScoreItemCount)
+				{
+					SCNP->SetNum((int)(m_ScoreItemCountCal += m_AmountScoreCount));
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_ScoreItemCountCal = m_ScoreItemCount;
+					m_GoalState = 7;
+
+					SCNP->SetNum((int)m_ScoreItemCount);
+
+					//ランクロゴ作成
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(-720, -150, 0);
+					objTrans->SetScale(300, 300, 1);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"RANKLOGO_TX");
+					objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_RankLogo = obj;
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						m_ScoreItemCountCal = m_ScoreItemCount;
+						m_GoalState = 7;
+
+						SCNP->SetNum((int)m_ScoreItemCount);
+
+						//ランクロゴ作成
+						auto obj = AddGameObject<GameObject>();
+						auto objTrans = obj->AddComponent<Transform>();
+						objTrans->SetPosition(-720, -150, 0);
+						objTrans->SetScale(300, 300, 1);
+						objTrans->SetRotation(0, 0, 0);
+						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+						objDraw->SetTextureResource(L"RANKLOGO_TX");
+						objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+						obj->SetAlphaActive(true);
+						obj->SetDrawLayer(7);
+						m_RankLogo = obj;
+
+					}
+				}
+
+			}
+			break;
+			//ランク書き込み
+		case 7:
+			if (true)
+			{
+				if (m_alpha < 1.0f)
+				{
+					m_alpha += 1.0f * App::GetApp()->GetElapsedTime();
+					m_RankLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_alpha));
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_RankLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+					m_alpha = 0;
+					m_GoalState = 8;
+
+					//ランク作成
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(-150, -180, 0);
+					objTrans->SetScale(300, 300, 1);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"RANKS_TX");
+					objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_RankSprite = obj;
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						{
+							m_RankLogo->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+							m_alpha = 0;
+							m_GoalState = 8;
+
+							//ランク作成
+							auto obj = AddGameObject<GameObject>();
+							auto objTrans = obj->AddComponent<Transform>();
+							objTrans->SetPosition(-150, -180, 0);
+							objTrans->SetScale(300, 300, 1);
+							objTrans->SetRotation(0, 0, 0);
+							auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+							objDraw->SetTextureResource(L"RANKS_TX");
+							objDraw->SetDiffuse(Color4(1, 1, 1, 0));
+							obj->SetAlphaActive(true);
+							obj->SetDrawLayer(7);
+							m_RankSprite = obj;
+						}
+					}
+				}
+			}
+			break;
+			//ランク貼り付け
+		case 8:
+			if (true)
+			{
+				if (m_alpha < 1.0f)
+				{
+					m_alpha += 1.0f * App::GetApp()->GetElapsedTime();
+					m_RankSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_alpha));
+				}
+				else
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_alpha = 0;
+					m_GoalState = 9;
+					m_RankSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+					//キャラ画像
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(1500, -50, 0);
+					objTrans->SetScale(600, 600, 1);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"RESULTCHAR1_TX");
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_Char1Sprite = obj;
+
+					obj = AddGameObject<GameObject>();
+					objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(1500, -50, 0);
+					objTrans->SetScale(600, 600, 1);
+					objTrans->SetRotation(0, 0, 0);
+					objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"RESULTCHAR2_TX");
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_Char2Sprite = obj;
+
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						{
+							m_alpha = 0;
+							m_GoalState = 9;
+							m_RankSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+
+							//キャラ画像
+							auto obj = AddGameObject<GameObject>();
+							auto objTrans = obj->AddComponent<Transform>();
+							objTrans->SetPosition(1500, -50, 0);
+							objTrans->SetScale(600, 600, 1);
+							objTrans->SetRotation(0, 0, 0);
+							auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+							objDraw->SetTextureResource(L"RESULTCHAR1_TX");
+							obj->SetAlphaActive(true);
+							obj->SetDrawLayer(7);
+							m_Char1Sprite = obj;
+
+							obj = AddGameObject<GameObject>();
+							objTrans = obj->AddComponent<Transform>();
+							objTrans->SetPosition(1500, -50, 0);
+							objTrans->SetScale(600, 600, 1);
+							objTrans->SetRotation(0, 0, 0);
+							objDraw = obj->AddComponent<PCTSpriteDraw>();
+							objDraw->SetTextureResource(L"RESULTCHAR2_TX");
+							obj->SetAlphaActive(true);
+							obj->SetDrawLayer(7);
+							m_Char2Sprite = obj;
+						}
+					}
+				}
+			}
+			break;
+			//キャラ右から出てくる
+		case 9:
+			if (true)
+			{
+				
+				Vector3 pos1 = m_Char1Sprite->GetComponent<Transform>()->GetPosition();
+				Vector3 pos2 = m_Char2Sprite->GetComponent<Transform>()->GetPosition();
+				float ElaTime = App::GetApp()->GetElapsedTime();
+
+				if (pos1.x > 350)
+				{
+					pos1.x += -1500 * ElaTime;
+				}
+				else
+				{
+					pos1.x = 350;
+				}
+				if (pos2.x > 600)
+				{
+					pos2.x += -1200 * ElaTime;
+				}
+				else
+				{
+					pos2.x = 600;
+				}
+
+				//移動終了
+				if (pos1.x == 350 && pos2.x == 600)
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_GoalState = 10;
+
+					//選択項目作成
+					auto obj = AddGameObject<GameObject>();
+					auto objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(-600, -1000, 0);
+					objTrans->SetScale(m_NotSelectScale);
+					objTrans->SetRotation(0, 0, 0);
+					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"GONEXTSTAGELOGO_TX");
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_NextStageLogo = obj;
+
+					obj = AddGameObject<GameObject>();
+					objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(0, -1000, 0);
+					objTrans->SetScale(m_NotSelectScale);
+					objTrans->SetRotation(0, 0, 0);
+					objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"PAUSESTAGESELECTLOGO_TX");
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_StageSelectLogo = obj;
+
+					obj = AddGameObject<GameObject>();
+					objTrans = obj->AddComponent<Transform>();
+					objTrans->SetPosition(600, -1000, 0);
+					objTrans->SetScale(m_NotSelectScale);
+					objTrans->SetRotation(0, 0, 0);
+					objDraw = obj->AddComponent<PCTSpriteDraw>();
+					objDraw->SetTextureResource(L"PAUSETITLELOGO_TX");
+					obj->SetAlphaActive(true);
+					obj->SetDrawLayer(7);
+					m_TitleLogo = obj;	
+				}
+
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected&& !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						{
+							pos1.x = 350;
+							pos2.x = 600;
+							m_GoalState = 10;
+
+							//選択項目作成
+							auto obj = AddGameObject<GameObject>();
+							auto objTrans = obj->AddComponent<Transform>();
+							objTrans->SetPosition(-600, -1000, 0);
+							objTrans->SetScale(m_NotSelectScale);
+							objTrans->SetRotation(0, 0, 0);
+							auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+							objDraw->SetTextureResource(L"GONEXTSTAGELOGO_TX");
+							obj->SetAlphaActive(true);
+							obj->SetDrawLayer(7);
+							m_NextStageLogo = obj;
+
+							obj = AddGameObject<GameObject>();
+							objTrans = obj->AddComponent<Transform>();
+							objTrans->SetPosition(0, -1000, 0);
+							objTrans->SetScale(m_NotSelectScale);
+							objTrans->SetRotation(0, 0, 0);
+							objDraw = obj->AddComponent<PCTSpriteDraw>();
+							objDraw->SetTextureResource(L"PAUSESTAGESELECTLOGO_TX");
+							obj->SetAlphaActive(true);
+							obj->SetDrawLayer(7);
+							m_StageSelectLogo = obj;
+
+							obj = AddGameObject<GameObject>();
+							objTrans = obj->AddComponent<Transform>();
+							objTrans->SetPosition(600, -1000, 0);
+							objTrans->SetScale(m_NotSelectScale);
+							objTrans->SetRotation(0, 0, 0);
+							objDraw = obj->AddComponent<PCTSpriteDraw>();
+							objDraw->SetTextureResource(L"PAUSETITLELOGO_TX");
+							obj->SetAlphaActive(true);
+							obj->SetDrawLayer(7);
+							m_TitleLogo = obj;
+
+						}
+					}
+				}
+
+				m_Char1Sprite->GetComponent<Transform>()->SetPosition(pos1);
+				m_Char2Sprite->GetComponent<Transform>()->SetPosition(pos2);
+			}
+			break;
+			//選択項目下から出てくる
+		case 10:
+			if (true)
+			{
+				Vector3 pos1 = m_NextStageLogo->GetComponent<Transform>()->GetPosition();
+				Vector3 pos2 = m_StageSelectLogo->GetComponent<Transform>()->GetPosition();
+				Vector3 pos3 = m_TitleLogo->GetComponent<Transform>()->GetPosition();
+				float ElaTime = App::GetApp()->GetElapsedTime();
+
+				if (pos1.y < -430)
+				{
+					pos1.y += 1000 * ElaTime;
+				}
+				else
+				{
+					pos1.y = -430;
+				}
+				if (pos2.y < -430)
+				{
+					pos2.y += 1000 * ElaTime;
+				}
+				else
+				{
+					pos2.y = -430;
+				}
+
+				if (pos3.y < -430)
+				{
+					pos3.y += 1000 * ElaTime;
+				}
+				else
+				{
+					pos3.y = -430;
+				}
+
+
+				//移動終了
+				if (pos1.y == -430 && pos2.y == -430 && pos3.y == -430)
+				{
+					//二重に動かないように
+					SkipFlg = true;
+
+					m_NextStageLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+					m_GoalState = 11;
+				}
+
+				//ボタン押されたらスキップ
+				if (CntlVec[0].bConnected && !SkipFlg)
+				{
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						{
+							pos1.y = -430;
+							pos2.y = -430;
+							pos3.y = -430;
+
+							m_NextStageLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+							m_GoalState = 11;
+
+						}
+					}
+				}
+
+				m_NextStageLogo->GetComponent<Transform>()->SetPosition(pos1);
+				m_StageSelectLogo->GetComponent<Transform>()->SetPosition(pos2);
+				m_TitleLogo->GetComponent<Transform>()->SetPosition(pos3);
+
+
+			}
+			break;
+			//終了、入力待ち
+		case 11:
+			if (true)
+			{
+				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+				if (CntlVec[0].bConnected)
+				{
+					
+					Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+					bool MoveFlg = false;
+					if (m_MoveConFlg)
+					{
+						//右
+						if (InputXY.x > 0.8f)
+						{
+							m_SelectNum++;
+							if (m_SelectNum > 2)
+							{
+								m_SelectNum = 0;
+							}
+							m_MoveConFlg = false;
+							MoveFlg = true;
+						}
+						if (InputXY.x < -0.8f)
+						{
+							m_SelectNum--;
+							if (m_SelectNum < 0)
+							{
+								m_SelectNum = 2;
+							}
+							m_MoveConFlg = false;
+							MoveFlg = true;
+						}
+					}
+					else if (!m_MoveConFlg)
+					{
+						if (abs(InputXY.x) < 0.1f && abs(InputXY.y) < 0.1f)
+						{
+							m_MoveConFlg = true;
+						}
+					}
+
+					//移動したら大きさ変更
+					if (MoveFlg)
+					{
+						switch (m_SelectNum)
+						{
+							//次のステージ
+						case 0:
+							m_NextStageLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+							m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							break;
+							//ステージセレクト
+						case 1:
+							m_NextStageLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+							m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							break;
+							//タイトル
+						case 2:
+							m_NextStageLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_StageSelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+							m_TitleLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+							break;
+						}
+					}
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						m_GoalState = 12;
+					}
+				}
+
+			}
+			break;
+			//選択されたのでシーン移動
+		case 12:
+			switch (m_SelectNum)
+			{
+				//次のステージ
+			case 0:
+				if (true)
+				{
+					auto ScenePtr = App::GetApp()->GetScene<Scene>();
+					int StageNum = ScenePtr->GetStageNum();
+					StageNum++;
+					ScenePtr->SetStageNum(StageNum);
+					PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+				}
+				break;
+				//ステセレ
+			case 1:
+				if (true)
+				{
+					auto ScenePtr = App::GetApp()->GetScene<Scene>();
+					PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"StageSelect");
+				}
+				break;
+				//タイトル
+			case 2:
+				if (true)
+				{
+					auto ScenePtr = App::GetApp()->GetScene<Scene>();
+					PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
+				}
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+		//wstring txt = Util::IntToWStr(m_GoalState);
+		//txt += L"\n" + Util::IntToWStr(m_ScoreItemCount);
+		//m_StringObj->GetComponent<StringSprite>()->SetText(txt);
+	}
+
+
+
 	void GameStage::OnUpdate()
 	{
+		//ゴールした後の処理
+		if (m_GoalFlg)
+		{
+			GoalState();
+			return;
+		}
+		
+		//ゴールした瞬間の処理
+		if (GetSharedGameObject<GameObject>(L"GoalObj")->GetDrawActive())
+		{
+			m_GoalFlg = true;
+			//アップデート止める
+			auto UpdateGroup = GetSharedObjectGroup(L"SetUpdateObj")->GetGroupVector();
+			for (auto v : UpdateGroup)
+			{
+				auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
+				Ptr->SetUpdateActive(false);
+			}
+			return;
+		}
+
 		//*テスト用
 		auto key = App::GetApp()->GetInputDevice().GetKeyState();
 		if (key.m_bPressedKeyTbl[VK_SPACE])
 		{
-			auto ScenePtr = App::GetApp()->GetScene<Scene>();
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+			//auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 
+			GetSharedGameObject<GameObject>(L"GoalObj")->SetDrawActive(true);
 		}
 		//ポーズ
 		if (key.m_bPressedKeyTbl['Q'])
@@ -318,6 +1193,20 @@ namespace basecross {
 			//SEマネージャー
 			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
 
+
+			//ゴール判定するオブジェクト作成
+			auto obj = AddGameObject<GameObject>();
+			obj->SetDrawActive(false);
+			SetSharedGameObject(L"GoalObj", obj);
+
+			//文字列オブジェクト作成
+			auto stringobj = AddGameObject<GameObject>();
+			auto PtrString = stringobj->AddComponent<StringSprite>();
+			PtrString->SetText(L"");
+			PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+			PtrString->SetFont(L"", 80);
+
+			m_StringObj = stringobj;  
 
 		}
 		catch (...) {
