@@ -7,11 +7,10 @@
 #include "stdafx.h"
 
 namespace basecross{
-	/*暇なとき作る
+	/*
 	//--------------------------------------------------------------------------------------
 	//	class MagicParticle : public GameObject;
 	//	用途: パーティクル
-	//	使い方：(Vec3座標,Vec3大きさ,Vec3位置範囲,Vec3Velocity,stringテクスチャの名前,作成数,作成間隔,一度に作成する数,生存時間,レイヤー)
 	//--------------------------------------------------------------------------------------
 	class MagicParticle : public GameObject
 	{
@@ -23,9 +22,11 @@ namespace basecross{
 		//生成されるときの位置の振れ幅
 		Vector3 m_RandRange = Vector3(0, 0, 0);
 		//移動速度
-		Vector3 m_velocity = Vector3(0, 0, 0);
+		vector<Vector3> m_velocity;
+		//移動速度ブレ幅
+		Vector3 m_randVelocity = Vector3(0, 0, 0);
 		//テクスチャの名前
-		string m_TextureName = "None";
+		wstring m_TextureName = L"None";
 		//パーティクルフラグ
 		bool m_NowParticleFlg = false;
 		//合計作成数
@@ -50,44 +51,17 @@ namespace basecross{
 		//↑二つは使わないかもしれない
 		void OnUpdate()override ;
 
-		//(Vec3座標,Vec3大きさ,Vec3位置範囲,Vec3Velocity,stringテクスチャの名前,作成数,作成間隔,一度に作成する数,生存時間,レイヤー)
-		void OnParticle(Vector3 pos, Vector3 scale, Vector3 randrange, Vector3 velo, string texturename,
+		//(Vec3座標,Vec3大きさ,Vec3位置範囲,Vec3Velocity,Vec3速さの振れ幅stringテクスチャの名前,作成数,作成間隔,一度に作成する数,生存時間,レイヤー)
+		void OnParticle(Vector3 pos, Vector3 scale, Vector3 randrange, Vector3 velo, Vector3 randvelo,wstring texturename,
 			int createcount,float interval,int oncecreatecount,float moveingtime,int displayer);
 
 		//パーティクル出してるかどうか、これがtrue(出てる)状態なら新しく作るようにしてもらう
 		bool GetNowParticle() { return m_NowParticleFlg; }
+
+		void StopParticle();
 	};
 	*/
-
-	//--------------------------------------------------------------------------------------
-	//	class MagicParticleProt : public GameObject;
-	//	用途: パーティクル(試作版)
-	//--------------------------------------------------------------------------------------
-	class MagicParticleProt : public GameObject
-	{
-	private:
-		Vector3 m_InitPos;
-		Vector3 m_InitScale;
-		vector<shared_ptr<GameObject>> m_Particle;
-		string m_TextureName;
-		int m_Layer = 0;
-
-		//起動してるかどうか
-		bool m_OnFlg = true;
-
-		//作成間隔
-		const float m_Interval = 0.5f;
-		//時間
-		float m_time = 0;
-	public :
-		//座標、大きさ
-		MagicParticleProt(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale,string txt,int layer);
-		void OnCreate()override;
-		void OnUpdate()override;
-
-		void SetActiveParticle(bool flg) { m_OnFlg = flg; };
-	};
-
+	/*
 	//--------------------------------------------------------------------------------------
 	//	class MPPP : public GameObject;
 	//	用途: パーティクル簡易
@@ -160,6 +134,66 @@ namespace basecross{
 				}
 			}
 		}
+	};
+	*/
+
+	//--------------------------------------------------------------------------------------
+	//	class MagicParticle : public GameObject;
+	//	用途: パーティクル(簡易対応版)
+	//--------------------------------------------------------------------------------------
+	class MagicParticle : public GameObject
+	{
+	private :
+		//設定用
+		//初期位置
+		Vector3 m_InitPos;
+		//位置ブレ幅
+		Vector3 m_RandPos;
+		//速度
+		Vector3 m_Initvelocity;
+		//速度ブレ幅
+		Vector3 m_RandVelocity;
+		//大きさ
+		Vector3 m_Scale;
+		//作成する間隔
+		float m_CreateInterval;
+		//テクスチャの名前
+		wstring m_TextureName;
+		//消滅演出
+		bool m_DeleteFlg = false;
+		//現在パーティクルを出しているかどうか
+		bool m_NowParticleFlg = false;
+		//レイヤー
+		int m_Layer;
+
+		//消える時間
+		float m_DeleteTime = 1.0f;
+		//計算用
+		//経過時間
+		float m_time = 0;
+		//パーティクルデータ
+		vector<shared_ptr<GameObject>> m_Particle;
+		//速度
+		vector<Vector3> m_velocity;
+		vector<float> m_alpha;
+
+		//パーティクル生成関数
+		void CreateParticle();
+
+		//再利用されるとき設定
+		void SetVeloPos(int num);
+	public :
+		MagicParticle(const shared_ptr<Stage>& StagePtr);
+		void OnUpdate() override;
+
+		//初期位置、ブレ幅、速度、速度ブレ幅、大きさ、テクスチャの名前、消滅演出(true:薄くなるfalse:小さくなる)、作成間隔、レイヤー、消える時間
+		void OnParticle(Vector3 InitPos , Vector3 RandPos , Vector3 Velo, Vector3 RandVelo,Vector3 scale,wstring TextureName,bool DeleteFlg,float CreateInterval,int Layer,float deleteTime);
+
+		//パーティクル停止
+		void StopParticle();
+
+		//パーティクル指導
+		void StartParticle() { m_NowParticleFlg = true; }
 	};
 	//--------------------------------------------------------------------------------------
 	//	class Goal : public GameObject;
@@ -505,6 +539,9 @@ namespace basecross{
 		Vector3 m_Scale;
 		//生きてるかどうか
 		bool m_ActiveFlg = true;
+
+		//エフェクト
+
 	public :
 		Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale);
 		void OnCreate() override;

@@ -45,7 +45,7 @@ namespace basecross {
 		float angle = -90 * (3.14159265f /180);
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
-			Vector3(4.0f, 4.0f, 4.0f),
+			Vector3(0.5f, 0.5f, 0.5f),
 			Vector3(0.0f, angle, 0.0f),
 			Vector3(0.0f, 1.0f, 0.0f)
 			);
@@ -56,7 +56,6 @@ namespace basecross {
 		{
 			// モデルとトランスフォームの間の差分行列
 			angle = -90 * (3.14159265f / 180);
-			SpanMat;
 			SpanMat.DefTransformation(
 				Vector3(2.0f, 2.0f, 2.0f),
 				Vector3(0.0f, angle, 0.0f),
@@ -145,14 +144,24 @@ namespace basecross {
 			auto ShadowPtr = AddComponent<Shadowmap>();
 			//影の形（メッシュ）を設定
 			ShadowPtr->SetMeshResource(L"Player2_Model");
+
+			SpanMat.DefTransformation(
+				Vector3(0.5f, 0.5f, 0.5f),
+				Vector3(0.0f, angle, 0.0f),
+				Vector3(0.0f, 1.0f, 0.0f)
+				);
+
 			ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
 
 			//描画コンポーネントの設定
-			auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+			auto PtrDraw = AddComponent<PNTBoneModelDraw>();
 			//描画するメッシュを設定
-			PtrDraw->SetMeshResource(L"Player2_Model");
+			PtrDraw->SetMeshResource(L"Character_02_WalkWalk_BONE_MESH");
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+			//アニメーション追加
+			PtrDraw->AddAnimation(L"walk", 0, 180, true, 30);
 
 			//魔法作成
 			auto magicBoal = GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 2);
@@ -231,6 +240,23 @@ namespace basecross {
 		auto CameraP = View->GetTargetCamera();
 		m_CameraPos = m_CameraTargetVec;
 		m_CameraPos += Vector3(0, 5, -5);
+
+		//暗転用幕--------------------------------------
+		auto BlackP = GetStage()->AddGameObject<GameObject>();
+		auto BlackPT = BlackP->AddComponent<Transform>();
+		BlackPT->SetPosition(0, 0, 0);
+		BlackPT->SetScale(1920, 1080, 1);
+		BlackPT->SetRotation(0, 0, 0);
+
+		auto BlackPD = BlackP->AddComponent<PCTSpriteDraw>();
+		BlackPD->SetTextureResource(L"BLACK_TX");
+		BlackPD->SetDiffuse(Color4(1, 1, 1, 0));
+
+		BlackP->SetAlphaActive(true);
+		BlackP->SetDrawLayer(2);
+		m_Black = BlackP;
+		//暗転用幕--------------------------------------
+
 	}
 
 	//更新
@@ -246,6 +272,39 @@ namespace basecross {
 		if (m_endFrame)
 		{
 			m_endFrame = false;
+			return;
+		}
+		if (m_BlackFlg)
+		{
+			//暗転状態なら
+			if (m_BlackFlg)
+			{
+				if (m_BlackFlg2)
+				{
+					m_BlackAlpha += 1 * App::GetApp()->GetElapsedTime();
+					m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+					//暗くなったら
+					if (m_BlackAlpha > 1.0f)
+					{
+						ChangeChar();
+						m_BlackAlpha = 1.0f;
+						m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+					}
+				}
+				else
+				{
+					m_BlackAlpha += -1 * App::GetApp()->GetElapsedTime();
+					m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+					if (m_BlackAlpha < 0)
+					{
+						m_BlackAlpha = 0;
+						m_Black->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_BlackAlpha));
+						m_endFrame = false;
+						m_BlackFlg = false;
+
+					}
+				}
+			}
 			return;
 		}
 		if (m_ActiveFlg)
@@ -358,6 +417,18 @@ namespace basecross {
 				TranP->SetRotation(Vector3(0, angle, 0));
 
 
+				//現状2キャラ目にアニメーションついてるからそっち限定
+				if (m_myName == "Player2")
+				{
+					//アニメーションを更新する(コントローラーを傾けると動く)
+					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+					if (PtrDraw->GetCurrentAnimation() == L"walk") {
+						//アニメーション更新
+						PtrDraw->UpdateAnimation(ElapsedTime);
+						//アニメーションを変えるとき
+						//PtrDraw->ChangeCurrentAnimation(L"Default");
+					}
+				}
 			}
 
 			//Rトリガーでキャラ切り替え
@@ -443,99 +514,121 @@ namespace basecross {
 		m_CameraTargetVec = pos;
 		//m_CameraPos.y = m_CameraTargetVec.y + 5.0f;
 		m_CameraPos = m_CameraTargetVec;
-		m_CameraPos.y += 8.0f;
-		m_CameraPos.z += -8.0f;
+		m_CameraPos.y += 6.0f;
+		m_CameraPos.z += -6.0f;
 		CameraP->SetAt(m_CameraTargetVec);
 		CameraP->SetEye(m_CameraPos);
+
+		//ついでに背景も移動
+		auto obj = GetStage()->GetSharedGameObject<GameObject>(L"Back",false);
+		Vector3 PlayerPos = GetComponent<Transform>()->GetPosition();
+		PlayerPos.y += -14;
+		PlayerPos.z += 15;
+		obj->GetComponent<Transform>()->SetPosition(PlayerPos);
 	}
 
 	//キャラチェンジ
 	void Player::ChangeChar()
 	{
-		m_velocity = Vector2(0, 0);
-		GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
-		//自分がどっちか判定
-		if (m_myName == "Player1")
+		if (m_BlackFlg2)
 		{
-			
-			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+			m_BlackFlg2 = false;
 
-			//ライフ透明化＆表示 キャラUIも
-			m_LifeSprite->SetDrawActive(false);
-			m_CharaUI->SetDrawActive(false);
-			DPlayer->DispUI();
+			m_velocity = Vector2(0, 0);
+			GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
 
-			//いなかったらエラー終了
-			if (!DPlayer)
+			//自分がどっちか判定
+			if (m_myName == "Player1")
 			{
-				throw BaseException(
-					L"Player2いません", L"", L""
-					);
+
+				auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+				//ライフ透明化＆表示 キャラUIも
+				m_LifeSprite->SetDrawActive(false);
+				m_CharaUI->SetDrawActive(false);
+				DPlayer->DispUI();
+
+				//いなかったらエラー終了
+				if (!DPlayer)
+				{
+					throw BaseException(
+						L"Player2いません", L"", L""
+						);
+				}
+
+				//あっち側起動
+				DPlayer->SetActive(true);
+				//こっち停止
+				m_ActiveFlg = false;
+
+
+				//カメラ移動
+				auto View = GetStage()->GetView();
+				auto CameraP = View->GetTargetCamera();
+
+				Vector3 At = DPlayer->GetComponent<Transform>()->GetPosition();
+				Vector3 pos = At;
+
+				//カメラ移動するために情報送る
+				pos.y += 5.0f;
+				pos.z += -5.0f;
+
+				DPlayer->SetCamera(At, pos);
+
+				return;
+			}
+			else if (m_myName == "Player2")
+			{
+				auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+
+				//ライフ透明化＆表示 キャラUIも
+				m_LifeSprite->SetDrawActive(false);
+				m_CharaUI->SetDrawActive(false);
+				DPlayer->DispUI();
+
+				//いなかったらエラー終了
+				if (!DPlayer)
+				{
+					throw BaseException(
+						L"Player1いません", L"", L""
+						);
+				}
+
+				//あっち側起動
+				DPlayer->SetActive(true);
+				//こっち停止
+				m_ActiveFlg = false;
+
+
+
+				//カメラ移動
+				auto View = GetStage()->GetView();
+				auto CameraP = View->GetTargetCamera();
+
+				Vector3 At = DPlayer->GetComponent<Transform>()->GetPosition();
+				Vector3 pos = At;
+
+				//カメラ移動するために情報送る
+				pos.y += 5.0f;
+				pos.z += -5.0f;
+
+				DPlayer->SetCamera(At, pos);
+				return;
 			}
 
-			//あっち側起動
-			DPlayer->SetActive(true);
-			//こっち停止
-			m_ActiveFlg = false;
-
-
-			//カメラ移動
-			auto View = GetStage()->GetView();
-			auto CameraP = View->GetTargetCamera();
-
-			Vector3 At = DPlayer->GetComponent<Transform>()->GetPosition();
-			Vector3 pos = At;
-
-			//カメラ移動するために情報送る
-			pos.y += 5.0f;
-			pos.z += -5.0f;
-
-			DPlayer->SetCamera(At, pos);
-
-			return;
+			throw BaseException(
+				L"交代ミスってます", L"", L""
+				);
 		}
-		else if (m_myName == "Player2")
+		else
 		{
-			auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
-
-			//ライフ透明化＆表示 キャラUIも
-			m_LifeSprite->SetDrawActive(false);
-			m_CharaUI->SetDrawActive(false);
-			DPlayer->DispUI();
-
-			//いなかったらエラー終了
-			if (!DPlayer)
-			{
-				throw BaseException(
-					L"Player1いません", L"", L""
-					);
-			}
-
-			//あっち側起動
-			DPlayer->SetActive(true);
-			//こっち停止
+			//暗転用
+			m_BlackFlg = true;
+			m_BlackFlg2 = true;
 			m_ActiveFlg = false;
-
-
-
-			//カメラ移動
-			auto View = GetStage()->GetView();
-			auto CameraP = View->GetTargetCamera();
-
-			Vector3 At = DPlayer->GetComponent<Transform>()->GetPosition();
-			Vector3 pos = At;
-
-			//カメラ移動するために情報送る
-			pos.y += 5.0f;
-			pos.z += -5.0f;
-
-			DPlayer->SetCamera(At, pos);
-			return;
+			m_velocity = Vector3(0, 0, 0);
+			GetComponent<Rigidbody>()->SetVelocity(Vector3(m_velocity.x, 0, m_velocity.y));
 		}
-
-		throw BaseException(
-			L"交代ミスってます", L"", L""
-			);
 	}
 
 	//操作状態操作

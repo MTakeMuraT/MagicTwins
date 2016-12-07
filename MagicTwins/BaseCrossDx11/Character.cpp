@@ -7,7 +7,7 @@
 #include "Project.h"
 
 namespace basecross{
-	/*暇なとき作る
+	/*
 	//--------------------------------------------------------------------------------------
 	//	class MagicParticle : public GameObject;
 	//	用途: パーティクル
@@ -31,18 +31,25 @@ namespace basecross{
 				//描画されてたら
 				if (m_Particle[i]->GetDrawActive())
 				{
+					//コンポーネントとっとく
+					auto Trans = m_Particle[i]->GetComponent<Transform>();
+
 					//最初の更新時
 					if (m_TimeCount[i] == 0)
 					{
-						m_Particle[i]->GetComponent<Transform>()->SetPosition(m_InitPos);
+						//ブレ幅
+						Vector3 pos = m_InitPos;
+						pos.x += rand() % (int)(m_RandRange.x / 2) - m_RandRange.x / 2;
+						pos.y += rand() % (int)(m_RandRange.y / 2) - m_RandRange.y / 2;
+						pos.z += rand() % (int)(m_RandRange.z / 2) - m_RandRange.z / 2;
+
+						//位置初期化
+						Trans->SetPosition(pos);
 					}
 
 					//位置更新
-					auto Trans = m_Particle[i]->GetComponent<Transform>();
 					Vector3 pos = Trans->GetPosition();
-					pos.x += rand() % (int)(m_RandRange.x / 2) - m_RandRange.x / 2;
-					pos.y += rand() % (int)(m_RandRange.y / 2) - m_RandRange.y / 2;
-					pos.z += rand() % (int)(m_RandRange.z / 2) - m_RandRange.z / 2;
+					
 
 					//時間更新
 					m_TimeCount[i] += App::GetApp()->GetElapsedTime();
@@ -57,7 +64,7 @@ namespace basecross{
 	}
 
 	//パーティクル登録
-	void MagicParticle::OnParticle(Vector3 pos, Vector3 scale, Vector3 randrange, Vector3 velo, string texturename,
+	void MagicParticle::OnParticle(Vector3 pos, Vector3 scale, Vector3 randrange, Vector3 velo,Vector3 randvelo, wstring texturename,
 		int createcount, float interval, int oncecreatecount,float moveingTime,int displayer)
 	{
 		//パーティクル出していない状態なら
@@ -69,8 +76,8 @@ namespace basecross{
 			m_InitScale = scale;
 			//生成されるときの位置の振れ幅
 			m_RandRange = randrange;
-			//移動速度
-			m_velocity = velo;
+			//移動ブレ幅
+			m_randVelocity = randvelo;
 			//テクスチャの名前
 			m_TextureName = texturename;
 			//合計作成数
@@ -94,17 +101,13 @@ namespace basecross{
 				auto obj = GetStage()->AddGameObject<GameObject>();
 				
 				auto objTrans = obj->AddComponent<Transform>();
-				objTrans->SetPosition(0,-100,0);
+				objTrans->SetPosition(0,0,0);
 				objTrans->SetScale(m_InitScale);
 				objTrans->SetRotation(0,0,0);
 
 				auto objDraw = obj->AddComponent<PNTStaticDraw>();
 				objDraw->SetMeshResource(L"DEFAULT_SQUARE");
-				objDraw->SetTextureResource(L"BOX_TX");
-				if (m_TextureName == "FireEf")
-				{
-					objDraw->SetTextureResource(L"FIREEF_TX");
-				}
+				objDraw->SetTextureResource(m_TextureName);
 				obj->SetAlphaActive(true);
 				obj->SetDrawLayer(m_DispLayer);
 
@@ -115,126 +118,268 @@ namespace basecross{
 				m_TimeCount.push_back(0);
 				//フラグリセット
 				m_OnFlg.push_back(false);
+				//移動速度作る分追加
+				Vector3 setVelocity = velo;
+				Vector3 randVelocity;
+				randvelo.x = rand() % (int)randvelo.x - (randvelo.x / 2);
+				randvelo.y = rand() % (int)randvelo.y - (randvelo.y / 2);
+				randvelo.z = rand() % (int)randvelo.z - (randvelo.z / 2);
+				m_velocity.push_back(velo);
 			}
 		}
 	}
-	*/
 
-	//--------------------------------------------------------------------------------------
-	//	class MagicParticleProt : public GameObject;
-	//	用途: パーティクル(試作版)
-	//--------------------------------------------------------------------------------------
-	MagicParticleProt::MagicParticleProt(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, string txt,int layer):
-		GameObject(StagePtr),
-		m_InitPos(pos),
-		m_InitScale(scale),
-		m_TextureName(txt),
-		m_Layer(layer)
-		{}
-
-	void MagicParticleProt::OnCreate()
+	void MagicParticle::StopParticle()
 	{
-		//とりあえず三個生成
-		//for (int i = 0; i < 3; i++)
-		//{
-			auto obj = GetStage()->AddGameObject<GameObject>();
-			auto objTrans = obj->AddComponent<Transform>();
-			Vector3 pos = m_InitPos;
-			//位置ちょっとずらす
-			pos.x += (rand() % 150 - 75) / 100;
-			pos.z += (rand() % 150 - 75) / 100;
-			objTrans->SetPosition(pos);
-			objTrans->SetScale(m_InitScale);
-			objTrans->SetRotation(0, 0, 0);
-
-			auto objDraw = AddComponent<PNTStaticDraw>();
-			objDraw->SetMeshResource(L"DEFAULT_SQUARE");
-			objDraw->SetTextureResource(L"BOX_TX");
-			//名前ごとに分ける
-			if (m_TextureName == "FireEF")
-			{
-				objDraw->SetTextureResource(L"FIREEF_TX");
-			}
-			obj->SetAlphaActive(true);
-			obj->SetDrawLayer(m_Layer);
-
-			m_Particle.push_back(obj);
-		//}
-		SetAlphaActive(true);
-
-	}
-
-	void MagicParticleProt::OnUpdate()
-	{
-		/*
-		if (m_OnFlg)
+		//全パーティクル消滅
+		for (auto v : m_Particle)
 		{
-		*/
-			m_time += App::GetApp()->GetElapsedTime();
-			if (m_time > m_Interval)
-			{
-				m_time = 0;
-				for (auto v : m_Particle)
-				{
-					//空いてるオブジェクトあれば
-					if (!v->GetDrawActive())
-					{
-						v->SetDrawActive(true);
-						Vector3 pos = m_InitPos;
-						pos.x += (rand() % 150 - 75) / 100;
-						pos.z += (rand() % 150 - 75) / 100;
-						v->GetComponent<Transform>()->SetPosition(pos);
-						v->GetComponent<Transform>()->SetScale(m_InitScale);
-						return;
-					}
-				}
-				//なければ生成
-				auto obj = GetStage()->AddGameObject<GameObject>();
-				auto objTrans = obj->AddComponent<Transform>();
-				Vector3 pos = m_InitPos;
-				//位置ちょっとずらす
-				pos.x += (rand() % 150 - 75) / 100;
-				pos.z += (rand() % 150 - 75) / 100;
-				objTrans->SetPosition(pos);
-				objTrans->SetScale(m_InitScale);
-				objTrans->SetRotation(0, 0, 0);
+			v->SetDrawActive(false);
+		}
+		m_NowParticleFlg = false;
+	}
+	*/
+	//--------------------------------------------------------------------------------------
+	//	class MagicParticle : public GameObject;
+	//	用途: パーティクル(簡易対応版)
+	//--------------------------------------------------------------------------------------
+	MagicParticle::MagicParticle(const shared_ptr<Stage>& StagePtr) :
+		GameObject(StagePtr)
+	{}
 
-				auto objDraw = AddComponent<PNTStaticDraw>();
-				objDraw->SetMeshResource(L"DEFAULT_SQUARE");
-				objDraw->SetTextureResource(L"BOX_TX");
-				if (m_TextureName == "FireEF")
-				{
-					objDraw->SetTextureResource(L"FIREEF_TX");
-				}
-				obj->SetAlphaActive(true);
-				obj->SetDrawLayer(m_Layer);
-
-				m_Particle.push_back(obj);
-			}
-
+	void MagicParticle::OnUpdate()
+	{
+		//数表示
+		//GetComponent<StringSprite>()->SetText(Util::IntToWStr(m_Particle.size()));
+		if (m_NowParticleFlg)
+		{
 			//位置更新
+			int count = 0;
 			for (auto v : m_Particle)
 			{
-				//表示されてれば
+				//描画されてたら
 				if (v->GetDrawActive())
 				{
-					Vector3 pos = v->GetComponent<Transform>()->GetPosition();
-					pos.y += 3 * App::GetApp()->GetElapsedTime();
-					v->GetComponent<Transform>()->SetPosition(pos);
-					Vector3 scale = GetComponent<Transform>()->GetScale();
-					scale *= 0.98f;
-					v->GetComponent<Transform>()->SetScale(scale);
+					auto Trans = v->GetComponent<Transform>();
+					Vector3 pos = Trans->GetPosition();
+					pos += m_velocity[count] * App::GetApp()->GetElapsedTime();
+					Trans->SetPosition(pos);
 
-					//座標が最初の位置から初期の大きさの2倍の高さに行ったら
-					if (pos.y > m_InitPos.y + (m_InitScale.y * 2))
+					//消滅処理
+					//trueで透明になる
+					if (m_DeleteFlg)
 					{
-						v->SetDrawActive(false);
+						m_alpha[count] += -m_DeleteTime * App::GetApp()->GetElapsedTime();
+						v->GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, m_alpha[count]));
+						//透明化したら
+						if (m_alpha[count] < 0)
+						{
+							m_alpha[count] = 1.0f;
+							v->GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+							//停止
+							v->SetDrawActive(false);
+						}
+					}
+					else
+					{
+						//サイズ小さく
+						Vector3 scale = Trans->GetScale();
+						scale *= 0.98f;
+						Trans->SetScale(scale);
+						//10分の1まで小さくなったら消える
+						if (Trans->GetScale().x < m_Scale.x / 10)
+						{
+							Trans->SetScale(m_Scale);
+							v->SetDrawActive(false);
+						}
 					}
 				}
+				count++;
 			}
-		//}
+			count = 0;
+
+
+			//経過時間加算
+			m_time += App::GetApp()->GetElapsedTime();
+			//生成感覚を越えたら
+			if (m_time > m_CreateInterval)
+			{
+				m_time = 0;
+				bool CreateFlg = true;
+				//生きてるのあったら再利用
+				int count = 0;
+				for (auto v : m_Particle)
+				{
+					if (!v->GetDrawActive())
+					{
+						//描画
+						v->SetDrawActive(true);
+						//速度位置設定
+						SetVeloPos(count);
+						//作成フラグを消す
+						CreateFlg = false;
+
+						//一回で終わらせるために抜ける
+						break;
+					}
+
+					count++;
+				}
+				count = 0;
+				if (CreateFlg)
+				{
+					//無かったら生成
+					CreateParticle();
+				}
+			}
+		}
 	}
 
+	void MagicParticle::OnParticle(Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval,int layer,float deleteTime)
+	{
+		//初期位置設定
+		m_InitPos = InitPos;
+		//位置振れ幅設定
+		m_RandPos = RandPos;
+		//初期速度
+		m_Initvelocity = Velo;
+		//速度ブレ幅
+		m_RandVelocity = RandVelo;
+		//大きさ設定
+		m_Scale = scale;
+		//テクスチャの名前設定
+		m_TextureName = TextureName;
+		//消滅演出設定
+		m_DeleteFlg = DeleteFlg;
+		//作成間隔設定
+		m_CreateInterval = CreateInterval;
+		//レイヤー設定
+		m_Layer = layer;
+		//消滅時間
+		m_DeleteTime = deleteTime;
+
+		//起動フラグをON
+		m_NowParticleFlg = true;
+
+		//文字列をつける
+		auto PtrString = AddComponent<StringSprite>();
+		PtrString->SetText(L"");
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		PtrString->SetFont(L"", 60);
+
+	}
+
+	void MagicParticle::StopParticle()
+	{
+		/*エフェクトも消す
+		for (auto v : m_Particle)
+		{
+			v->SetDrawActive(false);
+		}*/
+		m_NowParticleFlg = false;
+	}
+
+	void MagicParticle::SetVeloPos(int num)
+	{
+
+		//位置調整-------------------------------------------------------------
+		Vector3 pos = m_InitPos;
+		Vector3 random;
+		if (m_RandPos.x != 0)
+		{
+			random.x = (float)(rand() % (int)(m_RandPos.x * 100)) / 100 - (m_RandPos.x / 2);
+		}
+		if (m_RandPos.y != 0)
+		{
+			random.y = (float)(rand() % (int)(m_RandPos.y * 100)) / 100 - (m_RandPos.y / 2);
+		}
+		if (m_RandPos.z != 0)
+		{
+			random.z = (float)(rand() % (int)(m_RandPos.z * 100)) / 100 - (m_RandPos.z / 2);
+		}
+		pos += random;
+		m_Particle[num]->GetComponent<Transform>()->SetPosition(pos);
+
+		//速度調整-------------------------------------------------------------
+		Vector3 velo = m_Initvelocity;
+		Vector3 randvelo;
+		if (m_RandVelocity.x != 0)
+		{
+			randvelo.x = (float)(rand() % (int)(m_RandVelocity.x * 100)) / 100 - (m_RandVelocity.x / 2);
+		}
+		if (m_RandVelocity.y != 0)
+		{
+			randvelo.y = (float)(rand() % (int)(m_RandVelocity.y * 100)) / 100 - (m_RandVelocity.y / 2);
+		}
+		if (m_RandVelocity.z != 0)
+		{
+			randvelo.z = (float)(rand() % (int)(m_RandVelocity.z * 100)) / 100 - (m_RandVelocity.z / 2);
+		}
+		velo += randvelo;
+		m_velocity[num] = velo;
+
+	}
+
+	void MagicParticle::CreateParticle()
+	{
+		//生成
+		auto obj = GetStage()->AddGameObject<GameObject>();
+		auto Trans = obj->AddComponent<Transform>();
+		//生成位置調整
+		Vector3 pos = m_InitPos;
+		Vector3 random;
+		if (m_RandPos.x != 0)
+		{
+			random.x = (float)(rand() % (int)(m_RandPos.x * 100)) / 100 - (m_RandPos.x / 2);
+		}
+		if (m_RandPos.y != 0)
+		{
+			random.y = (float)(rand() % (int)(m_RandPos.y * 100)) / 100 - (m_RandPos.y / 2);
+		}
+		if (m_RandPos.z != 0)
+		{
+			random.z = (float)(rand() % (int)(m_RandPos.z * 100)) / 100 - (m_RandPos.z / 2);
+		}
+		pos += random;
+		//位置設定
+		Trans->SetPosition(pos);
+		//大きさ設定
+		Trans->SetScale(m_Scale);
+		//かいて…、意味あるん？
+		Trans->SetRotation(0, 0, 0);
+
+		//描画設定
+		auto Draw = obj->AddComponent<PNTStaticDraw>();
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		Draw->SetTextureResource(m_TextureName);
+		obj->SetAlphaActive(true);
+		obj->SetDrawLayer(m_Layer);
+
+		//速さ設定
+		Vector3 velo = m_Initvelocity;
+		Vector3 randvelo;
+		if (m_RandVelocity.x != 0)
+		{
+			randvelo.x = (float)(rand() % (int)(m_RandVelocity.x * 100)) / 100 - (m_RandVelocity.x / 2);
+		}
+		if (m_RandVelocity.y != 0)
+		{
+			randvelo.y = (float)(rand() % (int)(m_RandVelocity.y * 100)) / 100 - (m_RandVelocity.y / 2);
+		}
+		if (m_RandVelocity.z != 0)
+		{
+			randvelo.z = (float)(rand() % (int)(m_RandVelocity.z * 100)) / 100 - (m_RandVelocity.z / 2);
+		}
+		
+		velo += randvelo;
+
+		m_velocity.push_back(velo);
+		m_Particle.push_back(obj);
+		m_alpha.push_back(1.0f);
+		//wstring txt;
+		//txt += L"RandPos.X = " + Util::FloatToWStr(random.x) + L"RandPos.Y = " + Util::FloatToWStr(random.y + L"RandPos.Z = " + Util::FloatToWStr(random.z);
+		//GetComponent<StringSprite>()->SetText(Util::IntToWStr(m_Particle.size()));
+	}
 	//--------------------------------------------------------------------------------------
 	//	class Goal : public GameObject;
 	//	用途: ゴール
@@ -585,9 +730,9 @@ namespace basecross{
 
 	void Enemy::StopEnemy(int TargetNum)
 	{
-
 		if (TargetNum == m_TargetPlayernum)
 		{
+			m_ChaceFlg = true;
 			m_StopFlg = true;
 			m_life--;
 			m_time = 0;

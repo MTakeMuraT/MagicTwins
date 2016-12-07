@@ -16,8 +16,6 @@ namespace basecross {
 		void CreateResourses();
 		//ビューの作成
 		void CreateViewLight();
-		//プレートの作成
-		void CreatePlate();
 		//制限時間作成
 		void CreateLimitTime();
 		//コリジョンマネージャー作成

@@ -36,6 +36,9 @@ namespace basecross{
 
 		//音全停止
 		void StopBGM();
+
+		//ゴールしたフラグ
+		bool m_GoalFlg = false;
 	public:
 		Scene() :SceneBase(){}
 		virtual ~Scene(){}
@@ -47,6 +50,7 @@ namespace basecross{
 		//ステージ番号取得
 		unsigned int GetStageNum() { return m_stageNum; }
 
+		//たぶんクリアとスコア使ってない
 		//クリアタイムをセット
 		void SetClearTime(unsigned int num) { m_clearTime = num; }
 		//クリアタイム取得
@@ -56,6 +60,9 @@ namespace basecross{
 		void SetScoreItemCount(unsigned int num) { m_ScoreItemCount = num; }
 		//スコアアイテム取得
 		unsigned int GetScoreItemCount() { return m_ScoreItemCount; }
+
+		//クリアしたときのBGM処理
+		void ClearBGM();
 	};
 
 }

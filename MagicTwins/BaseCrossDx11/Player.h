@@ -89,6 +89,15 @@ namespace basecross{
 		//キャラUI
 		shared_ptr<GameObject> m_CharaUI;
 		 
+		//暗転用幕
+		shared_ptr<GameObject> m_Black;
+
+		//キャラ暗転切り替え用
+		//そもそも暗転するかどうか
+		bool m_BlackFlg = false;
+		//今出てる状態か消えてる状態か
+		bool m_BlackFlg2 = false;
+		float m_BlackAlpha = 0;
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))

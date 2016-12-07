@@ -100,6 +100,11 @@ namespace basecross {
 		//魔法
 		strTexture = DataDir + L"FireEf.png";
 		App::GetApp()->RegisterTexture(L"FIREEF_TX", strTexture);
+		strTexture = DataDir + L"IceEF.png";
+		App::GetApp()->RegisterTexture(L"ICEEF_TX", strTexture);
+		strTexture = DataDir + L"WindEF.png";
+		App::GetApp()->RegisterTexture(L"WINDEF_TX", strTexture);
+
 		//ポーズメニュー
 		strTexture = DataDir + L"PauseLogo.png";
 		App::GetApp()->RegisterTexture(L"PAUSELOGO_TX", strTexture);
@@ -113,15 +118,21 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"PAUSETITLELOGO_TX", strTexture);
 		strTexture = DataDir + L"map/map.png";
 		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
+		
+		//エフェクト用Right
+		strTexture = DataDir + L"Light/RedLight.png";
+		App::GetApp()->RegisterTexture(L"FIRERIGHT_TX", strTexture);
+		strTexture = DataDir + L"Light/BlueLight.png";
+		App::GetApp()->RegisterTexture(L"ICERIGHT_TX", strTexture);
+		strTexture = DataDir + L"Light/GreenLight.png";
+		App::GetApp()->RegisterTexture(L"WINDRIGHT_TX", strTexture);
+		strTexture = DataDir + L"Light/WhiteLight.png";
+		App::GetApp()->RegisterTexture(L"RIGHT_TX", strTexture);
 
-		//-----------------------------
-		//絶対消せ
-		strTexture = DataDir + L"W.png";
-		App::GetApp()->RegisterTexture(L"W_TX", strTexture);
-		strTexture = DataDir + L"I.png";
-		App::GetApp()->RegisterTexture(L"I_TX", strTexture);
 
-		//-----------------------------
+		//背景
+		strTexture = DataDir + L"Back_Sky.jpg";
+		App::GetApp()->RegisterTexture(L"BACK_SKY_TX", strTexture);
 
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
@@ -148,62 +159,22 @@ namespace basecross {
 		auto PtrSingleLight = CreateLight<SingleLight>();
 		//ライトの設定
 		PtrSingleLight->GetLight().SetPositionToDirectional(-0.25f, 1.0f, -0.25f);
-	}
 
 
-	//プレートの作成
-	void GameStage::CreatePlate() {
-		//ステージへのゲームオブジェクトの追加
-		auto Ptr = AddGameObject<GameObject>();
-		auto PtrTrans = Ptr->GetComponent<Transform>();
-		Quaternion Qt;
-		Qt.RotationRollPitchYawFromVector(Vector3(XM_PIDIV2, 0, 0));
-		Matrix4X4 WorldMat;
-		WorldMat.DefTransformation(
-			Vector3(1.0f, 1.0f, 1.0f),
-			Qt,
-			Vector3(0.0f, 0.0f, 0.0f)
-			);
-		PtrTrans->SetScale(20.0f, 20.0f, 1.0f);
-		PtrTrans->SetQuaternion(Qt);
-		Vector3 pos = GetSharedGameObject<Player>(L"Player1", false)->GetComponent<Transform>()->GetPosition();
-		pos.y = 0;
-		PtrTrans->SetPosition(pos);
+		//背景作成--------------------------------------
+		auto BackP = AddGameObject<GameObject>();
+		auto BPD = BackP->AddComponent<PNTStaticDraw>();
+		BPD->SetMeshResource(L"DEFAULT_SQUARE");
+		BPD->SetTextureResource(L"BACK_SKY_TX");
+		auto BPT = BackP->AddComponent<Transform>();
+		BPT->SetPosition(0, 0, 10);
+		BPT->SetScale(50, 28, 1);
+		BPT->SetRotation(45, 0, 0);
+		BackP->SetAlphaActive(true);
+		BackP->SetDrawLayer(1);
 
-		//描画コンポーネントの追加
-		auto DrawComp = Ptr->AddComponent<PNTStaticDraw>();
-		//描画コンポーネントに形状（メッシュ）を設定
-		DrawComp->SetMeshResource(L"DEFAULT_SQUARE");
-		//自分に影が映りこむようにする
-		DrawComp->SetOwnShadowActive(true);
-
-		//描画コンポーネントテクスチャの設定
-		DrawComp->SetTextureResource(L"PANEL_TX");
-
-		//ステージへのゲームオブジェクトの追加
-		Ptr= AddGameObject<GameObject>();
-		PtrTrans = Ptr->GetComponent<Transform>();
-		Qt.RotationRollPitchYawFromVector(Vector3(XM_PIDIV2, 0, 0));
-		WorldMat.DefTransformation(
-			Vector3(1.0f, 1.0f, 1.0f),
-			Qt,
-			Vector3(0.0f, 0.0f, 0.0f)
-			);
-		PtrTrans->SetScale(20.0f, 20.0f, 1.0f);
-		PtrTrans->SetQuaternion(Qt);
-		pos = GetSharedGameObject<Player>(L"Player2", false)->GetComponent<Transform>()->GetPosition();
-		pos.y = -0.125f;
-		PtrTrans->SetPosition(pos);
-
-		//描画コンポーネントの追加
-		DrawComp = Ptr->AddComponent<PNTStaticDraw>();
-		//描画コンポーネントに形状（メッシュ）を設定
-		DrawComp->SetMeshResource(L"DEFAULT_SQUARE");
-		//自分に影が映りこむようにする
-		DrawComp->SetOwnShadowActive(true);
-
-		//描画コンポーネントテクスチャの設定
-		DrawComp->SetTextureResource(L"PANEL_TX");
+		SetSharedGameObject(L"Back", BackP);
+		//背景作成--------------------------------------
 
 	}
 
@@ -242,6 +213,7 @@ namespace basecross {
 	{
 		if (m_GoalState == 0)
 		{
+			//リソース読み込み
 			wstring DataDir;
 			App::GetApp()->GetDataDirectory(DataDir);
 			wstring strTexture = DataDir + L"Result/Result_Logo.png";
@@ -1108,6 +1080,13 @@ namespace basecross {
 				auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
 				Ptr->SetUpdateActive(false);
 			}
+			//エフェクト止める
+			auto EfGroupVec = GetSharedObjectGroup(L"Effect")->GetGroupVector();
+			for (auto v : EfGroupVec)
+			{
+				auto Ptr = dynamic_pointer_cast<MagicParticle>(v.lock());
+				Ptr->StopParticle();
+			}
 			return;
 		}
 
@@ -1178,8 +1157,6 @@ namespace basecross {
 			CreateViewLight();
 			//CSV作成
 			AddGameObject<CSVReader>();
-			//プレートの作成
-			//CreatePlate();
 			//制限時間の作成
 			CreateLimitTime();
 			//ポーズメニュー作成

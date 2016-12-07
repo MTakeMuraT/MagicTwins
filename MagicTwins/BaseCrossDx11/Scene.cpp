@@ -23,6 +23,10 @@ namespace basecross{
 		//キャラ２モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char2/Character_02.bmf");
 		App::GetApp()->RegisterResource(L"Player2_Model", ModelMesh);
+		//キャラ２アニメーション
+		auto BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char2/Character_02_WalkWalk.bmf");
+		App::GetApp()->RegisterResource(L"Character_02_WalkWalk_BONE_MESH", BoneModelMesh);
+
 		//風車モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
 		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
@@ -146,6 +150,8 @@ namespace basecross{
 		//ゲーム中
 		else if (event->m_MsgStr == L"GameStage")
 		{
+			//ゴールフラグリセット
+			m_GoalFlg = false;
 			//音全停止
 			StopBGM();
 			//再生
@@ -172,6 +178,16 @@ namespace basecross{
 			ResetActiveStage<GameOver>();
 		}
 
+	}
+
+	void Scene::ClearBGM()
+	{
+		if (!m_GoalFlg)
+		{
+			StopBGM();
+			m_AudioResult->Start(L"ResultBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
+			m_GoalFlg = true;
+		}
 	}
 
 }

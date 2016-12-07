@@ -215,6 +215,8 @@ namespace basecross {
 		auto num = GetStage()->GetSharedGameObject<LimitTime>(L"LimitTime", false)->GetClearTime();
 		ScenePtr->SetClearTime(num);
 		ScenePtr->SetScoreItemCount(m_scoreItemCount);
+		//BGMˆ—
+		ScenePtr->ClearBGM();
 		//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Result");
 
 		GetStage()->GetSharedGameObject<GameObject>(L"GoalObj")->SetDrawActive(true);
