@@ -168,6 +168,14 @@ namespace basecross{
 		//自分の属性
 		MagicType m_MagicType = None;
 
+		//なんかしらんメッシュのリスト
+		vector<shared_ptr<MeshResource>> m_Mesh;
+
+		//今の連番の番号
+		unsigned int m_MeshNumber = 0;
+		//画像切り替えるタイミング計算用
+		float m_CountTime = 0;
+		const float m_ConstCountTime = 0.3f;
 	public :
 		MagicBoal(const shared_ptr<Stage>& StagePtr, Vector3 pos,int m);
 		virtual void OnCreate() override;

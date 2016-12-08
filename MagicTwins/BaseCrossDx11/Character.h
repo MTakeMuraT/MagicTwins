@@ -418,6 +418,16 @@ namespace basecross{
 		float m_LimitTime = 60.0f;
 		//数字スプライト
 		shared_ptr<NumberSprite> m_numberSp;
+
+		//赤枠スプライト
+		shared_ptr<GameObject> m_AkaWakuSprite;
+
+		//赤枠フラグ
+		bool m_AkaWakuFlg = false;
+		//透明度
+		float m_AlphaAka = 1.0f;
+		//透明フラグ
+		bool m_AlphaAkaFlg = false;
 	public:
 		LimitTime(const shared_ptr<Stage>& StagePtr, float LimitTime);
 		void OnCreate() override;

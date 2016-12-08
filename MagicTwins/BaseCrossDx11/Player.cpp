@@ -45,7 +45,7 @@ namespace basecross {
 		float angle = -90 * (3.14159265f /180);
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
-			Vector3(0.5f, 0.5f, 0.5f),
+			Vector3(1.0f, 1.0f, 1.0f),
 			Vector3(0.0f, angle, 0.0f),
 			Vector3(0.0f, 1.0f, 0.0f)
 			);
@@ -57,7 +57,7 @@ namespace basecross {
 			// モデルとトランスフォームの間の差分行列
 			angle = -90 * (3.14159265f / 180);
 			SpanMat.DefTransformation(
-				Vector3(2.0f, 2.0f, 2.0f),
+				Vector3(1.5f, 1.5f, 1.5f),
 				Vector3(0.0f, angle, 0.0f),
 				Vector3(0.0f, 1.0f, 0.0f)
 				);
@@ -68,12 +68,22 @@ namespace basecross {
 			ShadowPtr->SetMeshResource(L"Player1_Model");
 			ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
+			//描画コンポーネントの設定
+			auto PtrDraw = AddComponent<PNTBoneModelDraw>();
+			//描画するメッシュを設定
+			PtrDraw->SetMeshResource(L"Character1_Walk_MESH");
+			PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
+			//アニメーション追加
+			PtrDraw->AddAnimation(L"walk", 0, 180, true, 30);
+
+			/*
 			//描画コンポーネントの設定
 			auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 			//描画するメッシュを設定
 			PtrDraw->SetMeshResource(L"Player1_Model");
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
+			*/
 
 			//魔法作成
 			auto magicBoal = GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 1);
@@ -428,9 +438,6 @@ namespace basecross {
 				TranP->SetRotation(Vector3(0, angle, 0));
 
 
-				//現状2キャラ目にアニメーションついてるからそっち限定
-				if (m_myName == "Player2")
-				{
 					//アニメーションを更新する(コントローラーを傾けると動く)
 					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
 					if (PtrDraw->GetCurrentAnimation() == L"walk") {
@@ -439,7 +446,6 @@ namespace basecross {
 						//アニメーションを変えるとき
 						//PtrDraw->ChangeCurrentAnimation(L"Default");
 					}
-				}
 			}
 
 			//Rトリガーでキャラ切り替え
@@ -926,12 +932,67 @@ namespace basecross {
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(16.0f, 320.0f, 640.0f, 480.0f));
 		PtrString->SetFont(L"", 60);
+
+		/*
+		for (int i = 0; i < 10; i++)
+		{
+
+			//頂点配列
+			vector<VertexPositionNormalTexture> vertices;
+			//インデックスを作成するための配列
+			vector<uint16_t> indices;
+			//Squareの作成(ヘルパー関数を利用)
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			//UV値の変更
+			float from = i / 10.0f;
+			float to = from + (1.0f / 10.0f);
+			//左上頂点
+			vertices[0].textureCoordinate = Vector2(from, 0);
+			//右上頂点
+			vertices[1].textureCoordinate = Vector2(to, 0);
+			//左下頂点
+			vertices[2].textureCoordinate = Vector2(from, 1.0f);
+			//右下頂点
+			vertices[3].textureCoordinate = Vector2(to, 1.0f);
+			//頂点の型を変えた新しい頂点を作成
+			vector<VertexPositionColorTexture> new_vertices;
+			for (auto& v : vertices) {
+				VertexPositionColorTexture nv;
+				nv.position = v.position;
+				nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+				nv.textureCoordinate = v.textureCoordinate;
+				new_vertices.push_back(nv);
+			}
+			//メッシュ作成
+			m_Mesh.push_back(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		}
+
+		//連番の１を設定
+		PtrDraw->SetMeshResource(m_Mesh[0]);
+		*/
 	}
 
 	void MagicBoal::OnUpdate()
 	{
 		if (m_ActiveFlg)
 		{
+			/*
+			//アニメーション更新
+			m_CountTime += App::GetApp()->GetElapsedTime();
+			//間隔時間越えたら
+			if (m_CountTime > m_ConstCountTime)
+			{
+				m_CountTime = 0;
+				m_MeshNumber++;
+				if (m_MeshNumber > 9)
+				{
+					m_MeshNumber = 0;
+				}
+
+				//テクスチャ切り替え
+				GetComponent<PNTStaticDraw>()->SetMeshResource(m_Mesh[m_MeshNumber]);
+			}*/
+
 			Vector3 pos = GetComponent<Transform>()->GetPosition();
 			float Elapsed = App::GetApp()->GetElapsedTime();
 			pos += Vector3(m_velocity.x*Elapsed, 0, m_velocity.y*Elapsed);

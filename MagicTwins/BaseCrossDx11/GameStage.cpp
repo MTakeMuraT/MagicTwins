@@ -138,7 +138,10 @@ namespace basecross {
 		strTexture = DataDir + L"Game_Start_Logo.png";
 		App::GetApp()->RegisterTexture(L"GAMESTARTLOGO_TX", strTexture);
 
-		
+		//赤枠
+		strTexture = DataDir + L"Akawaku.png";
+		App::GetApp()->RegisterTexture(L"AKAWAKU_TX", strTexture);
+
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
 		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);

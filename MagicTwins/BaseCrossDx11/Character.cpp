@@ -1088,6 +1088,24 @@ namespace basecross{
 
 		auto numobj = GetStage()->AddGameObject<NumberSprite>(0, Vector2(830, 470), Vector2(100, 100), 6);
 		m_numberSp = numobj;
+
+
+
+		//赤枠スプライト作成
+		auto akaobj = GetStage()->AddGameObject<GameObject>();
+		auto AkaTrans = akaobj->AddComponent<Transform>();
+		AkaTrans->SetPosition(0, 0, 0);
+		AkaTrans->SetRotation(0, 0, 0);
+		AkaTrans->SetScale(1920, 1080, 1);
+
+		auto AkaDraw = akaobj->AddComponent<PCTSpriteDraw>();
+		AkaDraw->SetTextureResource(L"AKAWAKU_TX");
+
+		akaobj->SetDrawLayer(5);
+		akaobj->SetAlphaActive(true);
+		akaobj->SetDrawActive(false);
+
+		m_AkaWakuSprite = akaobj;
 	}
 
 	void LimitTime::OnUpdate()
@@ -1095,6 +1113,45 @@ namespace basecross{
 		//wstring txt = Util::IntToWStr((int)m_nowTime);
 		//GetComponent<StringSprite>()->SetText(txt);
 
+		if (m_AkaWakuFlg)
+		{
+			//falseで透明化
+			if (!m_AlphaAkaFlg)
+			{
+				m_AlphaAka += -1 * App::GetApp()->GetElapsedTime();
+				m_AkaWakuSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_AlphaAka));
+				if (m_AlphaAka <0)
+				{
+					m_AlphaAkaFlg = true;
+				}
+			}
+			//trueで実体化
+			else
+			{
+				m_AlphaAka += 1 * App::GetApp()->GetElapsedTime();
+				m_AkaWakuSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, m_AlphaAka));
+
+				if (m_AlphaAka > 1.0f)
+				{
+					m_AlphaAkaFlg = false;
+				}
+			}
+			if (m_nowTime > 10)
+			{
+				m_AkaWakuFlg = false;
+				m_AkaWakuSprite->SetDrawActive(false);
+			}
+
+
+		}
+		//10秒未満で赤枠
+		if (!m_AkaWakuFlg && m_nowTime <= 10)
+		{
+			m_AkaWakuFlg = true;
+			m_AkaWakuSprite->SetDrawActive(true);
+			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("TimeAlert");
+		}
+		
 		//時間経過処理
 		m_nowTime += -App::GetApp()->GetElapsedTime();
 
@@ -1133,7 +1190,6 @@ namespace basecross{
 		//数字のスプライト作成
 		for (int i = 0; i < 10; i++)
 		{
-
 			//頂点配列
 			vector<VertexPositionNormalTexture> vertices;
 			//インデックスを作成するための配列

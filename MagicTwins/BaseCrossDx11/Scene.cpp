@@ -23,8 +23,13 @@ namespace basecross{
 		//キャラ２モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char2/Character_02.bmf");
 		App::GetApp()->RegisterResource(L"Player2_Model", ModelMesh);
+
+		//キャラ１アニメーション
+		auto BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char1/Character_01motion01.bmf");
+		App::GetApp()->RegisterResource(L"Character1_Walk_MESH", BoneModelMesh);
+
 		//キャラ２アニメーション
-		auto BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char2/Character_02_WalkWalk.bmf");
+		BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char2/Character_02_WalkWalk.bmf");
 		App::GetApp()->RegisterResource(L"Character_02_WalkWalk_BONE_MESH", BoneModelMesh);
 
 		//風車モデル
@@ -101,7 +106,11 @@ namespace basecross{
 			//スコアアイテム取得音
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/ItemGet.wav";
 			App::GetApp()->RegisterWav(L"ScoreItemGetSE", strMusic);
+			//時間もうちょい赤枠音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Alert.wav";
+			App::GetApp()->RegisterWav(L"TimeAlertSE", strMusic);
 
+			
 			//オーディオの初期化
 			m_AudioTitle = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioTitle->AddAudioResource(L"TitleBGM");
@@ -173,7 +182,7 @@ namespace basecross{
 			//音全停止
 			StopBGM();
 			//再生
-			m_AudioResult->Start(L"ResultBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
+			m_AudioResult->Start(L"ResultBGM", XAUDIO2_LOOP_INFINITE, 0.5f);
 			//なってる音更新
 			m_NowBGM = "Result";
 			ResetActiveStage<Result>();

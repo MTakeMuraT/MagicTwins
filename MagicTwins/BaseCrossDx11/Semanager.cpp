@@ -127,9 +127,15 @@ namespace basecross {
 					m_Se[i]->Start(L"ScoreItemGetSE", 0.5f);
 					flgg = true;
 				}
-
+				//タイムもうちょい赤枠
+				if (name == "TimeAlert")
+				{
+					m_Se[i]->AddAudioResource(L"TimeAlertSE");
+					m_Se[i]->Start(L"TimeAlertSE", 0.5f);
+					flgg = true;
+				}
 				m_OnFlg[i] = flgg;
-				if (flgg = false)
+				if (flgg == false)
 				{
 					throw BaseException(
 						L"Se指定ミス", L"", L""
