@@ -89,9 +89,9 @@ namespace basecross {
 			auto objtrans = obj->AddComponent<Transform>();
 			//1920,1080
 			//960,540
-			objtrans->SetPosition(-700, 420, 0);
+			objtrans->SetPosition(-700, 400, 0);
 			objtrans->SetRotation(0, 0, 0);
-			objtrans->SetScale(400, 200, 1);
+			objtrans->SetScale(400, 130, 1);
 			obj->SetAlphaActive(true);
 			obj->SetDrawLayer(3);
 			m_LifeSprite = obj;
@@ -195,9 +195,9 @@ namespace basecross {
 			auto objtrans = obj->AddComponent<Transform>();
 			//1920,1080
 			//960,540
-			objtrans->SetPosition(-700, 420, 0);
+			objtrans->SetPosition(-700, 400, 0);
 			objtrans->SetRotation(0, 0, 0);
-			objtrans->SetScale(400, 200, 1);
+			objtrans->SetScale(400, 130, 1);
 			obj->SetAlphaActive(true);
 			obj->SetDrawLayer(3);
 
@@ -261,6 +261,17 @@ namespace basecross {
 
 	//更新
 	void Player::OnUpdate() {
+		//死んだフラグ立ってたら
+		if (m_DieFlg)
+		{
+			if (m_BlackDie->GetBlackFinish())
+			{
+				//ゲームオーバーに遷移
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+			}
+			return;
+		}
 		if (m_WarpFlg)
 		{
 			m_WarpFlg = false;
@@ -455,6 +466,12 @@ namespace basecross {
 		GetComponent<Rigidbody>()->SetVelocity(Vector3(m_velocity.x,0,m_velocity.y));
 
 
+		//座標がある程度下になったら地形ダメージ与えて戻す
+		if (GetComponent<Transform>()->GetPosition().y < -10)
+		{
+			GetComponent<Transform>()->SetPosition(m_InitPos);
+			PlayerTerrainDamege();
+		}
 	}
 
 	void Player::CameraTarget()
@@ -802,7 +819,15 @@ namespace basecross {
 				//しんだ
 				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE0_TX");
 				//ゲームオーバーに遷移
-				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+				//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+				//暗転させる
+				m_DieFlg = true;
+				if (true)
+				{
+					auto obj = GetStage()->AddGameObject<Black>();
+					obj->StartBlack();
+					m_BlackDie = obj;
+				}
 				break;
 			case 1:
 				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE1_TX");
@@ -843,7 +868,15 @@ namespace basecross {
 			//しんだ
 			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE0_TX");
 			//ゲームオーバーに遷移
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+			//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
+			//暗転させる
+			m_DieFlg = true;
+			if (true)
+			{
+				auto obj = GetStage()->AddGameObject<Black>();
+				obj->StartBlack();
+				m_BlackDie = obj;
+			}
 			break;
 		case 1:
 			m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"LIFE1_TX");

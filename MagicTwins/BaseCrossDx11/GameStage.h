@@ -89,6 +89,8 @@ namespace basecross {
 		bool m_StartFlg = false;
 		//なんかうまくいかないから調整用
 		bool m_StartFlg2 = false;
+		//終わったフラグ
+		bool m_StartFinish = false;
 
 		void StopAll();
 		void StartAll();

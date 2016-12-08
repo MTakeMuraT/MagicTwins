@@ -98,6 +98,11 @@ namespace basecross{
 		//今出てる状態か消えてる状態か
 		bool m_BlackFlg2 = false;
 		float m_BlackAlpha = 0;
+
+		//死んだフラグ
+		bool m_DieFlg = false;
+		//暗転用幕
+		shared_ptr<Black> m_BlackDie;
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))

@@ -1784,6 +1784,7 @@ namespace basecross{
 			//SE再生
 			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("FireDamage");
 
+			//エフェクト停止
 			for (auto v : m_Particle)
 			{
 				v->StopParticle();
@@ -1851,6 +1852,12 @@ namespace basecross{
 			m_ActiveFlg = false;
 			//SE再生
 			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("FireDamage");
+
+			//エフェクト停止
+			for (auto v : m_Particle)
+			{
+				v->StopParticle();
+			}
 
 		}
 
@@ -2175,7 +2182,16 @@ namespace basecross{
 		GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
 		//SE再生
 		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
-
+		//エフェクト停止
+		for (auto v : m_ParticleIce)
+		{
+			v->StopParticle();
+		}
+		//エフェクト出現
+		for (auto v : m_ParticleFire)
+		{
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+		}
 	}
 	//溶かす
 	void WaterFall::Melt()
@@ -2186,6 +2202,17 @@ namespace basecross{
 		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Water");
 
 		OnPlayer();
+
+		//エフェクト停止
+		for (auto v : m_ParticleFire)
+		{
+			v->StopParticle();
+		}
+		//エフェクト出現
+		for (auto v : m_ParticleIce)
+		{
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+		}
 
 	}
 	//止める
@@ -2198,7 +2225,15 @@ namespace basecross{
 
 		//水の部分
 		SetDrawActive(false);
-
+		//エフェクト停止
+		for (auto v : m_ParticleFire)
+		{
+			v->StopParticle();
+		}
+		for (auto v : m_ParticleIce)
+		{
+			v->StopParticle();
+		}
 	}
 	//流す
 	void WaterFall::Flow()
@@ -2211,6 +2246,12 @@ namespace basecross{
 		GetComponent<CollisionObb>()->SetUpdateActive(true);
 
 		OnPlayer();
+		//エフェクト出現
+		for (auto v : m_ParticleIce)
+		{
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+		}
+
 	}
 
 	void WaterFall::OnPlayer()
@@ -2346,6 +2387,18 @@ namespace basecross{
 		{
 			v->Freeze();
 		}
+
+		//エフェクト停止
+		for (auto v : m_ParticleIce)
+		{
+			v->StopParticle();
+		}
+		//エフェクト出現
+		for (auto v : m_ParticleFire)
+		{
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+		}
+
 	}
 
 	//溶かす
@@ -2363,6 +2416,18 @@ namespace basecross{
 			v->Melt();
 		}
 		OnPlayer();
+
+		//エフェクト停止
+		for (auto v : m_ParticleFire)
+		{
+			v->StopParticle();
+		}
+		//エフェクト出現
+		for (auto v : m_ParticleIce)
+		{
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+		}
+
 	}
 
 	//止める
@@ -2377,14 +2442,24 @@ namespace basecross{
 		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
 		m_waterunder->SetDrawActive(false);
-			for (auto v : m_waters)
+		for (auto v : m_waters)
 		{
 			v->Stop();
 		}
-			for (auto v : m_waterfalls)
-			{
-				v->Stop();
-			}
+		for (auto v : m_waterfalls)
+		{
+			v->Stop();
+		}
+		//エフェクト停止
+		for (auto v : m_ParticleFire)
+		{
+			v->StopParticle();
+		}
+		for (auto v : m_ParticleIce)
+		{
+			v->StopParticle();
+		}
+
 	}
 
 	//流す
@@ -2410,6 +2485,13 @@ namespace basecross{
 			v->Flow();
 		}
 		OnPlayer();
+
+		//エフェクト出現
+		for (auto v : m_ParticleIce)
+		{
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+		}
+
 	}
 
 	void Gimmick3::OnPlayer()
@@ -2492,6 +2574,12 @@ namespace basecross{
 			GetComponent<Transform>()->SetPosition(0, -10, 0);
 			//SE再生
 			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
+
+			//エフェクト停止
+			for (auto v : m_Particle)
+			{
+				v->StopParticle();
+			}
 
 		}
 	}

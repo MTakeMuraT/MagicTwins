@@ -553,6 +553,7 @@ namespace basecross{
 
 		bool GetActive() { return m_ActiveFlg; }
 
+		//エフェクト設定
 		void SetParticle(shared_ptr<MagicParticle> ParticleVec) { m_Particle.push_back(ParticleVec); }
 	};
 
@@ -569,6 +570,9 @@ namespace basecross{
 		Vector3 m_Scale;
 		//生きてるかどうか
 		bool m_ActiveFlg = true;
+		//エフェクト
+		vector<shared_ptr<MagicParticle>> m_Particle;
+
 	public:
 		Gimmick2(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
@@ -576,6 +580,9 @@ namespace basecross{
 		void Delete(MagicType MT);
 
 		bool GetActive() { return m_ActiveFlg; }
+
+		//エフェクト設定
+		void SetParticle(shared_ptr<MagicParticle> ParticleVec) { m_Particle.push_back(ParticleVec); }
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -658,6 +665,11 @@ namespace basecross{
 		bool m_FreezeFlg = false;
 		//流れてるかどうか
 		bool m_FlowFlg = true;
+
+		//エフェクトIce
+		vector<shared_ptr<MagicParticle>> m_ParticleIce;
+		//エフェクトFire
+		vector<shared_ptr<MagicParticle>> m_ParticleFire;
 	public:
 		WaterFall(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
@@ -677,6 +689,11 @@ namespace basecross{
 		bool GetFlow() { return m_FlowFlg; }
 
 		void HitMagic(MagicType mt);
+
+		//エフェクト設定
+		void SetParticleIce(shared_ptr<MagicParticle> ParticleVec) { m_ParticleIce.push_back(ParticleVec); }
+		void SetParticleFire(shared_ptr<MagicParticle> ParticleVec) { m_ParticleFire.push_back(ParticleVec); }
+
 	};
 
 	//--------------------------------------------------------------------------------------
@@ -701,6 +718,12 @@ namespace basecross{
 		vector<shared_ptr<WaterFall>> m_waterfalls;
 		//見た目の部分
 		shared_ptr<GameObject> m_waterunder;
+
+		//エフェクトIce
+		vector<shared_ptr<MagicParticle>> m_ParticleIce;
+		//エフェクトFire
+		vector<shared_ptr<MagicParticle>> m_ParticleFire;
+
 	public:
 		Gimmick3(const shared_ptr<Stage>& StagePtr, Vector3 pos,Vector3 scale);
 		void OnCreate() override;
@@ -727,6 +750,9 @@ namespace basecross{
 		//プレイヤーがいるかどうか
 		void OnPlayer();
 
+		//エフェクト設定
+		void SetParticleIce(shared_ptr<MagicParticle> ParticleVec) { m_ParticleIce.push_back(ParticleVec); }
+		void SetParticleFire(shared_ptr<MagicParticle> ParticleVec) { m_ParticleFire.push_back(ParticleVec); }
 
 	};
 
@@ -743,6 +769,9 @@ namespace basecross{
 		Vector3 m_Scale;
 		//生きてるかどうか
 		bool m_ActiveFlg = true;
+		//エフェクト
+		vector<shared_ptr<MagicParticle>> m_Particle;
+
 	public:
 		Gimmick5(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
@@ -750,6 +779,9 @@ namespace basecross{
 		void Delete(MagicType MT);
 
 		bool GetActive() { return m_ActiveFlg; }
+
+		//エフェクト設定
+		void SetParticle(shared_ptr<MagicParticle> ParticleVec) { m_Particle.push_back(ParticleVec); }
 
 	};
 

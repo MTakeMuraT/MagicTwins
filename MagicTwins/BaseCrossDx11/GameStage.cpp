@@ -236,6 +236,13 @@ namespace basecross {
 
 			strTexture = DataDir + L"Result/Rank_S.png";
 			App::GetApp()->RegisterTexture(L"RANKS_TX", strTexture);
+			strTexture = DataDir + L"Result/Rank_A.png";
+			App::GetApp()->RegisterTexture(L"RANKA_TX", strTexture);
+			strTexture = DataDir + L"Result/Rank_B.png";
+			App::GetApp()->RegisterTexture(L"RANKB_TX", strTexture);
+			strTexture = DataDir + L"Result/Rank_C.png";
+			App::GetApp()->RegisterTexture(L"RANKC_TX", strTexture);
+
 			strTexture = DataDir + L"Result/Result_Chara1.png";
 			App::GetApp()->RegisterTexture(L"RESULTCHAR1_TX", strTexture);
 			strTexture = DataDir + L"Result/Result_Chara2.png";
@@ -641,6 +648,28 @@ namespace basecross {
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 					objDraw->SetTextureResource(L"RANKS_TX");
+
+					//ここでランク計算
+					int ScoreItem = m_ScoreItemCount;
+					int ClearTime = m_LimitTimeGoal;
+					int TotalScore = ClearTime + (ScoreItem * 10);
+
+					if (TotalScore >= 70)
+					{
+						objDraw->SetTextureResource(L"RANKS_TX");
+					}
+					else if (TotalScore >= 50)
+					{
+						objDraw->SetTextureResource(L"RANKA_TX");
+					}
+					else if (TotalScore >= 30)
+					{
+						objDraw->SetTextureResource(L"RANKB_TX");
+					}
+					else
+					{
+						objDraw->SetTextureResource(L"RANKC_TX");
+					}
 					objDraw->SetDiffuse(Color4(1, 1, 1, 0));
 					obj->SetAlphaActive(true);
 					obj->SetDrawLayer(7);
@@ -1109,76 +1138,78 @@ namespace basecross {
 
 	void GameStage::OnUpdate()
 	{
-		//1回目スルー
-		if (m_StartFlg && !m_StartFlg2)
+		if (!m_StartFinish)
 		{
-			m_StartFlg = false;
-			auto obj = AddGameObject<GameObject>();
-			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
-			objDraw->SetTextureResource(L"GAMESTARTLOGO_TX");
-			auto objTrans = obj->AddComponent<Transform>();
-			objTrans->SetPosition(0, 0, 0);
-			objTrans->SetScale(1000, 200, 1);
-			objTrans->SetRotation(0, 0, 0);
-			obj->SetAlphaActive(true);
-			obj->SetDrawLayer(10);
-			SetSharedGameObject(L"GameStartLogo", obj);
-			return;
-		}
-		//2回目スルー
-		else if (!m_StartFlg2 && !m_StartFlg)
-		{
-			m_StartFlg2 = true;
-			StopAll();
-			return;
-		}
-		//待機中
-		else if(!m_StartFlg && m_StartFlg2)
-		{
-
-			//点滅処理
-			Color4 GSLDif = GetSharedGameObject<GameObject>(L"GameStartLogo")->GetComponent<PCTSpriteDraw>()->GetDiffuse();
-			float alpha = GSLDif.GetA();
-			alpha += -0.8f * App::GetApp()->GetElapsedTime();
-			if (alpha < 0)
+			//1回目スルー
+			if (m_StartFlg && !m_StartFlg2)
 			{
-				alpha = 1.0f;
+				m_StartFlg = false;
+				auto obj = AddGameObject<GameObject>();
+				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+				objDraw->SetTextureResource(L"GAMESTARTLOGO_TX");
+				auto objTrans = obj->AddComponent<Transform>();
+				objTrans->SetPosition(0, 0, 0);
+				objTrans->SetScale(1000, 130, 1);
+				objTrans->SetRotation(0, 0, 0);
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(10);
+				SetSharedGameObject(L"GameStartLogo", obj);
+				return;
 			}
-			GSLDif.SetA(alpha);
-			GetSharedGameObject<GameObject>(L"GameStartLogo")->GetComponent<PCTSpriteDraw>()->SetDiffuse(GSLDif);
-
-			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-			if (CntlVec[0].bConnected)
+			//2回目スルー
+			else if (!m_StartFlg2 && !m_StartFlg)
 			{
-				
-				//AかBボタン押されたらスタート
-				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+				m_StartFlg2 = true;
+				StopAll();
+				return;
+			}
+			//待機中
+			else if (!m_StartFlg && m_StartFlg2)
+			{
+
+				//点滅処理
+				Color4 GSLDif = GetSharedGameObject<GameObject>(L"GameStartLogo")->GetComponent<PCTSpriteDraw>()->GetDiffuse();
+				float alpha = GSLDif.GetA();
+				alpha += -0.8f * App::GetApp()->GetElapsedTime();
+				if (alpha < 0)
 				{
-					StartAll();
-					m_StartFlg = true;
-					//SE再生
-					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+					alpha = 1.0f;
 				}
-				
-			}
-			return;
-		}
-		else if (m_StartFlg && m_StartFlg2)
-		{
-			auto obj = GetSharedGameObject<GameObject>(L"GameStartLogo");
-			Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
-			if (pos.x > 1500 && obj->GetDrawActive())
-			{
-				obj->SetDrawActive(false);
-			}
-			else if(pos.x < 1500)
-			{
-				pos.x += 1000 * App::GetApp()->GetElapsedTime();
-				obj->GetComponent<Transform>()->SetPosition(pos);
-			}
+				GSLDif.SetA(alpha);
+				GetSharedGameObject<GameObject>(L"GameStartLogo")->GetComponent<PCTSpriteDraw>()->SetDiffuse(GSLDif);
 
-		}
+				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+				if (CntlVec[0].bConnected)
+				{
 
+					//AかBボタン押されたらスタート
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+					{
+						StartAll();
+						m_StartFlg = true;
+						//SE再生
+						GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+					}
+
+				}
+				return;
+			}
+			else if (m_StartFlg && m_StartFlg2)
+			{
+				auto obj = GetSharedGameObject<GameObject>(L"GameStartLogo");
+				Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
+				if (pos.x > 1500 && obj->GetDrawActive())
+				{
+					obj->SetDrawActive(false);
+					m_StartFinish = true;
+				}
+				else if (pos.x < 1500)
+				{
+					pos.x += 1000 * App::GetApp()->GetElapsedTime();
+					obj->GetComponent<Transform>()->SetPosition(pos);
+				}
+			}
+		}
 
 		//ゴールした後の処理
 		if (m_GoalFlg)
@@ -1307,6 +1338,7 @@ namespace basecross {
 			//スタートフラグをfalseにしたいけどなんか変だから調整
 			m_StartFlg = true;
 			m_StartFlg2 = false;
+			m_StartFinish = false;
 		}
 		catch (...) {
 			throw;
