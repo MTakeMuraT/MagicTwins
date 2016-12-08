@@ -182,6 +182,9 @@ namespace basecross{
 
 		//再利用されるとき設定
 		void SetVeloPos(int num);
+
+		//残り消えてるかどうか
+		bool m_NokoriFlg = false;
 	public :
 		MagicParticle(const shared_ptr<Stage>& StagePtr);
 		void OnUpdate() override;
@@ -541,7 +544,7 @@ namespace basecross{
 		bool m_ActiveFlg = true;
 
 		//エフェクト
-
+		vector<shared_ptr<MagicParticle>> m_Particle;
 	public :
 		Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale);
 		void OnCreate() override;
@@ -550,6 +553,7 @@ namespace basecross{
 
 		bool GetActive() { return m_ActiveFlg; }
 
+		void SetParticle(shared_ptr<MagicParticle> ParticleVec) { m_Particle.push_back(ParticleVec); }
 	};
 
 	//--------------------------------------------------------------------------------------

@@ -233,6 +233,68 @@ namespace basecross{
 				}
 			}
 		}
+		//パーティクル停止
+		else
+		{
+			//残ってるのあったら
+			if (m_NokoriFlg)
+			{
+				//位置更新
+				int count = 0;
+				//パーティクル出てる数
+				int PaticleCount = 0;
+				for (auto v : m_Particle)
+				{
+					//描画されてたら
+					if (v->GetDrawActive())
+					{
+						//出てる数かさん
+						PaticleCount++;
+
+						auto Trans = v->GetComponent<Transform>();
+						Vector3 pos = Trans->GetPosition();
+						pos += m_velocity[count] * App::GetApp()->GetElapsedTime();
+						Trans->SetPosition(pos);
+
+						//消滅処理
+						//trueで透明になる
+						if (m_DeleteFlg)
+						{
+							m_alpha[count] += -m_DeleteTime * App::GetApp()->GetElapsedTime();
+							v->GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, m_alpha[count]));
+							//透明化したら
+							if (m_alpha[count] < 0)
+							{
+								m_alpha[count] = 1.0f;
+								v->GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+								//停止
+								v->SetDrawActive(false);
+							}
+						}
+						else
+						{
+							//サイズ小さく
+							Vector3 scale = Trans->GetScale();
+							scale *= 0.98f;
+							Trans->SetScale(scale);
+							//10分の1まで小さくなったら消える
+							if (Trans->GetScale().x < m_Scale.x / 10)
+							{
+								Trans->SetScale(m_Scale);
+								v->SetDrawActive(false);
+							}
+						}
+					}
+					count++;
+				}
+				//パーティクルが一個も出てなければ更新すんのやめ
+				if (PaticleCount <= 0)
+				{
+					m_NokoriFlg = false;
+				}
+				count = 0;
+			}
+		}
 	}
 
 	void MagicParticle::OnParticle(Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval,int layer,float deleteTime)
@@ -277,6 +339,8 @@ namespace basecross{
 			v->SetDrawActive(false);
 		}*/
 		m_NowParticleFlg = false;
+		//現状残ってるエフェクト出し切るためのフラグ
+		m_NokoriFlg = true;
 	}
 
 	void MagicParticle::SetVeloPos(int num)
@@ -1716,6 +1780,10 @@ namespace basecross{
 			//SE再生
 			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("FireDamage");
 
+			for (auto v : m_Particle)
+			{
+				v->StopParticle();
+			}
 		}
 	}
 

@@ -535,7 +535,8 @@ namespace basecross
 		for (auto v : Gimmick1IcePos)
 		{
 			Vector3 scale = Gimmick1IceScale[count];
-			MOG->IntoGroup(st->AddGameObject<Gimmick1>(v, scale));
+			auto obj = st->AddGameObject<Gimmick1>(v, scale);
+			MOG->IntoGroup(obj);
 			count++;
 
 			//エフェクト
@@ -544,6 +545,7 @@ namespace basecross
 			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 
+			obj->SetParticle(mPobj);
 		}
 		count = 0;
 		//2
