@@ -84,6 +84,14 @@ namespace basecross {
 		//移動フラグ
 		bool m_MoveConFlg = false;
 
+
+		//始まるかどうかのフラグ
+		bool m_StartFlg = false;
+		//なんかうまくいかないから調整用
+		bool m_StartFlg2 = false;
+
+		void StopAll();
+		void StartAll();
 	public:
 		//構築と破棄
 		GameStage() :Stage() {}

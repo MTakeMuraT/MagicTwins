@@ -31,6 +31,12 @@ namespace basecross {
 		strTexture = DataDir + L"Number.png";
 		App::GetApp()->RegisterTexture(L"NUMBER_TX", strTexture);
 
+
+		//暗転用の黒
+		strTexture = DataDir + L"Black.png";
+		App::GetApp()->RegisterTexture(L"BLACK_TX", strTexture);
+
+
 	}
 
 	void StageSelect::CreateViewLight()
@@ -121,9 +127,12 @@ namespace basecross {
 
 	void StageSelect::SceneChange()
 	{
-		auto ScenePtr = App::GetApp()->GetScene<Scene>();
-		ScenePtr->SetStageNum(m_StageNum);
-		PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+		if (GetSharedGameObject<Black>(L"BlackObj", false)->GetBlackFinish())
+		{
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			ScenePtr->SetStageNum(m_StageNum);
+			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+		}
 	}
 
 	void StageSelect::CreateButtons()
@@ -262,75 +271,96 @@ namespace basecross {
 
 	void StageSelect::OnUpdate()
 	{
-		//左右でシーン遷移(仮)
-		auto ShareObject = GetSharedGameObject<GameObject>(L"TiBa", false);
-		auto ShareString = ShareObject->GetComponent<StringSprite>();
-
-		wstring sceneNum(L"");
-
-
-		//*テスト用
-		auto key = App::GetApp()->GetInputDevice().GetKeyState();
-		if (key.m_bPressedKeyTbl[VK_SPACE])
+		if (!m_SelectFlg)
 		{
-			SceneChange();
-		}
-		//*テスト用
+			//左右でシーン遷移(仮)
+			auto ShareObject = GetSharedGameObject<GameObject>(L"TiBa", false);
+			auto ShareString = ShareObject->GetComponent<StringSprite>();
 
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-		if (CntlVec[0].bConnected)
-		{
-			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B||
-				CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
-			{
-				SceneChange();
-			}
-			//左右シーン遷移(仮)
-			if (CntlVec[0].fThumbLX > 0 && m_flag&&m_StageNum<m_MaxStageNum)
-			{
+			wstring sceneNum(L"");
 
-				m_StageNum++;
-				m_flag = false;
+
+			//*テスト用
+			auto key = App::GetApp()->GetInputDevice().GetKeyState();
+			if (key.m_bPressedKeyTbl[VK_SPACE])
+			{
+				//暗転幕作成していったん終わらせる
+				auto BlackObj = AddGameObject<Black>();
+				BlackObj->StartBlack();
+				BlackObj->SetDrawLayer(10);
+				SetSharedGameObject(L"BlackObj", BlackObj);
+				m_SelectFlg = true;
+				return;
 
 			}
-			if (CntlVec[0].fThumbLX < 0 && m_flag&&m_StageNum>0)
-			{
-				m_StageNum--;
-				m_flag = false;
-			}
-			if (CntlVec[0].fThumbLX == 0)
-			{
-				m_flag = true;
-			}
+			//*テスト用
 
-		}
-		sceneNum += Util::IntToWStr(m_StageNum);
-		ShareString->SetText(sceneNum);
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].bConnected)
+			{
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B ||
+					CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
+				{
+					//暗転幕作成していったん終わらせる
+					auto BlackObj = AddGameObject<Black>();
+					BlackObj->StartBlack();
+					SetSharedGameObject(L"BlackObj", BlackObj);
+					m_SelectFlg = true;
+					//SE再生
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+					return;
+				}
+				//左右シーン遷移(仮)
+				if (CntlVec[0].fThumbLX > 0 && m_flag&&m_StageNum < m_MaxStageNum)
+				{
+
+					m_StageNum++;
+					m_flag = false;
+
+				}
+				if (CntlVec[0].fThumbLX < 0 && m_flag&&m_StageNum>0)
+				{
+					m_StageNum--;
+					m_flag = false;
+				}
+				if (CntlVec[0].fThumbLX == 0)
+				{
+					m_flag = true;
+				}
+
+			}
+			sceneNum += Util::IntToWStr(m_StageNum);
+			ShareString->SetText(sceneNum);
 			auto Left = GetSharedGameObject<GameObject>(L"Left");
 
-		if (m_StageNum != 0)
-		{
-			Left->SetDrawActive(true);
-		}
-
-		else {
-			/*if (m_SceneNum == 1)
+			if (m_StageNum != 0)
 			{
-				auto Left = GetSharedGameObject<GameObject>(L"Left");
 				Left->SetDrawActive(true);
-			}*/
-			Left->SetDrawActive(false);
-		}
-		auto Right = GetSharedGameObject<GameObject>(L"Right");
-		if (m_StageNum != m_MaxStageNum)
-		{
-			Right->SetDrawActive(true);
+			}
+
+			else {
+				/*if (m_SceneNum == 1)
+				{
+					auto Left = GetSharedGameObject<GameObject>(L"Left");
+					Left->SetDrawActive(true);
+				}*/
+				Left->SetDrawActive(false);
+			}
+
+			auto Right = GetSharedGameObject<GameObject>(L"Right");
+			if (m_StageNum != m_MaxStageNum)
+			{
+				Right->SetDrawActive(true);
+			}
+			else
+			{
+				Right->SetDrawActive(false);
+			}
 		}
 		else
 		{
-			Right->SetDrawActive(false);
+			SceneChange();
 		}
-
 	}
 
 }

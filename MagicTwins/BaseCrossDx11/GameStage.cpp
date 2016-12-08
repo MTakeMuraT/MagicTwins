@@ -134,6 +134,11 @@ namespace basecross {
 		strTexture = DataDir + L"Back_Sky.jpg";
 		App::GetApp()->RegisterTexture(L"BACK_SKY_TX", strTexture);
 
+		//ゲームスタートロゴ
+		strTexture = DataDir + L"Game_Start_Logo.png";
+		App::GetApp()->RegisterTexture(L"GAMESTARTLOGO_TX", strTexture);
+
+		
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
 		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);
@@ -1012,13 +1017,33 @@ namespace basecross {
 					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
 					{
 						m_GoalState = 12;
+						//暗転用の幕作成
+						auto obj = AddGameObject<Black>();
+						obj->StartBlack();
+						obj->SetDrawLayer(10);
+						SetSharedGameObject(L"ResultBlack", obj);
+						//SE再生
+						GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+
 					}
 				}
 
 			}
 			break;
-			//選択されたのでシーン移動
+			//暗転終了するまで待つ
 		case 12:
+			if (true)
+			{
+				auto obj = GetSharedGameObject<Black>(L"ResultBlack", false);
+				//暗転終了したら遷移
+				if (obj->GetBlackFinish())
+				{
+					m_GoalState = 13;
+				}
+			}
+			break;
+			//選択されたのでシーン移動
+		case 13:
 			switch (m_SelectNum)
 			{
 				//次のステージ
@@ -1058,10 +1083,103 @@ namespace basecross {
 		//m_StringObj->GetComponent<StringSprite>()->SetText(txt);
 	}
 
+	//全部ストップ
+	void GameStage::StopAll()
+	{
+		//アップデート止める
+		auto UpdateGroup = GetSharedObjectGroup(L"SetUpdateObj")->GetGroupVector();
+		for (auto v : UpdateGroup)
+		{
+			auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
+			Ptr->SetUpdateActive(false);
+		}
+	}
 
+	//全部スタート
+	void GameStage::StartAll()
+	{
+		//アップデート起動
+		auto UpdateGroup = GetSharedObjectGroup(L"SetUpdateObj")->GetGroupVector();
+		for (auto v : UpdateGroup)
+		{
+			auto Ptr = dynamic_pointer_cast<GameObject>(v.lock());
+			Ptr->SetUpdateActive(true);
+		}
+	}
 
 	void GameStage::OnUpdate()
 	{
+		//1回目スルー
+		if (m_StartFlg && !m_StartFlg2)
+		{
+			m_StartFlg = false;
+			auto obj = AddGameObject<GameObject>();
+			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+			objDraw->SetTextureResource(L"GAMESTARTLOGO_TX");
+			auto objTrans = obj->AddComponent<Transform>();
+			objTrans->SetPosition(0, 0, 0);
+			objTrans->SetScale(1000, 200, 1);
+			objTrans->SetRotation(0, 0, 0);
+			obj->SetAlphaActive(true);
+			obj->SetDrawLayer(10);
+			SetSharedGameObject(L"GameStartLogo", obj);
+			return;
+		}
+		//2回目スルー
+		else if (!m_StartFlg2 && !m_StartFlg)
+		{
+			m_StartFlg2 = true;
+			StopAll();
+			return;
+		}
+		//待機中
+		else if(!m_StartFlg && m_StartFlg2)
+		{
+
+			//点滅処理
+			Color4 GSLDif = GetSharedGameObject<GameObject>(L"GameStartLogo")->GetComponent<PCTSpriteDraw>()->GetDiffuse();
+			float alpha = GSLDif.GetA();
+			alpha += -0.8f * App::GetApp()->GetElapsedTime();
+			if (alpha < 0)
+			{
+				alpha = 1.0f;
+			}
+			GSLDif.SetA(alpha);
+			GetSharedGameObject<GameObject>(L"GameStartLogo")->GetComponent<PCTSpriteDraw>()->SetDiffuse(GSLDif);
+
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].bConnected)
+			{
+				
+				//AかBボタン押されたらスタート
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+				{
+					StartAll();
+					m_StartFlg = true;
+					//SE再生
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+				}
+				
+			}
+			return;
+		}
+		else if (m_StartFlg && m_StartFlg2)
+		{
+			auto obj = GetSharedGameObject<GameObject>(L"GameStartLogo");
+			Vector3 pos = obj->GetComponent<Transform>()->GetPosition();
+			if (pos.x > 1500 && obj->GetDrawActive())
+			{
+				obj->SetDrawActive(false);
+			}
+			else if(pos.x < 1500)
+			{
+				pos.x += 1000 * App::GetApp()->GetElapsedTime();
+				obj->GetComponent<Transform>()->SetPosition(pos);
+			}
+
+		}
+
+
 		//ゴールした後の処理
 		if (m_GoalFlg)
 		{
@@ -1185,6 +1303,10 @@ namespace basecross {
 
 			m_StringObj = stringobj;  
 
+
+			//スタートフラグをfalseにしたいけどなんか変だから調整
+			m_StartFlg = true;
+			m_StartFlg2 = false;
 		}
 		catch (...) {
 			throw;

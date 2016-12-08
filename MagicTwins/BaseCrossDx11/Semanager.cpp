@@ -77,7 +77,7 @@ namespace basecross {
 				if (name == "Freeze")
 				{
 					m_Se[i]->AddAudioResource(L"FreezeSE");
-					m_Se[i]->Start(L"FreezeSE", 0.5f);
+					m_Se[i]->Start(L"FreezeSE", 1,0.3f);
 					flgg = true;
 				}
 				//–‚–@‘Å‚Â‚Ì‰¹
@@ -90,7 +90,7 @@ namespace basecross {
 				if (name == "MagicShotIce")
 				{
 					m_Se[i]->AddAudioResource(L"IceSE");
-					m_Se[i]->Start(L"IceSE", 0.5f);
+					m_Se[i]->Start(L"IceSE",1, 0.3f);
 					flgg = true;
 				}
 				if (name == "MagicShotWind")
@@ -110,7 +110,7 @@ namespace basecross {
 				if (name == "FireDamage")
 				{
 					m_Se[i]->AddAudioResource(L"FireDamageSE");
-					m_Se[i]->Start(L"FireDamageSE", 0.5f);
+					m_Se[i]->Start(L"FireDamageSE", 1,1.5f);
 					flgg = true;
 				}
 				//–‚“±‘æ“¾‰¹

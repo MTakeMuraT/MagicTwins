@@ -33,6 +33,8 @@ namespace basecross {
 		//選択するときの調整
 		bool m_flag;
 
+		//ボタン押したときの処理
+		bool m_SelectFlg = false;
 	public:
 		//構築と破棄
 		StageSelect() :Stage() {}

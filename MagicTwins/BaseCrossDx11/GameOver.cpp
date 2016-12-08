@@ -30,6 +30,11 @@ namespace basecross
 		strTexture = DataDir + L"GameOver_Chara2.png";
 		App::GetApp()->RegisterTexture(L"GAMEOVERCHARA2_TX", strTexture);
 
+
+		//暗転用の黒
+		strTexture = DataDir + L"Black.png";
+		App::GetApp()->RegisterTexture(L"BLACK_TX", strTexture);
+
 	}
 
 	void GameOver::CreateViewLight()
@@ -238,7 +243,6 @@ namespace basecross
 			m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 			m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
 
-
 		}
 		catch (...) {
 			throw;
@@ -248,89 +252,114 @@ namespace basecross
 
 	void GameOver::OnUpdate()
 	{
-		//文字表示
-		auto getobj = GetSharedGameObject<GameObject>(L"StringTxt", false);
-		wstring txt = Util::IntToWStr(m_selectnum);
-		getobj->GetComponent<StringSprite>()->SetText(txt);
-
-		//*テスト用
-		auto key = App::GetApp()->GetInputDevice().GetKeyState();
-		if (key.m_bPressedKeyTbl[VK_SPACE])
+		if (!GetSharedGameObject<Black>(L"OverBlack", false))
 		{
-			SceneChange();
-		}
-		//*テスト用
+			//文字表示
+			auto getobj = GetSharedGameObject<GameObject>(L"StringTxt", false);
+			wstring txt = Util::IntToWStr(m_selectnum);
+			getobj->GetComponent<StringSprite>()->SetText(txt);
 
-
-		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-
-		Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
-		if (!m_moveFlg)
-		{
-			if (inputXY.x < -0.8f)
+			//*テスト用
+			auto key = App::GetApp()->GetInputDevice().GetKeyState();
+			if (key.m_bPressedKeyTbl[VK_SPACE])
 			{
-				m_moveFlg = true;
-				m_selectnum--;
-				if (m_selectnum < 0)
+				//SceneChange();
+				auto obj = AddGameObject<Black>();
+				obj->StartBlack();
+				obj->SetDrawLayer(10);
+				SetSharedGameObject(L"OverBlack", obj);
+				//SE再生
+				GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+
+			}
+			//*テスト用
+
+
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+
+			Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+			if (!m_moveFlg)
+			{
+				if (inputXY.x < -0.8f)
 				{
-					m_selectnum = 2;
+					m_moveFlg = true;
+					m_selectnum--;
+					if (m_selectnum < 0)
+					{
+						m_selectnum = 2;
+					}
+				}
+				if (inputXY.x > 0.8f)
+				{
+					m_moveFlg = true;
+					m_selectnum++;
+					if (m_selectnum > 2)
+					{
+						m_selectnum = 0;
+					}
+				}
+
+				//変更あったら
+				if (m_moveFlg)
+				{
+					//Vector3 pos;
+					Vector3 scale;
+					switch (m_selectnum)
+					{
+					case 0:
+						m_ReTryLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+						m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+						m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+
+
+						break;
+					case 1:
+						m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+						m_SelectLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+						m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+
+
+						break;
+					case 2:
+						m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+						m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+						m_TitleLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
+
+						break;
+
+					}
 				}
 			}
-			if (inputXY.x > 0.8f)
+			else if (inputXY.x < 0.1f && inputXY.x > -0.1f &&
+				inputXY.y < 0.1f && inputXY.y > -0.1f)
 			{
-				m_moveFlg = true;
-				m_selectnum++;
-				if (m_selectnum > 2)
-				{
-					m_selectnum = 0;
-				}
+				m_moveFlg = false;
 			}
 
-			//変更あったら
-			if (m_moveFlg)
+			if (CntlVec[0].bConnected)
 			{
-				//Vector3 pos;
-				Vector3 scale;
-				switch (m_selectnum)
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
 				{
-				case 0:
-					m_ReTryLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
-					m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-					m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
+					auto obj = AddGameObject<Black>();
+					obj->StartBlack();
+					obj->SetDrawLayer(10);
+					SetSharedGameObject(L"OverBlack",obj);
 
-
-					break;
-				case 1:
-					m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-					m_SelectLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
-					m_TitleLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-
-
-					break;
-				case 2:
-					m_ReTryLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-					m_SelectLogo->GetComponent<Transform>()->SetScale(m_NotSelectScale);
-					m_TitleLogo->GetComponent<Transform>()->SetScale(m_SelectScale);
-
-					break;
+					//SE再生
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+					//SceneChange();
 
 				}
 			}
 		}
-		else if (inputXY.x < 0.1f && inputXY.x > -0.1f && 
-			inputXY.y < 0.1f && inputXY.y > -0.1f)
+		//暗転幕が存在したら
+		else
 		{
-			m_moveFlg = false;
-		}
-
-		if (CntlVec[0].bConnected)
-		{
-			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+			if (GetSharedGameObject<Black>(L"OverBlack", false)->GetBlackFinish())
 			{
 				SceneChange();
 			}
 		}
-
 	}
 
 }

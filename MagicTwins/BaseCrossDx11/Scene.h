@@ -32,13 +32,16 @@ namespace basecross{
 		const int m_MagicTypeLength = 2;
 
 		//ステージの番号
-		unsigned int m_stageNum = 1;
+		unsigned int m_stageNum = 0;
 
 		//音全停止
 		void StopBGM();
 
 		//ゴールしたフラグ
 		bool m_GoalFlg = false;
+
+		//なってるBGM
+		string m_NowBGM;
 	public:
 		Scene() :SceneBase(){}
 		virtual ~Scene(){}

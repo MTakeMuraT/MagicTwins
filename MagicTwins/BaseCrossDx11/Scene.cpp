@@ -50,8 +50,8 @@ namespace basecross{
 			//最初のアクティブステージの設定
 			//ResetActiveStage<GameStage>();
 			//ResetActiveStage<Title>();
-			ResetActiveStage<StageSelect>();
-			//ResetActiveStage<GameOver>();
+			//ResetActiveStage<StageSelect>();
+			ResetActiveStage<GameOver>();
 			//ResetActiveStage<Result>();
 
 			//BGM
@@ -138,13 +138,20 @@ namespace basecross{
 			StopBGM();
 			//再生
 			m_AudioTitle->Start(L"TitleBGM",XAUDIO2_LOOP_INFINITE,0.5f);
+			m_NowBGM = "Title";
 			ResetActiveStage<Title>();
 		}
 		//ステージセレクト
 		else if (event->m_MsgStr == L"StageSelect")
 		{
 			//音全停止
-			StopBGM();
+			if (m_NowBGM != "Title")
+			{
+				StopBGM();
+				m_AudioTitle->Start(L"TitleBGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+				//なってる音更新
+				m_NowBGM = "Title";
+			}
 			ResetActiveStage<StageSelect>();
 		}
 		//ゲーム中
@@ -156,6 +163,8 @@ namespace basecross{
 			StopBGM();
 			//再生
 			m_AudioGame->Start(L"GameStageBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
+			//なってる音更新
+			m_NowBGM = "GameStage";
 			ResetActiveStage<GameStage>();
 		}
 		//クリア
@@ -165,6 +174,8 @@ namespace basecross{
 			StopBGM();
 			//再生
 			m_AudioResult->Start(L"ResultBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
+			//なってる音更新
+			m_NowBGM = "Result";
 			ResetActiveStage<Result>();
 
 		}
@@ -175,6 +186,8 @@ namespace basecross{
 			StopBGM();
 			//再生
 			m_AudioGameOver->Start(L"GameOverBGM", XAUDIO2_LOOP_INFINITE, 0.7f);
+			//なってる音更新
+			m_NowBGM = "GameOver";
 			ResetActiveStage<GameOver>();
 		}
 

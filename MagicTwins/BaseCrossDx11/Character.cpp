@@ -865,7 +865,7 @@ namespace basecross{
 		{
 			//実体化
 			auto PtrSprite = this->AddComponent<PCTSpriteDraw>();
-			m_alpha += 0.01f;
+			m_alpha += 1 * App::GetApp()->GetElapsedTime();
 			PtrSprite->SetDiffuse(Color4(1, 1, 1, m_alpha));
 			
 			if (m_alpha >= 1.2f)
@@ -1082,7 +1082,8 @@ namespace basecross{
 		PtrString->SetText(L"");
 		PtrString->SetTextRect(Rect2D<float>(1700.0f, 15.0f, 2000.0f, 300.0f));
 		PtrString->SetFont(L"", 80);
-		m_nowTime = m_LimitTime;
+		//調整用に+1
+		m_nowTime = m_LimitTime + 1;
 		SetDrawLayer(4);
 
 		auto numobj = GetStage()->AddGameObject<NumberSprite>(0, Vector2(830, 470), Vector2(100, 100), 6);
@@ -1410,7 +1411,7 @@ namespace basecross{
 			{
 				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 				//決定押されたら
-				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B)
+				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B || CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
 				{/*
 					//マップじゃなければ
 					if (m_selectnum != 1)
@@ -1431,7 +1432,10 @@ namespace basecross{
 					//暗転状態へ
 					m_BlackOutFlg = true;
 
-					m_Black->SetDrawLayer(8);
+					m_Black->SetDrawLayer(10);
+					//SE再生
+					GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+
 					return;
 
 				}
