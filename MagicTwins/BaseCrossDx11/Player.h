@@ -16,6 +16,9 @@ namespace basecross{
 	//--------------------------------------------------------------------------------------
 	class Player : public GameObject {
 	private :
+		//撮影モード
+		bool m_CameraMode = false;
+
 		//速度
 		float m_Speed = 3.0f;
 		//体力
@@ -136,6 +139,9 @@ namespace basecross{
 
 		//ライフ表示
 		void DispUI() { m_LifeSprite->SetDrawActive(true); m_CharaUI->SetDrawActive(true); }
+
+		//カメラモードかどうか
+		bool GetCameraModeFlg() { return m_CameraMode; }
 	};
 
 	//--------------------------------------------------------------------------------------

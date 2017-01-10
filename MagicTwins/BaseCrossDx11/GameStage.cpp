@@ -1338,13 +1338,21 @@ namespace basecross {
 			//CSV作成
 			AddGameObject<CSVReader>();
 			//制限時間の作成
-			CreateLimitTime();
+			//カメラモードが起動中なら制限時間作らない
+			if (!GetSharedGameObject<Player>(L"Player1", false)->GetCameraModeFlg())
+			{
+				CreateLimitTime();
+			}
 			//ポーズメニュー作成
 			CreatePauseMenu();
 			//コリジョンマネージャー作成
 			CreateCollisionManager();
 			//アイコン作成
-			CreateIcons();
+			//カメラモードが起動中ならアイコン作らない
+			if (!GetSharedGameObject<Player>(L"Player1", false)->GetCameraModeFlg())
+			{
+				CreateIcons();
+			}
 
 			CreateSharedObjectGroup(L"obj1");
 			//SEマネージャー

@@ -91,62 +91,65 @@ namespace basecross {
 			//アップデート止めるグループに追加
 			GetStage()->GetSharedObjectGroup(L"SetUpdateObj")->IntoGroup(magicBoal);
 
-			//ライフ表示----------------------------------------
-			auto obj = GetStage()->AddGameObject<GameObject>();
-			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
-			objDraw->SetTextureResource(L"LIFE3_TX");
+			//カメラモードじゃないとき
+			if (!m_CameraMode)
+			{
+				//ライフ表示----------------------------------------
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+				objDraw->SetTextureResource(L"LIFE3_TX");
 
-			auto objtrans = obj->AddComponent<Transform>();
-			//1920,1080
-			//960,540
-			objtrans->SetPosition(-600,390, 0);
-			objtrans->SetRotation(0, 0, 0);
-			objtrans->SetScale(400, 130, 1);
-			obj->SetAlphaActive(true);
-			obj->SetDrawLayer(3);
-			m_LifeSprite = obj;
-			//ライフ表示----------------------------------------
+				auto objtrans = obj->AddComponent<Transform>();
+				//1920,1080
+				//960,540
+				objtrans->SetPosition(-600, 390, 0);
+				objtrans->SetRotation(0, 0, 0);
+				objtrans->SetScale(400, 130, 1);
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(3);
+				m_LifeSprite = obj;
+				//ライフ表示----------------------------------------
 
-			//魔法UI表示----------------------------------------
-			//片方だけ作れば十分
-			auto MUI = GetStage()->AddGameObject<GameObject>();
-			auto MUIDraw = MUI->AddComponent<PCTSpriteDraw>();
-			MUIDraw->SetTextureResource(L"MAGICUI_TX");
-			auto MUIT = MUI->AddComponent<Transform>();
-			MUIT->SetPosition(0,420,0);
-			MUIT->SetRotation(0, 0, 0);
-			MUIT->SetScale(220, 220, 0);
-			MUI->SetAlphaActive(true);
-			MUI->SetDrawLayer(3);
-			m_MagicUI = MUI;
+				//魔法UI表示----------------------------------------
+				//片方だけ作れば十分
+				auto MUI = GetStage()->AddGameObject<GameObject>();
+				auto MUIDraw = MUI->AddComponent<PCTSpriteDraw>();
+				MUIDraw->SetTextureResource(L"MAGICUI_TX");
+				auto MUIT = MUI->AddComponent<Transform>();
+				MUIT->SetPosition(0, 420, 0);
+				MUIT->SetRotation(0, 0, 0);
+				MUIT->SetScale(220, 220, 0);
+				MUI->SetAlphaActive(true);
+				MUI->SetDrawLayer(3);
+				m_MagicUI = MUI;
 
-			auto MUI2 = GetStage()->AddGameObject<GameObject>();
-			auto MUIDraw2 = MUI2->AddComponent<PCTSpriteDraw>();
-			MUIDraw2->SetTextureResource(L"NULLUI_TX");
-			auto MUIT2 = MUI2->AddComponent<Transform>();
-			MUIT2->SetPosition(0, 420, 0);
-			MUIT2->SetRotation(0, 0, 0);
-			MUIT2->SetScale(150, 150, 0);
-			MUI2->SetAlphaActive(true);
-			MUI2->SetDrawLayer(4);
-			m_MagicUIIn = MUI2;
-			//魔法UI表示----------------------------------------
+				auto MUI2 = GetStage()->AddGameObject<GameObject>();
+				auto MUIDraw2 = MUI2->AddComponent<PCTSpriteDraw>();
+				MUIDraw2->SetTextureResource(L"NULLUI_TX");
+				auto MUIT2 = MUI2->AddComponent<Transform>();
+				MUIT2->SetPosition(0, 420, 0);
+				MUIT2->SetRotation(0, 0, 0);
+				MUIT2->SetScale(150, 150, 0);
+				MUI2->SetAlphaActive(true);
+				MUI2->SetDrawLayer(4);
+				m_MagicUIIn = MUI2;
+				//魔法UI表示----------------------------------------
 
 
-			//キャラUI表示--------------------------------------
-			auto CHU = GetStage()->AddGameObject<GameObject>();
-			auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
-			CHUD->SetTextureResource(L"CHARA1UI_TX");
-			auto CHUT = CHU->AddComponent<Transform>();
-			CHUT->SetPosition(-850, 450, 0);
-			CHUT->SetRotation(0, 0, 0);
-			CHUT->SetScale(200, 200, 0);
-			CHU->SetAlphaActive(true);
-			CHU->SetDrawLayer(3);
-			CHU->SetDrawActive(true);
-			m_CharaUI = CHU;
-			//キャラUI表示--------------------------------------
-
+				//キャラUI表示--------------------------------------
+				auto CHU = GetStage()->AddGameObject<GameObject>();
+				auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
+				CHUD->SetTextureResource(L"CHARA1UI_TX");
+				auto CHUT = CHU->AddComponent<Transform>();
+				CHUT->SetPosition(-850, 450, 0);
+				CHUT->SetRotation(0, 0, 0);
+				CHUT->SetScale(200, 200, 0);
+				CHU->SetAlphaActive(true);
+				CHU->SetDrawLayer(3);
+				CHU->SetDrawActive(true);
+				m_CharaUI = CHU;
+				//キャラUI表示--------------------------------------
+			}
 		}
 		else if (m_myName == "Player2")
 		{
@@ -196,40 +199,42 @@ namespace basecross {
 			m_LifeSprite = obj;
 
 			*/
+			//カメラモードじゃないとき
+			if (!m_CameraMode)
+			{
+				//ライフ表示----------------------------------------
+				auto obj = GetStage()->AddGameObject<GameObject>();
+				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
+				objDraw->SetTextureResource(L"LIFE3_TX");
 
-			//ライフ表示----------------------------------------
-			auto obj = GetStage()->AddGameObject<GameObject>();
-			auto objDraw = obj->AddComponent<PCTSpriteDraw>();
-			objDraw->SetTextureResource(L"LIFE3_TX");
+				auto objtrans = obj->AddComponent<Transform>();
+				//1920,1080
+				//960,540
+				objtrans->SetPosition(-600, 390, 0);
+				objtrans->SetRotation(0, 0, 0);
+				objtrans->SetScale(400, 130, 1);
+				obj->SetAlphaActive(true);
+				obj->SetDrawLayer(3);
 
-			auto objtrans = obj->AddComponent<Transform>();
-			//1920,1080
-			//960,540
-			objtrans->SetPosition(-600, 390, 0);
-			objtrans->SetRotation(0, 0, 0);
-			objtrans->SetScale(400, 130, 1);
-			obj->SetAlphaActive(true);
-			obj->SetDrawLayer(3);
+				obj->SetDrawActive(false);
+				m_LifeSprite = obj;
+				//ライフ表示----------------------------------------
 
-			obj->SetDrawActive(false);
-			m_LifeSprite = obj;
-			//ライフ表示----------------------------------------
+				//キャラUI表示--------------------------------------
+				auto CHU = GetStage()->AddGameObject<GameObject>();
+				auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
+				CHUD->SetTextureResource(L"CHARA2UI_TX");
+				auto CHUT = CHU->AddComponent<Transform>();
+				CHUT->SetPosition(-850, 450, 0);
+				CHUT->SetRotation(0, 0, 0);
+				CHUT->SetScale(200, 200, 0);
+				CHU->SetAlphaActive(true);
+				CHU->SetDrawLayer(3);
+				CHU->SetDrawActive(false);
+				m_CharaUI = CHU;
+				//キャラUI表示--------------------------------------
 
-			//キャラUI表示--------------------------------------
-			auto CHU = GetStage()->AddGameObject<GameObject>();
-			auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
-			CHUD->SetTextureResource(L"CHARA2UI_TX");
-			auto CHUT = CHU->AddComponent<Transform>();
-			CHUT->SetPosition(-850, 450, 0);
-			CHUT->SetRotation(0, 0, 0);
-			CHUT->SetScale(200, 200, 0);
-			CHU->SetAlphaActive(true);
-			CHU->SetDrawLayer(3);
-			CHU->SetDrawActive(false);
-			m_CharaUI = CHU;
-			//キャラUI表示--------------------------------------
-
-
+			}
 		}
 
 
@@ -271,6 +276,55 @@ namespace basecross {
 
 	//更新
 	void Player::OnUpdate() {
+		//カメラモード
+		if (m_CameraMode)
+		{
+			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+			if (CntlVec[0].bConnected)
+			{
+
+				auto View = GetStage()->GetView();
+				auto CameraP = View->GetTargetCamera();
+
+				int speed = 1;
+				//右肩ボタンで高速化
+				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+				{
+					speed = 2;
+				}
+
+				//移動入力
+				if (abs(CntlVec[0].fThumbLX) > 0.1f || abs(CntlVec[0].fThumbLY) > 0.1f)
+				{
+					Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+					InputXY *= 0.3f * speed;
+					m_CameraPos += Vector3(InputXY.x,0, InputXY.y);
+					m_CameraTargetVec += Vector3(InputXY.x, InputXY.y, 0);
+
+				}
+				if (abs(CntlVec[0].fThumbRX) > 0.1f || abs(CntlVec[0].fThumbRY) > 0.1f)
+				{
+					Vector2 InputXY = Vector2(CntlVec[0].fThumbRX, CntlVec[0].fThumbRY);
+					InputXY *= 0.3f * speed;
+					m_CameraPos += Vector3(InputXY.x, 0, InputXY.y);
+				}
+				//十字キー上でカメラ↑行く
+				if (abs(CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_UP))
+				{
+					m_CameraPos += Vector3(0, 0.1f * speed, 0);
+				}
+				//十字キー下でカメラ↓行く
+				if (abs(CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_DOWN))
+				{
+					m_CameraPos += Vector3(0, -0.1f * speed, 0);
+				}
+
+
+				CameraP->SetAt(m_CameraTargetVec);
+				CameraP->SetEye(m_CameraPos);
+			}
+			return;
+		}
 		//死んだフラグ立ってたら
 		if (m_DieFlg)
 		{
