@@ -199,7 +199,14 @@ namespace basecross{
 			m_NowBGM = "GameOver";
 			ResetActiveStage<GameOver>();
 		}
-
+		//チュートリアル
+		else if (event->m_MsgStr == L"Tutorial")
+		{
+			//音全停止
+			StopBGM();
+			//チュートリアルに移動
+			ResetActiveStage<Tutorial>();
+		}
 	}
 
 	void Scene::ClearBGM()

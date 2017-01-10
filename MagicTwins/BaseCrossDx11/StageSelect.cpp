@@ -130,9 +130,18 @@ namespace basecross {
 	{
 		if (GetSharedGameObject<Black>(L"BlackObj", false)->GetBlackFinish())
 		{
-			auto ScenePtr = App::GetApp()->GetScene<Scene>();
-			ScenePtr->SetStageNum(m_StageNum);
-			PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+			if (m_StageNum != 0)
+			{
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				ScenePtr->SetStageNum(m_StageNum);
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+			}
+			else
+			{
+				auto ScenePtr = App::GetApp()->GetScene<Scene>();
+				ScenePtr->SetStageNum(m_StageNum);
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Tutorial");
+			}
 		}
 	}
 
@@ -258,9 +267,9 @@ namespace basecross {
 		auto ImageP = AddGameObject<GameObject>();
 		//座標とか指定
 		auto ImageTrans = ImageP->AddComponent<Transform>();
-		ImageTrans->SetPosition(0, 0, 0);
+		ImageTrans->SetPosition(5, 6, 0);
 		ImageTrans->SetRotation(0, 0, 0);
-		ImageTrans->SetScale(960, 580, 1);
+		ImageTrans->SetScale(945, 550, 1);
 
 		//画像貼り付け
 		auto ImageDraw = ImageP->AddComponent<PCTSpriteDraw>();
@@ -303,9 +312,9 @@ namespace basecross {
 		else
 		{
 			scale.x += 5000 * App::GetApp()->GetElapsedTime();
-			if (scale.x > 960)
+			if (scale.x > 945)
 			{
-				scale.x = 960;
+				scale.x = 945;
 				m_SIHalfFlg = false;
 				m_StageImageRotFlg = false;
 			}
@@ -355,7 +364,20 @@ namespace basecross {
 			//Stp->SetFontColor(Color4(1, 1, 0.4f, 1));
 			//obj->SetDrawLayer(10);
 			//SetSharedGameObject(L"StringObject",obj);
-			SetSharedGameObject(L"NumberSprite", AddGameObject<NumberSprite>(0,Vector2(25,-400.0f),Vector2(128,128),4));
+			auto NumberP = AddGameObject<NumberSprite>(0, Vector2(25, -400.0f), Vector2(128, 128), 4);
+			SetSharedGameObject(L"NumberSprite", NumberP);
+
+			//チュートリアルみたかどうか判定して見てたら1にする
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			if (ScenePtr->GetTutorialOpenFlg())
+			{
+				//数字1
+				NumberP->SetNum(1);
+				m_StageNum = 1;
+				m_StageImage->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"STAGEIMAGE_1_TX");
+
+			}
+
 		}
 		catch (...) {
 			throw;

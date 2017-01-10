@@ -96,6 +96,9 @@
     <ClInclude Include="Semanager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Tutorial.h">
+      <Filter>ヘッダー ファイル\シーン</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BaseCrossDx11.rc">
@@ -173,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="Semanager.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Tutorial.cpp">
+      <Filter>ソース ファイル\シーン</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

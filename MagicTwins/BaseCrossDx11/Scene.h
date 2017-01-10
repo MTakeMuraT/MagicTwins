@@ -42,6 +42,10 @@ namespace basecross{
 
 		//なってるBGM
 		string m_NowBGM;
+
+		//チュートリアル一回でも表示したか
+		bool m_TutorialOpenFlg = false;
+
 	public:
 		Scene() :SceneBase(){}
 		virtual ~Scene(){}
@@ -66,6 +70,10 @@ namespace basecross{
 
 		//クリアしたときのBGM処理
 		void ClearBGM();
+
+		//チュートリアル開いたか関連
+		bool GetTutorialOpenFlg() { return m_TutorialOpenFlg; }
+		void SetTutorialOpenFlg(bool flg) { m_TutorialOpenFlg = flg; }
 	};
 
 }

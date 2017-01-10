@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "StageSelect.h"
 #include "Title.h"
+#include "Tutorial.h"
 //!ÉVÅ[Éì
 #include "Character.h"
 #include "Player.h"

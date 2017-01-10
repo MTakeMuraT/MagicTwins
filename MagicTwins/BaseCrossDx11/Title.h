@@ -66,6 +66,9 @@ namespace basecross {
 		//キャラの位置調整用
 		Vector3 m_Scale;
 		Vector3 m_pos;
+
+		//チュートリアルみたかどうか更新するフラグ
+		bool m_TutorialChamgeFlg = false;
 	public:
 		//構築と破棄
 		Title() :Stage() {}

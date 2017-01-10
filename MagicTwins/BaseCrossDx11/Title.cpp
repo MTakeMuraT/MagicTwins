@@ -280,6 +280,8 @@ namespace basecross {
 			SST->SetFontColor(Color4(0, 0, 0, 1));
 			StringPtr->SetDrawLayer(10);
 			m_String = StringPtr;
+
+
 		}
 		catch (...) {
 			throw;
@@ -288,6 +290,13 @@ namespace basecross {
 
 	void Title::OnUpdate()
 	{
+		if (!m_TutorialChamgeFlg)
+		{
+			m_TutorialChamgeFlg = true;
+			//チュートリアルみたかどうかのフラグを更新(見てない:falseに変更)
+			auto ScenePtr = App::GetApp()->GetScene<Scene>();
+			ScenePtr->SetTutorialOpenFlg(false);
+		}
 		//アニメーションしてればやって処理終わり
 		if (m_AnimationFlg)
 		{
