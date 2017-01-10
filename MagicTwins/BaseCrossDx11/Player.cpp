@@ -99,7 +99,7 @@ namespace basecross {
 			auto objtrans = obj->AddComponent<Transform>();
 			//1920,1080
 			//960,540
-			objtrans->SetPosition(-700, 400, 0);
+			objtrans->SetPosition(-600,390, 0);
 			objtrans->SetRotation(0, 0, 0);
 			objtrans->SetScale(400, 130, 1);
 			obj->SetAlphaActive(true);
@@ -138,9 +138,9 @@ namespace basecross {
 			auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
 			CHUD->SetTextureResource(L"CHARA1UI_TX");
 			auto CHUT = CHU->AddComponent<Transform>();
-			CHUT->SetPosition(-850, 480, 0);
+			CHUT->SetPosition(-850, 450, 0);
 			CHUT->SetRotation(0, 0, 0);
-			CHUT->SetScale(100, 100, 0);
+			CHUT->SetScale(200, 200, 0);
 			CHU->SetAlphaActive(true);
 			CHU->SetDrawLayer(3);
 			CHU->SetDrawActive(true);
@@ -205,7 +205,7 @@ namespace basecross {
 			auto objtrans = obj->AddComponent<Transform>();
 			//1920,1080
 			//960,540
-			objtrans->SetPosition(-700, 400, 0);
+			objtrans->SetPosition(-600, 390, 0);
 			objtrans->SetRotation(0, 0, 0);
 			objtrans->SetScale(400, 130, 1);
 			obj->SetAlphaActive(true);
@@ -220,9 +220,9 @@ namespace basecross {
 			auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
 			CHUD->SetTextureResource(L"CHARA2UI_TX");
 			auto CHUT = CHU->AddComponent<Transform>();
-			CHUT->SetPosition(-850, 480, 0);
+			CHUT->SetPosition(-850, 450, 0);
 			CHUT->SetRotation(0, 0, 0);
-			CHUT->SetScale(100, 100, 0);
+			CHUT->SetScale(200, 200, 0);
 			CHU->SetAlphaActive(true);
 			CHU->SetDrawLayer(3);
 			CHU->SetDrawActive(false);
@@ -295,8 +295,34 @@ namespace basecross {
 			m_endFrame = false;
 			return;
 		}
+		//êÿÇËë÷Ç¶ÇÃà√ì]èàóù
 		if (m_BlackFlg)
 		{
+			////HPÉoÅ[å„ÇÎÇ…
+			//if (!m_ActiveFlg)
+			//{
+			//	Vector3 pos = m_LifeSprite->GetComponent<Transform>()->GetPosition();
+			//	if (pos.x > -600)
+			//	{
+			//		pos.x += +100 * App::GetApp()->GetElapsedTime();
+			//	}
+			//	else
+			//	{
+			//		pos.x = -600;
+			//	}
+			//	if (pos.y > 350)
+			//	{
+			//		pos.y = -50 * App::GetApp()->GetElapsedTime();
+			//	}
+			//	else
+			//	{
+			//		pos.y = 350;
+			//	}
+			//	if (pos.x == -600 && pos.y == 350)
+			//	{
+			//		m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(1, 1, 1, 0.5f));
+			//	}
+			//}
 			//à√ì]èÛë‘Ç»ÇÁ
 			if (m_BlackFlg)
 			{

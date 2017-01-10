@@ -121,13 +121,13 @@ namespace basecross {
 		
 		//エフェクト用Right
 		strTexture = DataDir + L"Light/RedLight.png";
-		App::GetApp()->RegisterTexture(L"FIRERIGHT_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"FIRELIGHT_TX", strTexture);
 		strTexture = DataDir + L"Light/BlueLight.png";
-		App::GetApp()->RegisterTexture(L"ICERIGHT_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"ICELIGHT_TX", strTexture);
 		strTexture = DataDir + L"Light/GreenLight.png";
-		App::GetApp()->RegisterTexture(L"WINDRIGHT_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"WINDLIGHT_TX", strTexture);
 		strTexture = DataDir + L"Light/WhiteLight.png";
-		App::GetApp()->RegisterTexture(L"RIGHT_TX", strTexture);
+		App::GetApp()->RegisterTexture(L"LIGHT_TX", strTexture);
 
 
 		//背景
@@ -310,6 +310,20 @@ namespace basecross {
 					obj->SetDrawLayer(7);
 					m_Book = obj;
 
+
+
+					//黒幕
+					auto objBlack = AddGameObject<GameObject>();
+					auto Draw = objBlack->AddComponent<PCTSpriteDraw>();
+					Draw->SetTextureResource(L"BLACK_TX");
+					Draw->SetDiffuse(Color4(1, 1, 1, 0.6f));
+					auto Trans = objBlack->AddComponent<Transform>();
+					Trans->SetPosition(0, 0, 0);
+					Trans->SetScale(1920, 1080, 1);
+					Trans->SetRotation(0, 0, 0);
+					objBlack->SetDrawLayer(6);
+					objBlack->SetAlphaActive(true);
+
 				}
 
 				//ボタン押されたらスキップ
@@ -331,6 +345,20 @@ namespace basecross {
 						obj->SetAlphaActive(true);
 						obj->SetDrawLayer(7);
 						m_Book = obj;
+
+
+						//黒幕
+						auto objBlack = AddGameObject<GameObject>();
+						auto Draw = objBlack->AddComponent<PCTSpriteDraw>();
+						Draw->SetTextureResource(L"BLACK_TX");
+						Draw->SetDiffuse(Color4(1, 1, 1, 0.6f));
+						auto Trans = objBlack->AddComponent<Transform>();
+						Trans->SetPosition(0, 0, 0);
+						Trans->SetScale(1920, 1080, 1);
+						Trans->SetRotation(0, 0, 0);
+						objBlack->SetDrawLayer(6);
+						objBlack->SetAlphaActive(true);
+
 					}
 				}
 				m_GoalLogo->GetComponent<Transform>()->SetScale(scale);

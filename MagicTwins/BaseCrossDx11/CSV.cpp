@@ -474,6 +474,9 @@ namespace basecross
 
 		//ゴール作成
 		st->SetSharedGameObject(L"Goal",st->AddGameObject<Goal>(GoalPos, GoalScale));
+		auto mPobj = st->AddGameObject<MagicParticle>();
+		//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
+		mPobj->OnParticle(GoalPos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"LIGHT_TX", false, 0.2f, 1, 2.0f);
 
 
 		//魔導書作成
@@ -490,7 +493,7 @@ namespace basecross
 			{
 				auto mPobj = st->AddGameObject<MagicParticle>();
 				//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-				mPobj->OnParticle(FirePos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"FIRERIGHT_TX", false, 0.4f, 1, 2.0f);
+				mPobj->OnParticle(FirePos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"FIRELIGHT_TX", false, 0.4f, 1, 2.0f);
 				EfGroup->IntoGroup(mPobj);
 			}
 
@@ -507,7 +510,7 @@ namespace basecross
 			{
 				auto mPobj = st->AddGameObject<MagicParticle>();
 				//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-				mPobj->OnParticle(IceFogPos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"ICERIGHT_TX", false, 0.4f, 1, 2.0f);
+				mPobj->OnParticle(IceFogPos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"ICELIGHT_TX", false, 0.4f, 1, 2.0f);
 				EfGroup->IntoGroup(mPobj);
 			}
 		}
@@ -524,7 +527,7 @@ namespace basecross
 			{
 				auto mPobj = st->AddGameObject<MagicParticle>();
 				//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-				mPobj->OnParticle(WindPos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"WINDRIGHT_TX", false, 0.4f, 1, 2.0f);
+				mPobj->OnParticle(WindPos, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(0.5f, 0.5f, 0.5f), Vector3(1.0f, 1.0f, 1.0f), L"WINDLIGHT_TX", false, 0.4f, 1, 2.0f);
 				EfGroup->IntoGroup(mPobj);
 			}
 
@@ -542,7 +545,7 @@ namespace basecross
 			//エフェクト
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f,2.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f,2.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 
 			obj->SetParticle(mPobj);
@@ -559,14 +562,14 @@ namespace basecross
 			//エフェクト
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 
 			obj->SetParticle(mPobj);
 
 			mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"WINDRIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"WINDLIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 
 			obj->SetParticle(mPobj);
@@ -588,7 +591,7 @@ namespace basecross
 			//エフェクト
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 
 			obj->SetParticle(mPobj);
@@ -638,14 +641,14 @@ namespace basecross
 			//エフェクト(凍っていない時)
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			waP->SetParticleIce(mPobj);
 
 			//エフェクト(凍ってる時)
 			mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			waP->SetParticleFire(mPobj);
 
@@ -699,14 +702,14 @@ namespace basecross
 			//エフェクト(凍っていない時)
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			Gimi3P->SetParticleIce(mPobj);
 
 			//エフェクト(凍ってる時)
 			mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			Gimi3P->SetParticleFire(mPobj);
 
@@ -730,14 +733,14 @@ namespace basecross
 			//エフェクト(凍っていない時)
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			Gimi3P->SetParticleIce(mPobj);
 
 			//エフェクト(凍ってる時)
 			mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			Gimi3P->SetParticleFire(mPobj);
 
@@ -762,14 +765,14 @@ namespace basecross
 			//エフェクト(凍っていない時)
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			Gimi3P->SetParticleIce(mPobj);
 
 			//エフェクト(凍ってる時)
 			mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
-			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			//mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(3.0f, 3.0f, 3.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
 			Gimi3P->SetParticleFire(mPobj);
 

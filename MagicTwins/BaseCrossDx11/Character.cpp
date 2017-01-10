@@ -457,9 +457,12 @@ namespace basecross{
 	void Goal::OnCreate()
 	{
 		auto Ptr = GetComponent<Transform>();
-		Ptr->SetPosition(m_InitPos);
+		Vector3 pos = m_InitPos;
+		pos.y += -0.3f;
+		Ptr->SetPosition(pos);
 		Ptr->SetScale(m_Scale);
-		Ptr->SetRotation(0, 0, 0);
+		float rotangle = 90 * (3.14159265f / 180);
+		Ptr->SetRotation(rotangle, 0, 0);
 
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
@@ -469,17 +472,17 @@ namespace basecross{
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_CUBE");
+		ShadowPtr->SetMeshResource(L"DEFAULT_SQUARE");
 		//描画コンポーネントの設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_CUBE");
+		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		//描画するテクスチャを設定
 		PtrDraw->SetTextureResource(L"GOAL_TX");
 
 		//透明処理
 		SetAlphaActive(true);
-
+		SetDrawLayer(1);
 	}
 
 	//--------------------------------------------------------------------------------------
@@ -1723,7 +1726,7 @@ namespace basecross{
 		auto DrawP = AddComponent<PCTSpriteDraw>();
 		DrawP->SetTextureResource(L"MENUICON_TX");
 		auto TranP = AddComponent<Transform>();
-		TranP->SetPosition(450,-450, 0);
+		TranP->SetPosition(750,-450, 0);
 		TranP->SetRotation(0, 0, 0);
 		TranP->SetScale(100, 100, 0);
 		SetAlphaActive(true);
@@ -2047,6 +2050,7 @@ namespace basecross{
 				else
 				{
 					//もし凍ってるコアがあれば流すの中止
+					/*
 					auto WaterCoreGroup = GetStage()->GetSharedObjectGroup(L"WaterCore");
 					for (auto v : WaterCoreGroup->GetGroupVector())
 					{
@@ -2059,6 +2063,7 @@ namespace basecross{
 							}
 						}
 					}
+					*/
 					Vector3 pos = GetComponent<Transform>()->GetPosition();
 					m_targetY = pos.y + -m_Scale.y;
 
@@ -2246,7 +2251,7 @@ namespace basecross{
 		//エフェクト出現
 		for (auto v : m_ParticleFire)
 		{
-			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
 		}
 	}
 	//溶かす
@@ -2267,7 +2272,7 @@ namespace basecross{
 		//エフェクト出現
 		for (auto v : m_ParticleIce)
 		{
-			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 		}
 
 	}
@@ -2305,7 +2310,7 @@ namespace basecross{
 		//エフェクト出現
 		for (auto v : m_ParticleIce)
 		{
-			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
+			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
 		}
 
 	}
@@ -2432,122 +2437,133 @@ namespace basecross{
 	//凍らす
 	void Gimmick3::Freeze()
 	{
-		GetComponent<CollisionObb>()->SetUpdateActive(false);
-		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
-		for (auto v : m_waters)
+		//流れてるときのみ有効
+		if (m_FlowFlg)
 		{
-			v->Freeze();
-		}
+			GetComponent<CollisionObb>()->SetUpdateActive(false);
+			m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"ICE_TX");
+			for (auto v : m_waters)
+			{
+				v->Freeze();
+			}
 
-		for (auto v : m_waterfalls)
-		{
-			v->Freeze();
-		}
+			for (auto v : m_waterfalls)
+			{
+				v->Freeze();
+			}
 
-		//エフェクト停止
-		for (auto v : m_ParticleIce)
-		{
-			v->StopParticle();
+			//エフェクト停止
+			for (auto v : m_ParticleIce)
+			{
+				v->StopParticle();
+			}
+			//エフェクト出現
+			for (auto v : m_ParticleFire)
+			{
+				v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
+			}
 		}
-		//エフェクト出現
-		for (auto v : m_ParticleFire)
-		{
-			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRERIGHT_TX", false, 0.2f, 1, 2.0f);
-		}
-
 	}
 
 	//溶かす
 	void Gimmick3::Melt()
 	{
-		GetComponent<CollisionObb>()->SetUpdateActive(true);
-		m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
-		for (auto v : m_waters)
+		//流れてるときのみ有効
+		if (m_FlowFlg)
 		{
-			v->Melt();
-		}
+			GetComponent<CollisionObb>()->SetUpdateActive(true);
+			m_waterunder->GetComponent<PNTStaticDraw>()->SetTextureResource(L"WATER_TX");
+			for (auto v : m_waters)
+			{
+				v->Melt();
+			}
 
-		for (auto v : m_waterfalls)
-		{
-			v->Melt();
-		}
-		OnPlayer();
+			for (auto v : m_waterfalls)
+			{
+				v->Melt();
+			}
+			OnPlayer();
 
-		//エフェクト停止
-		for (auto v : m_ParticleFire)
-		{
-			v->StopParticle();
+			//エフェクト停止
+			for (auto v : m_ParticleFire)
+			{
+				v->StopParticle();
+			}
+			//エフェクト出現
+			for (auto v : m_ParticleIce)
+			{
+				v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
+			}
 		}
-		//エフェクト出現
-		for (auto v : m_ParticleIce)
-		{
-			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
-		}
-
 	}
 
 	//止める
 	void Gimmick3::Stop()
 	{
-		//アタリ判定の部分
-		GetComponent<CollisionObb>()->SetUpdateActive(false);
+		//凍ってないときのみ有効
+		if (!m_FreezeFlg)
+		{
+			//アタリ判定の部分
+			GetComponent<CollisionObb>()->SetUpdateActive(false);
 
-		//水の部分
-		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		//pos.y += -m_InitScale.y;
-		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
+			//水の部分
+			//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+			//pos.y += -m_InitScale.y;
+			//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
-		m_waterunder->SetDrawActive(false);
-		for (auto v : m_waters)
-		{
-			v->Stop();
+			m_waterunder->SetDrawActive(false);
+			for (auto v : m_waters)
+			{
+				v->Stop();
+			}
+			for (auto v : m_waterfalls)
+			{
+				v->Stop();
+			}
+			//エフェクト停止
+			for (auto v : m_ParticleFire)
+			{
+				v->StopParticle();
+			}
+			for (auto v : m_ParticleIce)
+			{
+				v->StopParticle();
+			}
 		}
-		for (auto v : m_waterfalls)
-		{
-			v->Stop();
-		}
-		//エフェクト停止
-		for (auto v : m_ParticleFire)
-		{
-			v->StopParticle();
-		}
-		for (auto v : m_ParticleIce)
-		{
-			v->StopParticle();
-		}
-
 	}
 
 	//流す
 	void Gimmick3::Flow()
 	{
-		//アタリ判定の部分
-		GetComponent<CollisionObb>()->SetUpdateActive(true);
-
-		//水の部分
-		//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
-		//pos.y += m_InitScale.y;
-		//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
-
-		m_waterunder->SetDrawActive(true);
-
-
-		for (auto v : m_waters)
+		if (!m_FlowFlg)
 		{
-			v->Flow();
-		}
-		for (auto v : m_waterfalls)
-		{
-			v->Flow();
-		}
-		OnPlayer();
+			//アタリ判定の部分
+			GetComponent<CollisionObb>()->SetUpdateActive(true);
 
-		//エフェクト出現
-		for (auto v : m_ParticleIce)
-		{
-			v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICERIGHT_TX", false, 0.2f, 1, 2.0f);
-		}
+			//水の部分
+			//Vector3 pos = m_waterunder->GetComponent<Transform>()->GetPosition();
+			//pos.y += m_InitScale.y;
+			//m_waterunder->GetComponent<Transform>()->SetPosition(pos);
 
+			m_waterunder->SetDrawActive(true);
+
+
+			for (auto v : m_waters)
+			{
+				v->Flow();
+			}
+			for (auto v : m_waterfalls)
+			{
+				v->Flow();
+			}
+			OnPlayer();
+
+			//エフェクト出現
+			for (auto v : m_ParticleIce)
+			{
+				v->OnParticle(GetComponent<Transform>()->GetPosition(), Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"ICELIGHT_TX", false, 0.2f, 1, 2.0f);
+			}
+		}
 	}
 
 	void Gimmick3::OnPlayer()
