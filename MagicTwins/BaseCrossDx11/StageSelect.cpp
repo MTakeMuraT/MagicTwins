@@ -78,11 +78,12 @@ namespace basecross {
 
 		SetSharedGameObject(L"TiBa", SelectBack);
 
-		//文字列を付ける(仮)
-		auto Stp = SelectBack->AddComponent<StringSprite>();
-		Stp->SetText(L"");
-		Stp->SetTextRect(Rect2D<float>(512.0f, 16.0f, 1024.0f, 960.0f));
-		Stp->SetFont(L"", 100);
+		////文字列を付ける(仮)
+		//auto Stp = SelectBack->AddComponent<StringSprite>();
+		//Stp->SetText(L"");
+		//Stp->SetTextRect(Rect2D<float>(1024.0f, -256.0f, 1024.0f, 960.0f));
+		//Stp->SetFontColor(Color4(1, 1, 0.4f, 1));
+		//Stp->SetFont(L"", 100);
 
 	}
 
@@ -109,7 +110,7 @@ namespace basecross {
 
 	}
 
-	void StageSelect::CreateStageImage()
+	void StageSelect::CreateStageImageFrame()
 	{
 		auto StageImage = AddGameObject<GameObject>();
 		auto SITranform = StageImage->AddComponent<Transform>();
@@ -198,7 +199,7 @@ namespace basecross {
 
 		//透明度反映
 		Left->SetAlphaActive(true);
-		GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
+		//GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
 
 	}
 
@@ -229,9 +230,93 @@ namespace basecross {
 
 		//透明度反映
 		Right->SetAlphaActive(true);
-		GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
+		//GetSharedGameObject<GameObject>(L"TiBa", false)->GetComponent<StringSprite>()->SetText(L"0");
 	}
 
+	//ステージイメージ作成
+	void StageSelect::CreateStageImage()
+	{
+		//画像用意
+		wstring DataDir;
+		App::GetApp()->GetDataDirectory(DataDir);
+		wstring strTexture;
+		for (int i = 0; i <= 20; i++)
+		{
+			wstring num = Util::IntToWStr(i);
+
+			wstring pathtxt = DataDir + L"StageImage/Stage_";
+			pathtxt += num + L".png";
+			strTexture = DataDir + pathtxt;
+
+			wstring numtxt = L"STAGEIMAGE_";
+			numtxt += Util::IntToWStr(i) + L"_TX";
+			App::GetApp()->RegisterTexture(numtxt, strTexture);
+
+		}
+
+		//生成
+		auto ImageP = AddGameObject<GameObject>();
+		//座標とか指定
+		auto ImageTrans = ImageP->AddComponent<Transform>();
+		ImageTrans->SetPosition(0, 0, 0);
+		ImageTrans->SetRotation(0, 0, 0);
+		ImageTrans->SetScale(960, 580, 1);
+
+		//画像貼り付け
+		auto ImageDraw = ImageP->AddComponent<PCTSpriteDraw>();
+		ImageDraw->SetTextureResource(L"STAGEIMAGE_0_TX");
+
+		//透明度
+		ImageP->SetAlphaActive(true);
+		//レイヤー
+		ImageP->SetDrawLayer(4);
+
+		//アクセスできるメンバ変数に入れとく
+		m_StageImage = ImageP;
+
+
+	}
+
+	//ステージイメージ回転
+	void StageSelect::RotStageImage()
+	{
+
+		Vector3 scale = m_StageImage->GetComponent<Transform>()->GetScale();
+
+		//m_SIHalfFlgがfalseなら小さく、trueなら大きく
+		if (!m_SIHalfFlg)
+		{
+			scale.x += -5000 * App::GetApp()->GetElapsedTime();
+			//線になったらテクスチャ切り替え
+			if (scale.x < 0)
+			{
+				//テクスチャ張り替え
+				wstring txt = L"STAGEIMAGE_";
+				txt += Util::IntToWStr(m_StageNum) + L"_TX";
+				m_StageImage->GetComponent<PCTSpriteDraw>()->SetTextureResource(txt);
+
+				//スケールとフラグ反転
+				scale.x = 0;
+				m_SIHalfFlg = true;
+			}
+		}
+		else
+		{
+			scale.x += 5000 * App::GetApp()->GetElapsedTime();
+			if (scale.x > 960)
+			{
+				scale.x = 960;
+				m_SIHalfFlg = false;
+				m_StageImageRotFlg = false;
+			}
+
+		}
+
+		m_StageImage->GetComponent<Transform>()->SetScale(scale);
+
+		//wstring txt = Util::FloatToWStr(scale.x);
+		//GetSharedGameObject<GameObject>(L"StringObject", false)->GetComponent<StringSprite>()->SetText(txt);
+	}
 
 	void StageSelect::OnCreate()
 	{
@@ -246,6 +331,8 @@ namespace basecross {
 			CreateSelectLogo();
 			//ボタン作成
 			CreateButtons();
+			//ステージイメージフレーム
+			CreateStageImageFrame();
 			//ステージイメージ作成
 			CreateStageImage();
 			//左矢印(仮)
@@ -259,13 +346,20 @@ namespace basecross {
 			//SEマネージャー
 			SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
 
+			//文字列
+			//auto obj = AddGameObject<GameObject>();
+			//auto Stp = obj->AddComponent<StringSprite>();
+			//Stp->SetText(L"0");
+			//Stp->SetTextRect(Rect2D<float>(1024.0f, -1024.0f, 1024.0f, 960.0f));
+			//Stp->SetFont(L"", 100);
+			//Stp->SetFontColor(Color4(1, 1, 0.4f, 1));
+			//obj->SetDrawLayer(10);
+			//SetSharedGameObject(L"StringObject",obj);
+			SetSharedGameObject(L"NumberSprite", AddGameObject<NumberSprite>(0,Vector2(25,-400.0f),Vector2(128,128),4));
 		}
 		catch (...) {
 			throw;
 		}
-
-
-
 
 	}
 
@@ -274,10 +368,10 @@ namespace basecross {
 		if (!m_SelectFlg)
 		{
 			//左右でシーン遷移(仮)
-			auto ShareObject = GetSharedGameObject<GameObject>(L"TiBa", false);
-			auto ShareString = ShareObject->GetComponent<StringSprite>();
+			//auto ShareObject = GetSharedGameObject<GameObject>(L"StringObject", false);
+			//auto ShareString = ShareObject->GetComponent<StringSprite>();
 
-			wstring sceneNum(L"");
+			//wstring sceneNum(L"");
 
 
 			//*テスト用
@@ -295,66 +389,79 @@ namespace basecross {
 			}
 			//*テスト用
 
-			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
-			if (CntlVec[0].bConnected)
+			//ステージイメージが回転してるとき以外操作可
+			if (!m_StageImageRotFlg)
 			{
-				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B ||
-					CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
+
+				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
+				if (CntlVec[0].bConnected)
 				{
-					//暗転幕作成していったん終わらせる
-					auto BlackObj = AddGameObject<Black>();
-					BlackObj->StartBlack();
-					SetSharedGameObject(L"BlackObj", BlackObj);
-					m_SelectFlg = true;
-					//SE再生
-					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
-					return;
+					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B ||
+						CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
+					{
+						//暗転幕作成していったん終わらせる
+						auto BlackObj = AddGameObject<Black>();
+						BlackObj->StartBlack();
+						SetSharedGameObject(L"BlackObj", BlackObj);
+						m_SelectFlg = true;
+						//SE再生
+						GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+						return;
+					}
+					//左右シーン遷移(仮)
+					if (CntlVec[0].fThumbLX > 0 && m_flag&&m_StageNum < m_MaxStageNum)
+					{
+
+						m_StageNum++;
+						m_flag = false;
+						m_StageImageRotFlg = true;
+					}
+					if (CntlVec[0].fThumbLX < 0 && m_flag&&m_StageNum>0)
+					{
+						m_StageNum--;
+						m_flag = false;
+						m_StageImageRotFlg = true;
+					}
+					if (CntlVec[0].fThumbLX == 0)
+					{
+						m_flag = true;
+					}
+
 				}
-				//左右シーン遷移(仮)
-				if (CntlVec[0].fThumbLX > 0 && m_flag&&m_StageNum < m_MaxStageNum)
+				if (!m_flag)
 				{
-
-					m_StageNum++;
-					m_flag = false;
-
+					GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNum(m_StageNum);
 				}
-				if (CntlVec[0].fThumbLX < 0 && m_flag&&m_StageNum>0)
-				{
-					m_StageNum--;
-					m_flag = false;
-				}
-				if (CntlVec[0].fThumbLX == 0)
-				{
-					m_flag = true;
-				}
+				auto Left = GetSharedGameObject<GameObject>(L"Left");
 
-			}
-			sceneNum += Util::IntToWStr(m_StageNum);
-			ShareString->SetText(sceneNum);
-			auto Left = GetSharedGameObject<GameObject>(L"Left");
-
-			if (m_StageNum != 0)
-			{
-				Left->SetDrawActive(true);
-			}
-
-			else {
-				/*if (m_SceneNum == 1)
+				if (m_StageNum != 0)
 				{
-					auto Left = GetSharedGameObject<GameObject>(L"Left");
 					Left->SetDrawActive(true);
-				}*/
-				Left->SetDrawActive(false);
-			}
+				}
 
-			auto Right = GetSharedGameObject<GameObject>(L"Right");
-			if (m_StageNum != m_MaxStageNum)
-			{
-				Right->SetDrawActive(true);
+				else {
+					/*if (m_SceneNum == 1)
+					{
+						auto Left = GetSharedGameObject<GameObject>(L"Left");
+						Left->SetDrawActive(true);
+					}*/
+					Left->SetDrawActive(false);
+				}
+
+				auto Right = GetSharedGameObject<GameObject>(L"Right");
+				if (m_StageNum != m_MaxStageNum)
+				{
+					Right->SetDrawActive(true);
+				}
+				else
+				{
+					Right->SetDrawActive(false);
+				}
 			}
+			//ステージイメージ回転してるフラグ立ってたら関数呼ぶ
 			else
 			{
-				Right->SetDrawActive(false);
+				RotStageImage();
 			}
 		}
 		else

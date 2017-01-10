@@ -30,9 +30,9 @@ namespace basecross {
 		//右矢印画像(仮)
 		strTexture = DataDir + L"Right.png";
 		App::GetApp()->RegisterTexture(L"RIGHTARROW_TX", strTexture);
-		//ステージイメージ0
-		strTexture = DataDir + L"StageImage/StageImage_0.png";
-		App::GetApp()->RegisterTexture(L"STAGEIMAGE_0_TX", strTexture);
+		//枠
+		strTexture = DataDir + L"Frame.png";
+		App::GetApp()->RegisterTexture(L"FRAME_TX", strTexture);
 
 
 	}
@@ -228,7 +228,7 @@ namespace basecross {
 		SIPT->SetScale(10, 10, 1);
 		//スプライトつけ
 		auto SIPD = StageImagePtr->AddComponent<PCTSpriteDraw>();
-		SIPD->SetTextureResource(L"STAGEIMAGE_0_TX");
+		SIPD->SetTextureResource(L"FRAME_TX");
 		//透明度有効
 		StageImagePtr->SetAlphaActive(true);
 		//レイヤー設定

@@ -172,12 +172,12 @@ namespace basecross {
 		//îwåiçÏê¨--------------------------------------
 		auto BackP = AddGameObject<GameObject>();
 		auto BPD = BackP->AddComponent<PNTStaticDraw>();
-		BPD->SetMeshResource(L"DEFAULT_SQUARE");
+		BPD->SetMeshResource(L"DEFAULT_CUBE");
 		BPD->SetTextureResource(L"BACK_SKY_TX");
 		auto BPT = BackP->AddComponent<Transform>();
-		BPT->SetPosition(0, 0, 10);
-		BPT->SetScale(50, 28, 1);
-		BPT->SetRotation(45, 0, 0);
+		BPT->SetPosition(0, 0, 0);
+		BPT->SetScale(50, 50, 50);
+		BPT->SetRotation(0, 0, 0);
 		BackP->SetAlphaActive(true);
 		BackP->SetDrawLayer(1);
 

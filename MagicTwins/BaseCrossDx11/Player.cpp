@@ -574,6 +574,7 @@ namespace basecross {
 		PlayerPos.y += -14;
 		PlayerPos.z += 15;
 		obj->GetComponent<Transform>()->SetPosition(PlayerPos);
+		
 	}
 
 	//キャラチェンジ
