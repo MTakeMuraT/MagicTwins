@@ -118,7 +118,16 @@ namespace basecross {
 		App::GetApp()->RegisterTexture(L"PAUSETITLELOGO_TX", strTexture);
 		strTexture = DataDir + L"map/map.png";
 		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
-		
+		//マップ
+		for (int i = 0; i <= 20; i++)
+		{
+			wstring txt = L"StageMap/Stage_" + Util::IntToWStr(i) + L".png";
+			strTexture = DataDir + txt;
+			wstring name = L"MAP_" + Util::IntToWStr(i) + L"_TX";
+			App::GetApp()->RegisterTexture(name, strTexture);
+		}
+
+
 		//エフェクト用Right
 		strTexture = DataDir + L"Light/RedLight.png";
 		App::GetApp()->RegisterTexture(L"FIRELIGHT_TX", strTexture);
@@ -168,21 +177,6 @@ namespace basecross {
 		//ライトの設定
 		PtrSingleLight->GetLight().SetPositionToDirectional(-0.25f, 1.0f, -0.25f);
 
-
-		//背景作成--------------------------------------
-		auto BackP = AddGameObject<GameObject>();
-		auto BPD = BackP->AddComponent<PNTStaticDraw>();
-		BPD->SetMeshResource(L"DEFAULT_CUBE");
-		BPD->SetTextureResource(L"BACK_SKY_TX");
-		auto BPT = BackP->AddComponent<Transform>();
-		BPT->SetPosition(0, 0, 0);
-		BPT->SetScale(50, 50, 50);
-		BPT->SetRotation(0, 0, 0);
-		BackP->SetAlphaActive(true);
-		BackP->SetDrawLayer(1);
-
-		SetSharedGameObject(L"Back", BackP);
-		//背景作成--------------------------------------
 
 	}
 
@@ -1333,10 +1327,32 @@ namespace basecross {
 			CreateSharedObjectGroup(L"SetUpdateObj");
 			//リソースの作成
 			CreateResourses();
+
 			//ビューとライトの作成
 			CreateViewLight();
+
 			//CSV作成
 			AddGameObject<CSVReader>();
+
+			//カメラモードが起動中なら制限時間作らない
+			if (!GetSharedGameObject<Player>(L"Player1", false)->GetCameraModeFlg())
+			{
+
+				//背景作成--------------------------------------
+				auto BackP = AddGameObject<GameObject>();
+				auto BPD = BackP->AddComponent<PNTStaticDraw>();
+				BPD->SetMeshResource(L"DEFAULT_CUBE");
+				BPD->SetTextureResource(L"BACK_SKY_TX");
+				auto BPT = BackP->AddComponent<Transform>();
+				BPT->SetPosition(0, 0, 0);
+				BPT->SetScale(50, 50, 50);
+				BPT->SetRotation(0, 0, 0);
+				BackP->SetAlphaActive(true);
+				BackP->SetDrawLayer(1);
+
+				SetSharedGameObject(L"Back", BackP);
+				//背景作成--------------------------------------
+			}
 			//制限時間の作成
 			//カメラモードが起動中なら制限時間作らない
 			if (!GetSharedGameObject<Player>(L"Player1", false)->GetCameraModeFlg())

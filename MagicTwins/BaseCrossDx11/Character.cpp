@@ -1156,7 +1156,7 @@ namespace basecross{
 		}
 		
 		//時間経過処理
-		m_nowTime += -App::GetApp()->GetElapsedTime();
+		m_nowTime += -App::GetApp()->GetElapsedTime() * 6;
 
 		//スプライト変更
 		m_numberSp->SetNum((int)m_nowTime);
@@ -1447,7 +1447,11 @@ namespace basecross{
 		MaTP->SetScale(500,500,1);
 		MaTP->SetRotation(0, 0, 0);
 		auto MaTDP = MaP->AddComponent<PCTSpriteDraw>();
-		MaTDP->SetTextureResource(L"MAP_TX");
+		//シーンからステージ番号取得
+		auto ScenePtr = App::GetApp()->GetScene<Scene>();
+		int StageNum = ScenePtr->GetStageNum();
+		wstring texturetxt = L"MAP_" + Util::IntToWStr(StageNum) + L"_TX";
+		MaTDP->SetTextureResource(texturetxt);
 		MaP->SetAlphaActive(true);
 		MaP->SetDrawActive(false);
 		MaP->SetDrawLayer(8);

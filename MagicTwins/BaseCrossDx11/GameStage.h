@@ -94,6 +94,7 @@ namespace basecross {
 
 		void StopAll();
 		void StartAll();
+
 	public:
 		//\’z‚Æ”jŠü
 		GameStage() :Stage() {}
@@ -101,6 +102,7 @@ namespace basecross {
 		//‰Šú‰»
 		virtual void OnCreate()override;
 		virtual void OnUpdate() override;
+
 	};
 
 
