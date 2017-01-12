@@ -2669,14 +2669,10 @@ namespace basecross{
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
 
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
 		//描画コンポーネントの設定
 		auto PtrDraw = AddComponent<PNTStaticDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		//描画するテクスチャを設定
 		PtrDraw->SetTextureResource(L"GIMMICK5_TX");
 
