@@ -85,6 +85,14 @@ namespace basecross {
 		strTexture = DataDir + L"WindUI.png";
 		App::GetApp()->RegisterTexture(L"WINDUI_TX", strTexture);
 
+		//‰Š
+		strTexture = DataDir + L"Fire01.png";
+		App::GetApp()->RegisterTexture(L"FIREGIMMICK5_0_TX", strTexture);
+		strTexture = DataDir + L"Fire02.png";
+		App::GetApp()->RegisterTexture(L"FIREGIMMICK5_1_TX", strTexture);
+		strTexture = DataDir + L"Fire03.png";
+		App::GetApp()->RegisterTexture(L"FIREGIMMICK5_2_TX", strTexture);
+
 		//ƒLƒƒƒ‰UI
 		strTexture = DataDir + L"Chara1UI.png";
 		App::GetApp()->RegisterTexture(L"CHARA1UI_TX", strTexture);

@@ -295,7 +295,7 @@ namespace basecross {
 		//m_SIHalfFlgがfalseなら小さく、trueなら大きく
 		if (!m_SIHalfFlg)
 		{
-			scale.x += -5000 * App::GetApp()->GetElapsedTime();
+			scale.x += -10000 * App::GetApp()->GetElapsedTime();
 			//線になったらテクスチャ切り替え
 			if (scale.x < 0)
 			{
@@ -311,7 +311,7 @@ namespace basecross {
 		}
 		else
 		{
-			scale.x += 5000 * App::GetApp()->GetElapsedTime();
+			scale.x += 10000 * App::GetApp()->GetElapsedTime();
 			if (scale.x > 945)
 			{
 				scale.x = 945;

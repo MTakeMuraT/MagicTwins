@@ -434,15 +434,19 @@ namespace basecross
 			auto Ptr = st->AddGameObject<ScoreItem>(v, scale);
 			SIG->IntoGroup(Ptr);
 			//エフェクト
+			vector<shared_ptr<MagicParticle>> Parti;
 			auto mPobj = st->AddGameObject<MagicParticle>();
 			//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
 			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 0.0f, 0), Vector3(0.0f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), L"LIGHT_TX", true, 0.2f, 1, 2.0f);
 			EfGroup->IntoGroup(mPobj);
+			Parti.push_back(mPobj);
 			//2個目
 			mPobj = st->AddGameObject<MagicParticle>();
 			mPobj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 0.0f, 0), Vector3(0.0f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), L"LIGHT_TX", true, 0.2f, 1, 1.0f);
 			EfGroup->IntoGroup(mPobj);
+			Parti.push_back(mPobj);
 
+			Ptr->SetParticle(Parti);
 			count++;
 		}
 		count = 0;

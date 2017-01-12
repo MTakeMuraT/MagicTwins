@@ -1804,6 +1804,11 @@ namespace basecross{
 		//SE再生
 		GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("ScoreItemGet");
 
+		//エフェクト停止
+		for (auto v : m_Particle)
+		{
+			v->StopParticle();
+		}
 	}
 
 	void ScoreItem::Detekuru()
@@ -2674,10 +2679,40 @@ namespace basecross{
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"DEFAULT_SQUARE");
 		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"GIMMICK5_TX");
+		PtrDraw->SetTextureResource(L"FIREGIMMICK5_0_TX");
 
 		//透明処理
 		SetAlphaActive(true);
+		SetDrawLayer(1);
+	}
+
+	void Gimmick5::OnUpdate()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_IntervalTime)
+		{
+			m_time = 0;
+			m_nowTexture++;
+			if (m_nowTexture > 2)
+			{
+				m_nowTexture = 0;
+			}
+
+			switch (m_nowTexture)
+			{
+			case 0:
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"FIREGIMMICK5_0_TX");
+				break;
+			case 1:
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"FIREGIMMICK5_1_TX");
+				break;
+			case 2:
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"FIREGIMMICK5_2_TX");
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	void Gimmick5::Delete(MagicType MT)
@@ -2691,6 +2726,8 @@ namespace basecross{
 			//SE再生
 			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Freeze");
 
+			//アップデート停止
+			SetUpdateActive(false);
 			//エフェクト停止
 			for (auto v : m_Particle)
 			{

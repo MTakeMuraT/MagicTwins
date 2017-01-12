@@ -450,6 +450,9 @@ namespace basecross{
 		Vector3 m_InitPos;
 		Vector3 m_InitScale;
 		bool m_Active = true;
+		//エフェクト
+		vector<shared_ptr<MagicParticle>> m_Particle;
+
 	public :
 		ScoreItem(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 
@@ -459,6 +462,7 @@ namespace basecross{
 
 		bool GetActive() { return m_Active; }
 
+		void SetParticle(vector<shared_ptr<MagicParticle>> Particle) { m_Particle = Particle; }
 
 		//****仮
 		void Detekuru();
@@ -787,9 +791,15 @@ namespace basecross{
 		//エフェクト
 		vector<shared_ptr<MagicParticle>> m_Particle;
 
+		//テクスチャ切り替え時間
+		float m_time = 0;
+		const float m_IntervalTime = 0.1f;
+		//テクスチャ番号
+		int m_nowTexture = 0;
 	public:
 		Gimmick5(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
+		void OnUpdate() override;
 
 		void Delete(MagicType MT);
 
