@@ -151,6 +151,21 @@ namespace basecross {
 				CHU->SetDrawActive(true);
 				m_CharaUI = CHU;
 				//キャラUI表示--------------------------------------
+
+				//ターゲットモード枠--------------------------------------
+				auto TargetFrame = GetStage()->AddGameObject<GameObject>();
+				auto TFT = TargetFrame->AddComponent<Transform>();
+				TFT->SetPosition(0, 0, 0);
+				TFT->SetRotation(0, 0, 0);
+				TFT->SetScale(1920, 1080, 1);
+				auto TFD = TargetFrame->AddComponent<PCTSpriteDraw>();
+				TFD->SetTextureResource(L"TARGETFRAME_TX");
+				TargetFrame->SetAlphaActive(true);
+				TargetFrame->SetDrawLayer(2);
+				TargetFrame->SetDrawActive(false);
+				m_TargetModeFrame = TargetFrame;
+				//ターゲットモード枠--------------------------------------
+
 			}
 		}
 		else if (m_myName == "Player2")
@@ -238,6 +253,21 @@ namespace basecross {
 				CHU->SetDrawActive(false);
 				m_CharaUI = CHU;
 				//キャラUI表示--------------------------------------
+
+
+				//ターゲットモード枠--------------------------------------
+				auto TargetFrame = GetStage()->AddGameObject<GameObject>();
+				auto TFT = TargetFrame->AddComponent<Transform>();
+				TFT->SetPosition(0, 0, 0);
+				TFT->SetRotation(0, 0, 0);
+				TFT->SetScale(1920, 1080, 1);
+				auto TFD = TargetFrame->AddComponent<PCTSpriteDraw>();
+				TFD->SetTextureResource(L"TARGETFRAME_TX");
+				TargetFrame->SetAlphaActive(true);
+				TargetFrame->SetDrawLayer(2);
+				TargetFrame->SetDrawActive(false);
+				m_TargetModeFrame = TargetFrame;
+				//ターゲットモード枠--------------------------------------
 
 			}
 		}
@@ -525,19 +555,21 @@ namespace basecross {
 					angle *= -1;
 					TranP->SetRotation(Vector3(0, angle, 0));
 
-					//アニメーション更新
-					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
-					if (PtrDraw->GetCurrentAnimation() == L"walk")
+					if (!m_TargetModeFlg)
 					{
 						//アニメーション更新
-						PtrDraw->UpdateAnimation(1.5f * ElapsedTime * ((abs(inputXY.x) + abs(inputXY.y)) / 2));
+						auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+						if (PtrDraw->GetCurrentAnimation() == L"walk")
+						{
+							//アニメーション更新
+							PtrDraw->UpdateAnimation(1.5f * ElapsedTime * ((abs(inputXY.x) + abs(inputXY.y)) / 2));
+						}
+						else
+						{
+							//アニメーション変更
+							PtrDraw->ChangeCurrentAnimation(L"walk");
+						}
 					}
-					else
-					{
-						//アニメーション変更
-						PtrDraw->ChangeCurrentAnimation(L"walk");
-					}
-
 					////アニメーションを更新する(コントローラーを傾けると動く)
 					//auto PtrDraw = GetComponent<PNTBoneModelDraw>();
 					//if (PtrDraw->GetCurrentAnimation() == L"walk") {
@@ -550,6 +582,7 @@ namespace basecross {
 				//移動入力がなければ
 				else
 				{
+					//アニメーション
 					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
 					if (PtrDraw->GetCurrentAnimation() == L"wait")
 					{
@@ -561,13 +594,23 @@ namespace basecross {
 						//アニメーション変更
 						PtrDraw->ChangeCurrentAnimation(L"wait");
 					}
-
 				}
 
 				//L肩ボタンで位置固定
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				{
 					m_velocity = Vector2(0, 0);
+					m_TargetModeFlg = true;
+					m_TargetModeFrame->SetDrawActive(true);
+				}
+				else
+				{
+					if (m_TargetModeFrame->GetDrawActive())
+					{
+						m_TargetModeFlg = false;
+
+						m_TargetModeFrame->SetDrawActive(false);
+					}
 				}
 
 				//Xボタン押したら魔法発射

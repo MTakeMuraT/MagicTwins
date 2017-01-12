@@ -25,8 +25,13 @@ namespace basecross{
 		BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char2/Character_02_MotionMotion.bmf");
 		App::GetApp()->RegisterResource(L"Character02_MESH", BoneModelMesh);
 
+		//敵モデル
+		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Ghost/Ghost.bmf");
+		App::GetApp()->RegisterResource(L"Enemy_Model", ModelMesh);
+
+
 		//風車モデル
-		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
+		ModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Windmill/Windmill.bmf");
 		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
 		//岩モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Rock/Rock04.bmf");
@@ -34,8 +39,10 @@ namespace basecross{
 		//柵モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Fence/FENCE.bmf");
 		App::GetApp()->RegisterResource(L"Fence_Model", ModelMesh);
+		//氷モデル
+		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"IceBlock/IceBlock.bmf");
+		App::GetApp()->RegisterResource(L"IceBlock_Model", ModelMesh);
 
-		
 		//魔導書モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBooks/magicbookF00.bmf");
 		App::GetApp()->RegisterResource(L"MagicBookFire_Model", ModelMesh);

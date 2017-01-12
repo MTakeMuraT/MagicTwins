@@ -119,7 +119,7 @@ namespace basecross {
 		strTexture = DataDir + L"map/map.png";
 		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
 		//マップ
-		for (int i = 0; i <= 20; i++)
+		for (int i = 0; i <= 21; i++)
 		{
 			wstring txt = L"StageMap/Stage_" + Util::IntToWStr(i) + L".png";
 			strTexture = DataDir + txt;
@@ -150,6 +150,10 @@ namespace basecross {
 		//赤枠
 		strTexture = DataDir + L"Akawaku.png";
 		App::GetApp()->RegisterTexture(L"AKAWAKU_TX", strTexture);
+
+		//ターゲットモードの青枠
+		strTexture = DataDir + L"TargetFrame.png";
+		App::GetApp()->RegisterTexture(L"TARGETFRAME_TX", strTexture);
 
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");

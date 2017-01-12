@@ -553,7 +553,7 @@ namespace basecross{
 		//生きてるかどうか
 		bool m_ActiveFlg = true;
 
-		//エフェクト
+		//エフェクト:
 		vector<shared_ptr<MagicParticle>> m_Particle;
 	public :
 		Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale);
@@ -583,10 +583,15 @@ namespace basecross{
 		//エフェクト
 		vector<shared_ptr<MagicParticle>> m_Particle;
 
+		//回ってるかどうか
+		bool m_RotFlg = false;
+		
+		float m_time = 0;
+		const float m_LimitTime = 3.0f;
 	public:
 		Gimmick2(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 		void OnCreate() override;
-
+		void OnUpdate() override;
 		void Delete(MagicType MT);
 
 		bool GetActive() { return m_ActiveFlg; }

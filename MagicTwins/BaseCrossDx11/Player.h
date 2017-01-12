@@ -115,6 +115,10 @@ namespace basecross{
 		float m_ShotMagicCountTime = 0;
 		//魔法打ったフラグ
 		bool m_ShotMagicFlg = false;
+		//ターゲットモードフラグ
+		bool m_TargetModeFlg = false;
+		//ターゲット枠
+		shared_ptr<GameObject> m_TargetModeFrame;
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))

@@ -676,12 +676,20 @@ namespace basecross{
 		Ptr->SetPosition(m_InitPos);
 		Ptr->SetScale(m_Scale);
 
+		// モデルとトランスフォームの間の差分行列
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(0.5f, 0.5f, 0.5f),
+			Vector3(0.0f, 0.0f, 0.0f),
+			Vector3(0.0f, -0.3f, 0.0f)
+			);
+
+
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"ENEMY_TX");
+		PtrDraw->SetMeshResource(L"Enemy_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 		//透明処理
 		SetAlphaActive(true);
@@ -727,6 +735,13 @@ namespace basecross{
 					nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
 					nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
 					GetComponent<Transform>()->SetPosition(nowpos);
+
+					//向き更新
+					angle = atan2(velo.y, velo.x);
+					angle += (3.14159265f / 180) * 90;
+					angle *= -1;
+					GetComponent<Transform>()->SetRotation(Vector3(0, angle, 0));
+
 				}
 			}
 			else if (m_TargetPlayernum == 2)
@@ -744,6 +759,12 @@ namespace basecross{
 					nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
 					nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
 					GetComponent<Transform>()->SetPosition(nowpos);
+
+					//向き更新
+					angle = atan2(velo.y, velo.x);
+					angle *= -1;
+					GetComponent<Transform>()->SetRotation(Vector3(0, angle, 0));
+
 				}
 			}
 		}
@@ -1820,16 +1841,20 @@ namespace basecross{
 		//衝突判定をつける
 		auto PtrCol = AddComponent<CollisionObb>();
 
-		//影をつける（シャドウマップを描画する）
-		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
+		// モデルとトランスフォームの間の差分行列
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(0.6f, 0.6f, 0.6f),
+			Vector3(0.0f, 0.0f, 0.0f),
+			Vector3(0.0f, -0.3f, 0.0f)
+			);
+
+
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
 		//描画するメッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画するテクスチャを設定
-		PtrDraw->SetTextureResource(L"GIMMICK1_TX");
+		PtrDraw->SetMeshResource(L"IceBlock_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 		//透明処理
 		SetAlphaActive(true);
@@ -1879,29 +1904,47 @@ namespace basecross{
 		float angle = (-90) * (3.14159265f / 180);
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
-			Vector3(1.0f, 0.3f, 1.0f),
-			Vector3(0,angle, 0),
+			Vector3(0.7f, 0.2f, 0.7f),
+			Vector3(0, 0, 0),
 			Vector3(0, 0, 0)
 			);
 
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		//ShadowPtr->SetMeshResource(L"Windmill_Model");
 		ShadowPtr->SetMeshResource(L"Windmill_Model");
 		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
 
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		auto PtrDraw = AddComponent<PNTBoneModelDraw>();
 		//描画するメッシュを設定
 		//PtrDraw->SetMeshResource(L"Windmill_Model");
 		PtrDraw->SetMeshResource(L"Windmill_Model");
 		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+		//アニメーション追加
+		PtrDraw->AddAnimation(L"rot", 0, 20, true, 30);
+		PtrDraw->ChangeCurrentAnimation(L"rot");
 
 		//透明処理
 		SetAlphaActive(true);
 
+	}
+
+	void Gimmick2::OnUpdate()
+	{
+		if (m_RotFlg)
+		{
+			float ElapsedTime = App::GetApp()->GetElapsedTime();
+			m_time += ElapsedTime;
+			if (m_time > m_LimitTime)
+			{
+				m_RotFlg = false;
+				m_time = 0;
+			}
+			//アニメーション更新
+			GetComponent<PNTBoneModelDraw>()->UpdateAnimation(ElapsedTime);
+		}
 	}
 
 	void Gimmick2::Delete(MagicType MT)
@@ -1927,6 +1970,7 @@ namespace basecross{
 		if (MT == Wind)
 		{
 			GetStage()->GetSharedGameObject<Gimmick2_1>(L"WaterGate", false)->Action();
+			m_RotFlg = true;
 		}
 	}
 
