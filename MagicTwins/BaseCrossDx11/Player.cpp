@@ -65,17 +65,19 @@ namespace basecross {
 			//影をつける（シャドウマップを描画する）
 			auto ShadowPtr = AddComponent<Shadowmap>();
 			//影の形（メッシュ）を設定
-			ShadowPtr->SetMeshResource(L"Player1_Model");
+			ShadowPtr->SetMeshResource(L"Character01_MESH");
 			ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
 			//描画コンポーネントの設定
 			auto PtrDraw = AddComponent<PNTBoneModelDraw>();
 			//描画するメッシュを設定
-			PtrDraw->SetMeshResource(L"Character1_Walk_MESH");
+			PtrDraw->SetMeshResource(L"Character01_MESH");
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 			//アニメーション追加
-			PtrDraw->AddAnimation(L"walk", 0, 180, true, 30);
+			PtrDraw->AddAnimation(L"walk", 0, 20, true, 30);
+			PtrDraw->AddAnimation(L"attack", 21, 24, false, 30);
+			PtrDraw->AddAnimation(L"wait", 40, 130, true, 30);
 
 			/*
 			//描画コンポーネントの設定
@@ -156,10 +158,10 @@ namespace basecross {
 			//影をつける（シャドウマップを描画する）
 			auto ShadowPtr = AddComponent<Shadowmap>();
 			//影の形（メッシュ）を設定
-			ShadowPtr->SetMeshResource(L"Player2_Model");
+			ShadowPtr->SetMeshResource(L"Character02_MESH");
 
 			SpanMat.DefTransformation(
-				Vector3(0.5f, 0.5f, 0.5f),
+				Vector3(1.5f, 1.5f, 1.5f),
 				Vector3(0.0f, angle, 0.0f),
 				Vector3(0.0f, 1.0f, 0.0f)
 				);
@@ -170,11 +172,14 @@ namespace basecross {
 			//描画コンポーネントの設定
 			auto PtrDraw = AddComponent<PNTBoneModelDraw>();
 			//描画するメッシュを設定
-			PtrDraw->SetMeshResource(L"Character_02_WalkWalk_BONE_MESH");
+			PtrDraw->SetMeshResource(L"Character02_MESH");
 			PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 			//アニメーション追加
-			PtrDraw->AddAnimation(L"walk", 0, 180, true, 30);
+			PtrDraw->AddAnimation(L"walk", 0, 20, true, 30);
+			PtrDraw->AddAnimation(L"attack", 20, 23, false, 30);
+			PtrDraw->AddAnimation(L"wait", 40, 130, true, 30);
+
 
 			//魔法作成
 			auto magicBoal = GetStage()->AddGameObject<MagicBoal>(Vector3(-100, -5.0f, 0), 2);
@@ -494,56 +499,130 @@ namespace basecross {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
-			//入力が少しでもあったら
-			if (CntlVec[0].fThumbLX > 0.1f || CntlVec[0].fThumbLX < -0.1f ||
-				CntlVec[0].fThumbLY > 0.1f || CntlVec[0].fThumbLY < -0.1f)
+			//魔法打ってる状態じゃなければ移動許可
+			if (!m_ShotMagicStopFlg)
 			{
-				float ElapsedTime = App::GetApp()->GetElapsedTime();
-				//コントローラーの入力XY
-				Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
-				auto TranP = GetComponent<Transform>();
-				//座標直接弄る
-				/*Vector3 Posi = TranP->GetPosition();
-				inputXY *= ElapsedTime*m_Speed;
-				Posi.x += inputXY.x;
-				Posi.z += inputXY.y;
-				TranP->SetPosition(Posi);
-				*/
+				//入力が少しでもあったら
+				if (CntlVec[0].fThumbLX > 0.1f || CntlVec[0].fThumbLX < -0.1f ||
+					CntlVec[0].fThumbLY > 0.1f || CntlVec[0].fThumbLY < -0.1f)
+				{
+					float ElapsedTime = App::GetApp()->GetElapsedTime();
+					//コントローラーの入力XY
+					Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
+					auto TranP = GetComponent<Transform>();
+					//座標直接弄る
+					/*Vector3 Posi = TranP->GetPosition();
+					inputXY *= ElapsedTime*m_Speed;
+					Posi.x += inputXY.x;
+					Posi.z += inputXY.y;
+					TranP->SetPosition(Posi);
+					*/
 
-				m_velocity += inputXY * m_Speed;
+					m_velocity += inputXY * m_Speed;
 
-				//向きを得る				
-				float angle = atan2(inputXY.y, inputXY.x);
-				angle *= -1;
-				TranP->SetRotation(Vector3(0, angle, 0));
+					//向きを得る				
+					float angle = atan2(inputXY.y, inputXY.x);
+					angle *= -1;
+					TranP->SetRotation(Vector3(0, angle, 0));
 
-
-					//アニメーションを更新する(コントローラーを傾けると動く)
+					//アニメーション更新
 					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
-					if (PtrDraw->GetCurrentAnimation() == L"walk") {
+					if (PtrDraw->GetCurrentAnimation() == L"walk")
+					{
+						//アニメーション更新
+						PtrDraw->UpdateAnimation(1.5f * ElapsedTime * ((abs(inputXY.x) + abs(inputXY.y)) / 2));
+					}
+					else
+					{
+						//アニメーション変更
+						PtrDraw->ChangeCurrentAnimation(L"walk");
+					}
+
+					////アニメーションを更新する(コントローラーを傾けると動く)
+					//auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+					//if (PtrDraw->GetCurrentAnimation() == L"walk") {
+					//	//アニメーション更新
+					//	PtrDraw->UpdateAnimation(ElapsedTime);
+					//	//アニメーションを変えるとき
+					//	//PtrDraw->ChangeCurrentAnimation(L"Default");
+					//}
+				}
+				//移動入力がなければ
+				else
+				{
+					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+					if (PtrDraw->GetCurrentAnimation() == L"wait")
+					{
 						//アニメーション更新
 						PtrDraw->UpdateAnimation(ElapsedTime);
-						//アニメーションを変えるとき
-						//PtrDraw->ChangeCurrentAnimation(L"Default");
 					}
+					else
+					{
+						//アニメーション変更
+						PtrDraw->ChangeCurrentAnimation(L"wait");
+					}
+
+				}
+
+				//L肩ボタンで位置固定
+				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+				{
+					m_velocity = Vector2(0, 0);
+				}
+
+				//Xボタン押したら魔法発射
+				if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_A)
+				{
+					if (m_Magic != None)
+					{
+						//アニメーションとタイミング合わないから硬直後に発射する
+						//魔法発射処理
+						//ShotMagic();
+						//硬直処理
+						m_ShotMagicStopFlg = true;
+					}
+				}
+
+			}
+			//魔法打った後の硬直中処理
+			else
+			{
+				//アニメーション更新
+				auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+				if (PtrDraw->GetCurrentAnimation() == L"attack")
+				{
+					//アニメーション更新
+					PtrDraw->UpdateAnimation(ElapsedTime);
+				}
+				else
+				{
+					//アニメーション変更
+					PtrDraw->ChangeCurrentAnimation(L"attack");
+				}
+
+				//硬直後時間計測
+				m_ShotMagicCountTime += ElapsedTime;
+				if (m_ShotMagicCountTime > 0.3f && !m_ShotMagicFlg)
+				{
+					//魔法発射処理
+					ShotMagic();
+					m_ShotMagicFlg = true;
+				}
+
+				//一定時間たったら硬直解除
+				if (m_ShotMagicCountTime > m_ShotStopTime)
+				{
+					m_ShotMagicStopFlg = false;	
+					m_ShotMagicFlg = false;
+					m_ShotMagicCountTime = 0;
+				}
 			}
 
+			//キャラチェンジはいつでもできるようにする
 			//Rトリガーでキャラ切り替え
 			if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_RIGHT_SHOULDER)
 			{
 				ChangeChar();
-			}
-
-			//Xボタン押したら魔法発射
-			if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_A)
-			{
-				ShotMagic();
-			}
-
-			//L肩ボタンで位置固定
-			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-			{
-				m_velocity = Vector2(0, 0);
 			}
 
 		}

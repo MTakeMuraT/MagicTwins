@@ -106,6 +106,15 @@ namespace basecross{
 		bool m_DieFlg = false;
 		//暗転用幕
 		shared_ptr<Black> m_BlackDie;
+
+		//魔法打つ時に移動できなくするフラグ
+		bool m_ShotMagicStopFlg = false;
+		//魔法打った時の硬直時間
+		const float m_ShotStopTime = 0.8f;
+		//魔法打った後のカウント用時間
+		float m_ShotMagicCountTime = 0;
+		//魔法打ったフラグ
+		bool m_ShotMagicFlg = false;
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))

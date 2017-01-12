@@ -18,22 +18,15 @@ namespace basecross{
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
 		//キャラ１モデル
-		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char1/Character_01.bmf");
-		App::GetApp()->RegisterResource(L"Player1_Model", ModelMesh);
+		auto BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char1/Character_01Motion03.bmf");
+		App::GetApp()->RegisterResource(L"Character01_MESH", BoneModelMesh);
+
 		//キャラ２モデル
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Char2/Character_02.bmf");
-		App::GetApp()->RegisterResource(L"Player2_Model", ModelMesh);
-
-		//キャラ１アニメーション
-		auto BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char1/Character_01motion01.bmf");
-		App::GetApp()->RegisterResource(L"Character1_Walk_MESH", BoneModelMesh);
-
-		//キャラ２アニメーション
-		BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char2/Character_02_WalkWalk.bmf");
-		App::GetApp()->RegisterResource(L"Character_02_WalkWalk_BONE_MESH", BoneModelMesh);
+		BoneModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Char2/Character_02_MotionMotion.bmf");
+		App::GetApp()->RegisterResource(L"Character02_MESH", BoneModelMesh);
 
 		//風車モデル
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
+		auto ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Windmill/Windmill.bmf");
 		App::GetApp()->RegisterResource(L"Windmill_Model", ModelMesh);
 		//岩モデル
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Rock/Rock04.bmf");
