@@ -776,7 +776,7 @@ namespace basecross{
 			{
 				m_StopFlg = false;
 				m_time = 0;
-				GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+				GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
 			}
 		}
 		//~‚Ü‚Á‚Ä‚È‚­‚Ä’Ç‚Á‚Ä‚È‚¢ó‘Ô‚È‚ç
@@ -824,7 +824,7 @@ namespace basecross{
 			m_StopFlg = true;
 			m_life--;
 			m_time = 0;
-			GetComponent<PNTStaticDraw>()->SetDiffuse(Color4(1, 1, 1, 0.5f));
+			GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 0.5f));
 
 			m_speed *= 2.0f;
 
