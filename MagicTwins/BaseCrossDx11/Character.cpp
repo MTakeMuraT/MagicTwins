@@ -1156,7 +1156,7 @@ namespace basecross{
 		}
 		
 		//時間経過処理
-		m_nowTime += -App::GetApp()->GetElapsedTime() * 6;
+		m_nowTime += -App::GetApp()->GetElapsedTime();
 
 		//スプライト変更
 		m_numberSp->SetNum((int)m_nowTime);

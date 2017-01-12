@@ -723,6 +723,28 @@ namespace basecross {
 							objDraw->SetDiffuse(Color4(1, 1, 1, 0));
 							obj->SetAlphaActive(true);
 							obj->SetDrawLayer(7);
+							//ランク計算
+							int ScoreItem = m_ScoreItemCount;
+							int ClearTime = m_LimitTimeGoal;
+							int TotalScore = ClearTime + (ScoreItem * 10);
+
+							if (TotalScore >= 70)
+							{
+								objDraw->SetTextureResource(L"RANKS_TX");
+							}
+							else if (TotalScore >= 50)
+							{
+								objDraw->SetTextureResource(L"RANKA_TX");
+							}
+							else if (TotalScore >= 30)
+							{
+								objDraw->SetTextureResource(L"RANKB_TX");
+							}
+							else
+							{
+								objDraw->SetTextureResource(L"RANKC_TX");
+							}
+
 							m_RankSprite = obj;
 						}
 					}
@@ -1107,8 +1129,15 @@ namespace basecross {
 					auto ScenePtr = App::GetApp()->GetScene<Scene>();
 					int StageNum = ScenePtr->GetStageNum();
 					StageNum++;
-					ScenePtr->SetStageNum(StageNum);
-					PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+					if (StageNum <= 21)
+					{
+						ScenePtr->SetStageNum(StageNum);
+						PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
+					}
+					else
+					{
+						PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
+					}
 				}
 				break;
 				//ステセレ
