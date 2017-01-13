@@ -115,6 +115,7 @@ namespace basecross{
 			m_AudioTitle = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioTitle->AddAudioResource(L"TitleBGM");
 			m_AudioTitle->Start(L"TitleBGM");
+			m_NowBGM = "Title";
 
 			m_AudioGame = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioGame->AddAudioResource(L"GameStageBGM");

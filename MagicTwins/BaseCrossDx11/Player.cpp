@@ -166,6 +166,23 @@ namespace basecross {
 				m_TargetModeFrame = TargetFrame;
 				//ターゲットモード枠--------------------------------------
 
+
+				//ターゲットモード照準(ステージに保存)--------------------------------------
+				auto TargetAim = GetStage()->AddGameObject<GameObject>();
+				auto TAT = TargetAim->AddComponent<Transform>();
+				TAT->SetPosition(0, 0, 0);
+				float TAangle = 45 * 3.14159265f / 180;
+				TAT->SetRotation(TAangle, 0, 0);
+				TAT->SetScale(1.5f, 1.5f, 1.5f);
+				auto TAD = TargetAim->AddComponent<PNTStaticDraw>();
+				TAD->SetTextureResource(L"TARGETAIM_TX");
+				TAD->SetMeshResource(L"DEFAULT_SQUARE");
+				TargetAim->SetAlphaActive(true);
+				TargetAim->SetDrawLayer(2);
+				TargetAim->SetDrawActive(false);
+				GetStage()->SetSharedGameObject(L"TargetAim", TargetAim);
+				//ターゲットモード照準(ステージに保存)--------------------------------------
+
 			}
 		}
 		else if (m_myName == "Player2")
@@ -276,7 +293,7 @@ namespace basecross {
 		//文字列をつける
 		auto PtrString = AddComponent<StringSprite>();
 		PtrString->SetText(L"");
-		PtrString->SetTextRect(Rect2D<float>(16.0f, 16.0f, 640.0f, 480.0f));
+		PtrString->SetTextRect(Rect2D<float>(16.0f, 200.0f, 640.0f, 480.0f));
 		PtrString->SetFont(L"", 80);
 
 		//透明処理
@@ -311,6 +328,15 @@ namespace basecross {
 
 	//更新
 	void Player::OnUpdate() {
+		//----------------------------------------
+		/*
+		if (m_myName == "Player1")
+		{
+			float angle = GetComponent<Transform>()->GetRotation().y;
+			GetComponent<StringSprite>()->SetText(Util::FloatToWStr(angle));
+		}
+		*/
+		//----------------------------------------
 		//カメラモード
 		if (m_CameraMode)
 		{
@@ -555,6 +581,7 @@ namespace basecross {
 					angle *= -1;
 					TranP->SetRotation(Vector3(0, angle, 0));
 
+
 					if (!m_TargetModeFlg)
 					{
 						//アニメーション更新
@@ -579,8 +606,8 @@ namespace basecross {
 					//	//PtrDraw->ChangeCurrentAnimation(L"Default");
 					//}
 				}
-				//移動入力がなければ
-				else
+				//移動入力がなければかつターゲットモードじゃない
+				else if(!m_TargetModeFlg)
 				{
 					//アニメーション
 					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
@@ -595,7 +622,11 @@ namespace basecross {
 						PtrDraw->ChangeCurrentAnimation(L"wait");
 					}
 				}
-
+				//ターゲットモード中
+				if (m_TargetModeFlg)
+				{
+					TargetMode();
+				}
 				//L肩ボタンで位置固定
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				{
@@ -610,6 +641,7 @@ namespace basecross {
 						m_TargetModeFlg = false;
 
 						m_TargetModeFrame->SetDrawActive(false);
+						TargetModeRelease();
 					}
 				}
 
@@ -645,6 +677,7 @@ namespace basecross {
 
 				//硬直後時間計測
 				m_ShotMagicCountTime += ElapsedTime;
+
 				if (m_ShotMagicCountTime > 0.3f && !m_ShotMagicFlg)
 				{
 					//魔法発射処理
@@ -658,6 +691,11 @@ namespace basecross {
 					m_ShotMagicStopFlg = false;	
 					m_ShotMagicFlg = false;
 					m_ShotMagicCountTime = 0;
+
+					//アニメーション変更
+					//停止するの防止
+					PtrDraw->ChangeCurrentAnimation(L"wait");
+
 				}
 			}
 
@@ -1097,6 +1135,87 @@ namespace basecross {
 
 	}
 
+	void Player::TargetMode()
+	{
+		//一番近い敵を保存
+		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"Enemy", false)->GetGroupVector();
+
+		//最短の距離
+		float Distance = 999999;
+
+		//自分の座標
+		Vector3 PlayerPos = GetComponent<Transform>()->GetPosition();
+
+		//敵がいるフラグ
+		bool EnemySurvivalFlg = false;
+		//最短的キャラへの角度
+		float angle = 0;
+		for (auto v : EnemyGroup)
+		{
+			auto EnemyPtr = dynamic_pointer_cast<Enemy>(v.lock());
+
+			//エネミーが生きてたら
+			if (EnemyPtr->GetActive())
+			{
+				EnemySurvivalFlg = true;
+				//照準をもってきて消えてたら表示
+				auto TargetAim = GetStage()->GetSharedGameObject<GameObject>(L"TargetAim", false);
+				if (!TargetAim->GetDrawActive())
+				{
+					TargetAim->SetDrawActive(true);
+				}
+
+				
+				Vector3 EnemyPos = EnemyPtr->GetComponent<Transform>()->GetPosition();
+
+				//差を計算
+				Vector3 DistanceVec3 = EnemyPos - PlayerPos;
+
+				//距離を計算
+				float nowDistance = (DistanceVec3.x * DistanceVec3.x) + (DistanceVec3.z + DistanceVec3.z);
+				//もし一番近かったら
+				if (nowDistance < Distance)
+				{
+					//比較用距離を更新
+					Distance = nowDistance;
+					//プレイヤーの角度変更
+					angle = atan2(DistanceVec3.z, DistanceVec3.x);
+					angle *= -1;
+					GetComponent<Transform>()->SetRotation(0, angle, 0);
+
+					//照準を持ってくる
+					Vector3 AimPos = EnemyPos;
+					//縦のサイズ分座標ずらす
+					float EnemySizeH = EnemyPtr->GetComponent<Transform>()->GetScale().y / 2;
+					AimPos.y += EnemySizeH;
+					//エネミーの大きさに合わせてサイズ変える
+					Vector3 AimScale = TargetAim->GetComponent<Transform>()->GetScale();
+					float ToScale = (EnemySizeH * 2) * 1.5f;
+					AimScale = Vector3(ToScale, ToScale, ToScale);
+
+					TargetAim->GetComponent<Transform>()->SetPosition(AimPos);
+					TargetAim->GetComponent<Transform>()->SetScale(AimScale);
+				}
+
+			}
+
+		}
+		auto TargetAim = GetStage()->GetSharedGameObject<GameObject>(L"TargetAim", false);
+
+		if (!EnemySurvivalFlg && TargetAim->GetDrawActive())
+		{
+			TargetAim->SetDrawActive(false);
+		}
+	}
+
+	void Player::TargetModeRelease()
+	{
+		auto TargetAim = GetStage()->GetSharedGameObject<GameObject>(L"TargetAim", false);
+		if (TargetAim->GetDrawActive())
+		{
+			TargetAim->SetDrawActive(false);
+		}
+	}
 	//--------------------------------------------------------------------------------------
 	//	class MagicBoal : public GameObject;
 	//	用途: 魔法

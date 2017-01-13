@@ -110,7 +110,7 @@ namespace basecross {
 		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
 		PtrTransform->SetPosition(0, -WindowSize.y / 4, 0);
 		PtrTransform->SetRotation(0, 0, 0);
-		PtrTransform->SetScale(800, 300, 1);
+		PtrTransform->SetScale(1200, 150, 1);
 
 		//スプライトをつける
 		auto PtrSprite = PressLogo->AddComponent<PCTSpriteDraw>();
@@ -233,8 +233,11 @@ namespace basecross {
 		StageImagePtr->SetAlphaActive(true);
 		//レイヤー設定
 		StageImagePtr->SetDrawLayer(4);
+		//消しとく
+		StageImagePtr->SetDrawActive(false);
 		//アクセス用
 		m_StageImage = StageImagePtr;
+
 
 	}
 
@@ -549,6 +552,8 @@ namespace basecross {
 			if (SSLpos.y == 432 && ArrowRpos.x == 890 && ArrowLpos.x == -890)
 			{
 				m_AnimationState = 4;
+				//枠を表示
+				m_StageImage->SetDrawActive(true);
 			}
 			break;
 			//ステージイメージをスケールアップで作成して終了

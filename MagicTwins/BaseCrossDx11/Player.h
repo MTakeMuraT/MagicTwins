@@ -17,7 +17,7 @@ namespace basecross{
 	class Player : public GameObject {
 	private :
 		//撮影モード
-		bool m_CameraMode = false;
+		bool m_CameraMode = true;
 
 		//速度
 		float m_Speed = 3.0f;
@@ -110,7 +110,7 @@ namespace basecross{
 		//魔法打つ時に移動できなくするフラグ
 		bool m_ShotMagicStopFlg = false;
 		//魔法打った時の硬直時間
-		const float m_ShotStopTime = 0.8f;
+		const float m_ShotStopTime = 1.0f;
 		//魔法打った後のカウント用時間
 		float m_ShotMagicCountTime = 0;
 		//魔法打ったフラグ
@@ -119,6 +119,10 @@ namespace basecross{
 		bool m_TargetModeFlg = false;
 		//ターゲット枠
 		shared_ptr<GameObject> m_TargetModeFrame;
+		//ターゲットモード中
+		void TargetMode();
+		//ターゲットモード解除
+		void TargetModeRelease();
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))
@@ -155,6 +159,9 @@ namespace basecross{
 
 		//カメラモードかどうか
 		bool GetCameraModeFlg() { return m_CameraMode; }
+
+		//ターゲットモード中か
+		bool GetTargeModeFlg() { return m_TargetModeFlg; }
 	};
 
 	//--------------------------------------------------------------------------------------

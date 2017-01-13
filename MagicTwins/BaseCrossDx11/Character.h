@@ -308,6 +308,10 @@ namespace basecross{
 		//ライフバー
 		shared_ptr<GameObject> m_lifeBar;
 
+		//消えてる最中のフラグ
+		bool m_deleteFlg = false;
+		//消える処理
+		void Delete();
 	public :
 		Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int targetNum);
 		void OnCreate() override;
@@ -316,6 +320,9 @@ namespace basecross{
 		void ResetPos();
 
 		bool GetStopFlg() { return m_StopFlg; }
+
+		//生存確認
+		bool GetActive() { return m_ActiveFlg; }
 	};
 	
 	//--------------------------------------------------------------------------------------

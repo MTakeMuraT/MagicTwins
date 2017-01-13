@@ -163,6 +163,10 @@ namespace basecross {
 		strTexture = DataDir + L"TargetFrame.png";
 		App::GetApp()->RegisterTexture(L"TARGETFRAME_TX", strTexture);
 
+		//ターゲットモードの照準
+		strTexture = DataDir + L"Target.png";
+		App::GetApp()->RegisterTexture(L"TARGETAIM_TX", strTexture);
+
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
 		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);
@@ -390,8 +394,8 @@ namespace basecross {
 					//タイムロゴ作成
 					auto obj = AddGameObject<GameObject>();
 					auto objTrans = obj->AddComponent<Transform>();
-					objTrans->SetPosition(-700, 200, 0);
-					objTrans->SetScale(300, 300, 1);
+					objTrans->SetPosition(-680, 200, 0);
+					objTrans->SetScale(450, 450, 1);
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 					objDraw->SetTextureResource(L"TIMELOGO_TX");
@@ -414,8 +418,8 @@ namespace basecross {
 						//タイムロゴ作成
 						auto obj = AddGameObject<GameObject>();
 						auto objTrans = obj->AddComponent<Transform>();
-						objTrans->SetPosition(-700, 200, 0);
-						objTrans->SetScale(300, 300, 1);
+						objTrans->SetPosition(-680, 200, 0);
+						objTrans->SetScale(450, 450, 1);
 						objTrans->SetRotation(0, 0, 0);
 						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 						objDraw->SetTextureResource(L"TIMELOGO_TX");
@@ -460,8 +464,8 @@ namespace basecross {
 					//アイテムロゴ作成
 					auto obj = AddGameObject<GameObject>();
 					auto objTrans = obj->AddComponent<Transform>();
-					objTrans->SetPosition(-680, 50, 0);
-					objTrans->SetScale(300, 300, 1);
+					objTrans->SetPosition(-640, 30, 0);
+					objTrans->SetScale(500, 500, 1);
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 					objDraw->SetTextureResource(L"ITEMLOGO_TX");
@@ -470,7 +474,7 @@ namespace basecross {
 					obj->SetDrawLayer(7);
 					m_ScoreItemLogo = obj;
 
-					SetSharedGameObject(L"RemainingNumberSprite",AddGameObject<NumberSprite>(0,Vector2(-250,210),Vector2(100,100),8));
+					SetSharedGameObject(L"RemainingNumberSprite",AddGameObject<NumberSprite>(0,Vector2(-150,210),Vector2(200,200),8));
 				}
 
 
@@ -494,8 +498,8 @@ namespace basecross {
 						//アイテムロゴ作成
 						auto obj = AddGameObject<GameObject>();
 						auto objTrans = obj->AddComponent<Transform>();
-						objTrans->SetPosition(-680, 50, 0);
-						objTrans->SetScale(300, 300, 1);
+						objTrans->SetPosition(-640, 30, 0);
+						objTrans->SetScale(500, 500, 1);
 						objTrans->SetRotation(0, 0, 0);
 						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 						objDraw->SetTextureResource(L"ITEMLOGO_TX");
@@ -504,7 +508,7 @@ namespace basecross {
 						obj->SetDrawLayer(7);
 						m_ScoreItemLogo = obj;
 
-						SetSharedGameObject(L"RemainingNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-250, 210), Vector2(100, 100), 8));
+						SetSharedGameObject(L"RemainingNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-150, 210), Vector2(200, 200), 8));
 
 					}
 				}
@@ -568,7 +572,7 @@ namespace basecross {
 					//スコア初期化
 					m_ScoreItemCountCal = 0;
 
-					SetSharedGameObject(L"ScoreCountNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-250, 50), Vector2(100, 100), 8));
+					SetSharedGameObject(L"ScoreCountNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-150, 30), Vector2(200, 200), 8));
 				}
 
 
@@ -589,7 +593,7 @@ namespace basecross {
 						//スコア初期化
 						m_ScoreItemCountCal = 0;
 
-						SetSharedGameObject(L"ScoreCountNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-250, 50), Vector2(100, 100), 8));
+						SetSharedGameObject(L"ScoreCountNumberSprite", AddGameObject<NumberSprite>(0, Vector2(-150, 30), Vector2(200, 200), 8));
 
 					}
 				}
@@ -619,8 +623,8 @@ namespace basecross {
 					//ランクロゴ作成
 					auto obj = AddGameObject<GameObject>();
 					auto objTrans = obj->AddComponent<Transform>();
-					objTrans->SetPosition(-720, -150, 0);
-					objTrans->SetScale(300, 300, 1);
+					objTrans->SetPosition(-690, -150, 0);
+					objTrans->SetScale(500, 500, 1);
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 					objDraw->SetTextureResource(L"RANKLOGO_TX");
@@ -643,8 +647,8 @@ namespace basecross {
 						//ランクロゴ作成
 						auto obj = AddGameObject<GameObject>();
 						auto objTrans = obj->AddComponent<Transform>();
-						objTrans->SetPosition(-720, -150, 0);
-						objTrans->SetScale(300, 300, 1);
+						objTrans->SetPosition(-690, -150, 0);
+						objTrans->SetScale(500, 500, 1);
 						objTrans->SetRotation(0, 0, 0);
 						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 						objDraw->SetTextureResource(L"RANKLOGO_TX");

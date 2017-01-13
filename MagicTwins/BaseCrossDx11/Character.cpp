@@ -701,6 +701,25 @@ namespace basecross{
 		//死んでたらやめ
 		if (!m_ActiveFlg)
 		{
+			if (m_deleteFlg)
+			{
+				//小さくしてく
+				Vector3 nowScale = GetComponent<Transform>()->GetScale();
+				nowScale *= 0.98f;
+				GetComponent<Transform>()->SetScale(nowScale);
+
+				//ある程度小さくなったら
+				if (nowScale.x < 0.1f)
+				{
+					SetDrawActive(false);
+					m_ChaceFlg = false;
+					m_deleteFlg = false;
+					GetComponent<Transform>()->SetPosition(0, -15, 0);
+					GetComponent<Transform>()->SetScale(m_Scale);
+				}
+				return ;
+			}
+
 			m_time += App::GetApp()->GetElapsedTime();
 			//復活するまで経過したら
 			if (m_time > m_ReSponTime)
@@ -732,6 +751,13 @@ namespace basecross{
 					float angle = atan2(velo.y, velo.x);
 					velo.x = cos(angle);
 					velo.y = sin(angle);
+
+					//もしプレイヤーがターゲットモード中なら移動速度遅くする
+					if (P1P->GetTargeModeFlg())
+					{
+						velo *= 0.5f;
+					}
+
 					nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
 					nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
 					GetComponent<Transform>()->SetPosition(nowpos);
@@ -756,6 +782,13 @@ namespace basecross{
 					float angle = atan2(velo.y, velo.x);
 					velo.x = cos(angle);
 					velo.y = sin(angle);
+
+					//もしプレイヤーがターゲットモード中なら移動速度遅くする
+					if (P2P->GetTargeModeFlg())
+					{
+						velo *= 0.5f;
+					}
+
 					nowpos.x += velo.x * App::GetApp()->GetElapsedTime() * m_speed;
 					nowpos.z += velo.y * App::GetApp()->GetElapsedTime() * m_speed;
 					GetComponent<Transform>()->SetPosition(nowpos);
@@ -828,16 +861,19 @@ namespace basecross{
 
 			m_speed *= 2.0f;
 
-			Vector3 pos = GetComponent<Transform>()->GetPosition();
-			pos += Vector3(rand() % 10 - 5, 0, rand() % 10 - 5);
-			GetComponent<Transform>()->SetPosition(pos);
 
 			if (m_life <= 0)
 			{
-				SetDrawActive(false);
+				m_deleteFlg = true;
 				m_ActiveFlg = false;
-				m_ChaceFlg = false;
-				GetComponent<Transform>()->SetPosition(0, -15, 0);
+			}
+			//死んでなければ座標移動
+			else
+			{
+				Vector3 pos = GetComponent<Transform>()->GetPosition();
+				pos += Vector3(rand() % 10 - 5, 0, rand() % 10 - 5);
+				GetComponent<Transform>()->SetPosition(pos);
+
 			}
 		}
 	}
