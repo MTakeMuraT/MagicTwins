@@ -17,7 +17,7 @@ namespace basecross{
 	class Player : public GameObject {
 	private :
 		//撮影モード
-		bool m_CameraMode = true;
+		bool m_CameraMode = false;
 
 		//速度
 		float m_Speed = 3.0f;
@@ -117,8 +117,6 @@ namespace basecross{
 		bool m_ShotMagicFlg = false;
 		//ターゲットモードフラグ
 		bool m_TargetModeFlg = false;
-		//ターゲット枠
-		shared_ptr<GameObject> m_TargetModeFrame;
 		//ターゲットモード中
 		void TargetMode();
 		//ターゲットモード解除

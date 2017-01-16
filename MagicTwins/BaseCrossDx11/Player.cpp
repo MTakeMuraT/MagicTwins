@@ -104,7 +104,7 @@ namespace basecross {
 				auto objtrans = obj->AddComponent<Transform>();
 				//1920,1080
 				//960,540
-				objtrans->SetPosition(-600, 390, 0);
+				objtrans->SetPosition(-550, 450, 0);
 				objtrans->SetRotation(0, 0, 0);
 				objtrans->SetScale(400, 130, 1);
 				obj->SetAlphaActive(true);
@@ -151,20 +151,6 @@ namespace basecross {
 				CHU->SetDrawActive(true);
 				m_CharaUI = CHU;
 				//キャラUI表示--------------------------------------
-
-				//ターゲットモード枠--------------------------------------
-				auto TargetFrame = GetStage()->AddGameObject<GameObject>();
-				auto TFT = TargetFrame->AddComponent<Transform>();
-				TFT->SetPosition(0, 0, 0);
-				TFT->SetRotation(0, 0, 0);
-				TFT->SetScale(1920, 1080, 1);
-				auto TFD = TargetFrame->AddComponent<PCTSpriteDraw>();
-				TFD->SetTextureResource(L"TARGETFRAME_TX");
-				TargetFrame->SetAlphaActive(true);
-				TargetFrame->SetDrawLayer(2);
-				TargetFrame->SetDrawActive(false);
-				m_TargetModeFrame = TargetFrame;
-				//ターゲットモード枠--------------------------------------
 
 
 				//ターゲットモード照準(ステージに保存)--------------------------------------
@@ -247,7 +233,7 @@ namespace basecross {
 				auto objtrans = obj->AddComponent<Transform>();
 				//1920,1080
 				//960,540
-				objtrans->SetPosition(-600, 390, 0);
+				objtrans->SetPosition(-550, 450, 0);
 				objtrans->SetRotation(0, 0, 0);
 				objtrans->SetScale(400, 130, 1);
 				obj->SetAlphaActive(true);
@@ -270,21 +256,6 @@ namespace basecross {
 				CHU->SetDrawActive(false);
 				m_CharaUI = CHU;
 				//キャラUI表示--------------------------------------
-
-
-				//ターゲットモード枠--------------------------------------
-				auto TargetFrame = GetStage()->AddGameObject<GameObject>();
-				auto TFT = TargetFrame->AddComponent<Transform>();
-				TFT->SetPosition(0, 0, 0);
-				TFT->SetRotation(0, 0, 0);
-				TFT->SetScale(1920, 1080, 1);
-				auto TFD = TargetFrame->AddComponent<PCTSpriteDraw>();
-				TFD->SetTextureResource(L"TARGETFRAME_TX");
-				TargetFrame->SetAlphaActive(true);
-				TargetFrame->SetDrawLayer(2);
-				TargetFrame->SetDrawActive(false);
-				m_TargetModeFrame = TargetFrame;
-				//ターゲットモード枠--------------------------------------
 
 			}
 		}
@@ -581,22 +552,19 @@ namespace basecross {
 					angle *= -1;
 					TranP->SetRotation(Vector3(0, angle, 0));
 
-
-					if (!m_TargetModeFlg)
+					//アニメーション更新
+					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
+					if (PtrDraw->GetCurrentAnimation() == L"walk")
 					{
 						//アニメーション更新
-						auto PtrDraw = GetComponent<PNTBoneModelDraw>();
-						if (PtrDraw->GetCurrentAnimation() == L"walk")
-						{
-							//アニメーション更新
-							PtrDraw->UpdateAnimation(1.5f * ElapsedTime * ((abs(inputXY.x) + abs(inputXY.y)) / 2));
-						}
-						else
-						{
-							//アニメーション変更
-							PtrDraw->ChangeCurrentAnimation(L"walk");
-						}
+						PtrDraw->UpdateAnimation(1.5f * ElapsedTime * ((abs(inputXY.x) + abs(inputXY.y)) / 2));
 					}
+					else
+					{
+						//アニメーション変更
+						PtrDraw->ChangeCurrentAnimation(L"walk");
+					}
+				
 					////アニメーションを更新する(コントローラーを傾けると動く)
 					//auto PtrDraw = GetComponent<PNTBoneModelDraw>();
 					//if (PtrDraw->GetCurrentAnimation() == L"walk") {
@@ -606,8 +574,8 @@ namespace basecross {
 					//	//PtrDraw->ChangeCurrentAnimation(L"Default");
 					//}
 				}
-				//移動入力がなければかつターゲットモードじゃない
-				else if(!m_TargetModeFlg)
+				//移動入力がなければ
+				else
 				{
 					//アニメーション
 					auto PtrDraw = GetComponent<PNTBoneModelDraw>();
@@ -627,22 +595,19 @@ namespace basecross {
 				{
 					TargetMode();
 				}
+
 				//L肩ボタンで位置固定
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				{
-					m_velocity = Vector2(0, 0);
+					//これ入れると押したとき停止
+					//m_velocity = Vector2(0, 0);
 					m_TargetModeFlg = true;
-					m_TargetModeFrame->SetDrawActive(true);
 				}
-				else
+				if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				{
-					if (m_TargetModeFrame->GetDrawActive())
-					{
-						m_TargetModeFlg = false;
+					m_TargetModeFlg = false;
 
-						m_TargetModeFrame->SetDrawActive(false);
-						TargetModeRelease();
-					}
+					TargetModeRelease();
 				}
 
 				//Xボタン押したら魔法発射
@@ -1141,7 +1106,7 @@ namespace basecross {
 		auto EnemyGroup = GetStage()->GetSharedObjectGroup(L"Enemy", false)->GetGroupVector();
 
 		//最短の距離
-		float Distance = 999999;
+		float Distance = 99999;
 
 		//自分の座標
 		Vector3 PlayerPos = GetComponent<Transform>()->GetPosition();
@@ -1157,15 +1122,6 @@ namespace basecross {
 			//エネミーが生きてたら
 			if (EnemyPtr->GetActive())
 			{
-				EnemySurvivalFlg = true;
-				//照準をもってきて消えてたら表示
-				auto TargetAim = GetStage()->GetSharedGameObject<GameObject>(L"TargetAim", false);
-				if (!TargetAim->GetDrawActive())
-				{
-					TargetAim->SetDrawActive(true);
-				}
-
-				
 				Vector3 EnemyPos = EnemyPtr->GetComponent<Transform>()->GetPosition();
 
 				//差を計算
@@ -1176,6 +1132,15 @@ namespace basecross {
 				//もし一番近かったら
 				if (nowDistance < Distance)
 				{
+					EnemySurvivalFlg = true;
+
+					//照準をもってきて消えてたら表示
+					auto TargetAim = GetStage()->GetSharedGameObject<GameObject>(L"TargetAim", false);
+					if (!TargetAim->GetDrawActive())
+					{
+						TargetAim->SetDrawActive(true);
+					}
+
 					//比較用距離を更新
 					Distance = nowDistance;
 					//プレイヤーの角度変更
@@ -1201,7 +1166,6 @@ namespace basecross {
 
 		}
 		auto TargetAim = GetStage()->GetSharedGameObject<GameObject>(L"TargetAim", false);
-
 		if (!EnemySurvivalFlg && TargetAim->GetDrawActive())
 		{
 			TargetAim->SetDrawActive(false);

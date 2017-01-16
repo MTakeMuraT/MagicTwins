@@ -114,7 +114,7 @@ namespace basecross{
 			//オーディオの初期化
 			m_AudioTitle = ObjectFactory::Create<MultiAudioObject>();
 			m_AudioTitle->AddAudioResource(L"TitleBGM");
-			m_AudioTitle->Start(L"TitleBGM");
+			m_AudioTitle->Start(L"TitleBGM",0.6f);
 			m_NowBGM = "Title";
 
 			m_AudioGame = ObjectFactory::Create<MultiAudioObject>();
@@ -138,6 +138,7 @@ namespace basecross{
 		m_AudioResult->Stop(L"ResultBGM");
 		m_AudioGameOver->Stop(L"GameOverBGM");
 		m_AudioTitle->Stop(L"TitleBGM");
+		m_NowBGM = "None";
 	}
 
 	void Scene::OnEvent(const shared_ptr<Event>& event) {
@@ -147,7 +148,7 @@ namespace basecross{
 			//音全停止
 			StopBGM();
 			//再生
-			m_AudioTitle->Start(L"TitleBGM",XAUDIO2_LOOP_INFINITE,0.5f);
+			m_AudioTitle->Start(L"TitleBGM",XAUDIO2_LOOP_INFINITE,0.6f);
 			m_NowBGM = "Title";
 			ResetActiveStage<Title>();
 		}
@@ -158,7 +159,7 @@ namespace basecross{
 			if (m_NowBGM != "Title")
 			{
 				StopBGM();
-				m_AudioTitle->Start(L"TitleBGM", XAUDIO2_LOOP_INFINITE, 0.5f);
+				m_AudioTitle->Start(L"TitleBGM", XAUDIO2_LOOP_INFINITE, 0.6f);
 				//なってる音更新
 				m_NowBGM = "Title";
 			}

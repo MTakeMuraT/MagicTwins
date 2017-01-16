@@ -394,7 +394,7 @@ namespace basecross {
 					//タイムロゴ作成
 					auto obj = AddGameObject<GameObject>();
 					auto objTrans = obj->AddComponent<Transform>();
-					objTrans->SetPosition(-680, 200, 0);
+					objTrans->SetPosition(-640, 200, 0);
 					objTrans->SetScale(450, 450, 1);
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -418,7 +418,7 @@ namespace basecross {
 						//タイムロゴ作成
 						auto obj = AddGameObject<GameObject>();
 						auto objTrans = obj->AddComponent<Transform>();
-						objTrans->SetPosition(-680, 200, 0);
+						objTrans->SetPosition(-640, 200, 0);
 						objTrans->SetScale(450, 450, 1);
 						objTrans->SetRotation(0, 0, 0);
 						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -464,7 +464,7 @@ namespace basecross {
 					//アイテムロゴ作成
 					auto obj = AddGameObject<GameObject>();
 					auto objTrans = obj->AddComponent<Transform>();
-					objTrans->SetPosition(-640, 30, 0);
+					objTrans->SetPosition(-600, 30, 0);
 					objTrans->SetScale(500, 500, 1);
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -498,7 +498,7 @@ namespace basecross {
 						//アイテムロゴ作成
 						auto obj = AddGameObject<GameObject>();
 						auto objTrans = obj->AddComponent<Transform>();
-						objTrans->SetPosition(-640, 30, 0);
+						objTrans->SetPosition(-600, 30, 0);
 						objTrans->SetScale(500, 500, 1);
 						objTrans->SetRotation(0, 0, 0);
 						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -623,7 +623,7 @@ namespace basecross {
 					//ランクロゴ作成
 					auto obj = AddGameObject<GameObject>();
 					auto objTrans = obj->AddComponent<Transform>();
-					objTrans->SetPosition(-690, -150, 0);
+					objTrans->SetPosition(-650, -150, 0);
 					objTrans->SetScale(500, 500, 1);
 					objTrans->SetRotation(0, 0, 0);
 					auto objDraw = obj->AddComponent<PCTSpriteDraw>();
@@ -647,7 +647,7 @@ namespace basecross {
 						//ランクロゴ作成
 						auto obj = AddGameObject<GameObject>();
 						auto objTrans = obj->AddComponent<Transform>();
-						objTrans->SetPosition(-690, -150, 0);
+						objTrans->SetPosition(-650, -150, 0);
 						objTrans->SetScale(500, 500, 1);
 						objTrans->SetRotation(0, 0, 0);
 						auto objDraw = obj->AddComponent<PCTSpriteDraw>();
