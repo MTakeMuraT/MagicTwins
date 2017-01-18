@@ -1501,7 +1501,7 @@ namespace basecross{
 		auto MaP = GetStage()->AddGameObject<GameObject>();
 		auto MaTP = MaP->AddComponent<Transform>();
 		MaTP->SetPosition(0, 0, 0);
-		MaTP->SetScale(500,500,1);
+		MaTP->SetScale(1024,650,1);
 		MaTP->SetRotation(0, 0, 0);
 		auto MaTDP = MaP->AddComponent<PCTSpriteDraw>();
 		//シーンからステージ番号取得

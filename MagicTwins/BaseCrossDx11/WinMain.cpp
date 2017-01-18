@@ -10,7 +10,7 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 //íËêî
 const wchar_t* pClassName = L"BaseCrossDx11Class";
-const wchar_t* pWndTitle = L"BaseCrossDx11Sample";
+const wchar_t* pWndTitle = L"MagicTwins";
 
 
 //--------------------------------------------------------------------------------------

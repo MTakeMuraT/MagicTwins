@@ -249,7 +249,7 @@ namespace basecross {
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring strTexture;
-		for (int i = 0; i <= 20; i++)
+		for (int i = 0; i <= 10; i++)
 		{
 			wstring num = Util::IntToWStr(i);
 
@@ -267,9 +267,9 @@ namespace basecross {
 		auto ImageP = AddGameObject<GameObject>();
 		//座標とか指定
 		auto ImageTrans = ImageP->AddComponent<Transform>();
-		ImageTrans->SetPosition(5, 6, 0);
+		ImageTrans->SetPosition(5, 2, 0);
 		ImageTrans->SetRotation(0, 0, 0);
-		ImageTrans->SetScale(945, 550, 1);
+		ImageTrans->SetScale(955, 565, 1);
 
 		//画像貼り付け
 		auto ImageDraw = ImageP->AddComponent<PCTSpriteDraw>();
@@ -312,9 +312,9 @@ namespace basecross {
 		else
 		{
 			scale.x += 10000 * App::GetApp()->GetElapsedTime();
-			if (scale.x > 945)
+			if (scale.x > 955)
 			{
-				scale.x = 945;
+				scale.x = 955;
 				m_SIHalfFlg = false;
 				m_StageImageRotFlg = false;
 			}
@@ -418,6 +418,13 @@ namespace basecross {
 				auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 				if (CntlVec[0].bConnected)
 				{
+					//スタートとバック同時押してタイトルに
+					if (CntlVec[0].wButtons & XINPUT_GAMEPAD_START && CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK)
+					{
+						auto ScenePtr = App::GetApp()->GetScene<Scene>();
+						PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
+					}
+
 					if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B ||
 						CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
 					{

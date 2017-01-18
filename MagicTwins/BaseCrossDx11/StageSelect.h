@@ -28,7 +28,7 @@ namespace basecross {
 		void CreateStageImage();
 
 		//Å‘å’l
-		unsigned int m_MaxStageNum = 20;
+		unsigned int m_MaxStageNum = 10;
 		//Œ»İ‘I‘ğ’†‚Ì”š
 		unsigned int m_StageNum = 0;
 

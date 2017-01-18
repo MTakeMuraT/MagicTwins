@@ -295,6 +295,12 @@ namespace basecross {
 		m_Black = BlackP;
 		//暗転用幕--------------------------------------
 
+
+		if (m_CameraMode)
+		{
+			m_CameraPos = Vector3(0, 10, -3);
+			m_CameraTargetVec = Vector3(0, 0, 0);
+		}
 	}
 
 	//更新
@@ -318,11 +324,11 @@ namespace basecross {
 				auto View = GetStage()->GetView();
 				auto CameraP = View->GetTargetCamera();
 
-				int speed = 1;
-				//右肩ボタンで高速化
+				float speed = 1;
+				//右肩ボタンで低速化
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				{
-					speed = 2;
+					speed = 0.5f;
 				}
 
 				//移動入力
@@ -331,15 +337,15 @@ namespace basecross {
 					Vector2 InputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
 					InputXY *= 0.3f * speed;
 					m_CameraPos += Vector3(InputXY.x,0, InputXY.y);
-					m_CameraTargetVec += Vector3(InputXY.x, InputXY.y, 0);
+					m_CameraTargetVec += Vector3(InputXY.x, 0, InputXY.y);
 
 				}
-				if (abs(CntlVec[0].fThumbRX) > 0.1f || abs(CntlVec[0].fThumbRY) > 0.1f)
+		/*		if (abs(CntlVec[0].fThumbRX) > 0.1f || abs(CntlVec[0].fThumbRY) > 0.1f)
 				{
 					Vector2 InputXY = Vector2(CntlVec[0].fThumbRX, CntlVec[0].fThumbRY);
 					InputXY *= 0.3f * speed;
 					m_CameraPos += Vector3(InputXY.x, 0, InputXY.y);
-				}
+				}*/
 				//十字キー上でカメラ↑行く
 				if (abs(CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_UP))
 				{

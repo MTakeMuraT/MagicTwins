@@ -277,6 +277,16 @@ namespace basecross
 
 			auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 
+			if (CntlVec[0].bConnected)
+			{
+				//スタートとバック同時押してタイトルに
+				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_START && CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK)
+				{
+					auto ScenePtr = App::GetApp()->GetScene<Scene>();
+					PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
+				}
+			}
+
 			Vector2 inputXY = Vector2(CntlVec[0].fThumbLX, CntlVec[0].fThumbLY);
 			if (!m_moveFlg)
 			{

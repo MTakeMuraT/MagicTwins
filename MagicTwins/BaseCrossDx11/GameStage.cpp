@@ -127,7 +127,7 @@ namespace basecross {
 		strTexture = DataDir + L"map/map.png";
 		App::GetApp()->RegisterTexture(L"MAP_TX", strTexture);
 		//マップ
-		for (int i = 0; i <= 21; i++)
+		for (int i = 0; i <= 10; i++)
 		{
 			wstring txt = L"StageMap/Stage_" + Util::IntToWStr(i) + L".png";
 			strTexture = DataDir + txt;
@@ -1145,7 +1145,7 @@ namespace basecross {
 					auto ScenePtr = App::GetApp()->GetScene<Scene>();
 					int StageNum = ScenePtr->GetStageNum();
 					StageNum++;
-					if (StageNum <= 21)
+					if (StageNum <= 10)
 					{
 						ScenePtr->SetStageNum(StageNum);
 						PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
@@ -1337,11 +1337,11 @@ namespace basecross {
 		auto CntlVec = App::GetApp()->GetInputDevice().GetControlerVec();
 		if (CntlVec[0].bConnected)
 		{
-			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_BACK)
+			//スタートとバック同時押してタイトルに
+			if (CntlVec[0].wButtons & XINPUT_GAMEPAD_START && CntlVec[0].wButtons & XINPUT_GAMEPAD_BACK)
 			{
 				auto ScenePtr = App::GetApp()->GetScene<Scene>();
-				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
-
+				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"Title");
 			}
 			//ポーズ
 			if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_START)
