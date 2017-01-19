@@ -2794,5 +2794,148 @@ namespace basecross{
 
 		}
 	}
+
+	//--------------------------------------------------------------------------------------
+	//	class Cloud : public GameObject;
+	//	用途: 右から左に流れる雲の生みの親
+	//--------------------------------------------------------------------------------------
+	Cloud::Cloud(const shared_ptr<Stage>& StagePtr, Vector3 scale, float speed,int layer,int mode):
+		GameObject(StagePtr),
+		m_Scale(scale),
+		m_Speed(speed),
+		m_Layer(layer),
+		m_mode(mode)
+	{}
+
+	void Cloud::OnUpdate()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		for (auto v : m_Clouds)
+		{
+			//表示されてれば移動
+			if (v->GetDrawActive())
+			{
+				Vector3 pos = v->GetComponent<Transform>()->GetPosition();
+				pos.x += -m_Speed;
+				v->GetComponent<Transform>()->SetPosition(pos);
+				//座標が左端＋自分のスケールの半分移動できたら
+				if (pos.x < (-960 - (m_Scale.x / 2)))
+				{
+					v->SetDrawActive(false);
+
+				}
+			}
+		}
+
+		if (m_SpawnFlg)
+		{
+			if (m_time > m_IntTime/2)
+			{
+				if (m_MoveFlg)
+				{
+					m_MoveFlg = false;
+					//一定時間で変形
+					for (auto v : m_Clouds)
+					{
+						//表示されてれば変形
+						if (v->GetDrawActive())
+						{
+							Vector3 scale = v->GetComponent<Transform>()->GetScale();
+							scale.x += rand() % 50 - 25;
+							scale.y += rand() % 50 - 25;
+							v->GetComponent<Transform>()->SetScale(scale);
+						}
+					}
+				}
+			}
+			if (m_time > m_IntTime)
+			{
+				m_MoveFlg = true;
+				//一定時間で変形
+				for (auto v : m_Clouds)
+				{
+					//表示されてれば変形
+					if (v->GetDrawActive())
+					{
+						Vector3 scale = v->GetComponent<Transform>()->GetScale();
+						scale.x += rand() % 50 - 25;
+						scale.y += rand() % 50 - 25;
+						v->GetComponent<Transform>()->SetScale(scale);
+					}
+				}
+
+				//出てきたかどうかのフラグ
+				bool SpawnFlg = true;
+				m_time = 0;
+				//設定した確立にあたったら
+				if (rand() % 100 < m_ParSpawn)
+				{
+					for (auto v : m_Clouds)
+					{
+						//もし表示されてなければ再利用
+						if (!v->GetDrawActive())
+						{
+							SpawnFlg = false;
+							v->SetDrawActive(true);
+							Vector3 pos;
+							if (m_mode == 0)
+							{
+								pos = Vector3(1200, rand() % 600 -200, 0);
+							}
+							else
+							{
+								pos = Vector3(1200, rand() % 400 + 200, 0);
+							}
+							v->GetComponent<Transform>()->SetPosition(pos);
+
+							if (rand() % 2 == 1)
+							{
+								v->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"CLOUD1_TX");
+							}
+							else
+							{
+								v->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"CLOUD2_TX");
+							}
+							//サイズ初期化
+							v->GetComponent<Transform>()->SetScale(m_Scale);
+
+							break;
+						}
+					}
+					//もし再利用できなかったら
+					if (SpawnFlg)
+					{
+						auto obj = GetStage()->AddGameObject<GameObject>();
+						auto obTrans = obj->AddComponent<Transform>();
+						Vector3 pos;
+						if (m_mode == 0)
+						{
+							pos = Vector3(1200, rand() % 600 - 200, 0);
+						}
+						else
+						{
+							pos = Vector3(1200, rand() % 400 + 200, 0);
+						}
+
+						obTrans->SetPosition(pos);
+						obTrans->SetScale(m_Scale);
+						obTrans->SetRotation(0, 0, 0);
+						auto obDraw = obj->AddComponent<PCTSpriteDraw>();
+						obDraw->SetTextureResource(L"CLOUD1_TX");
+						obj->SetAlphaActive(true);
+						obj->SetDrawLayer(m_Layer);
+
+						m_Clouds.push_back(obj);
+					}
+				}
+			}
+		}
+	}
+
+	void Cloud::StopCloud()
+	{
+		m_SpawnFlg = false;
+		m_Speed *= 10;
+	}
 }
 //end basecross

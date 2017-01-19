@@ -818,5 +818,38 @@ namespace basecross{
 
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class Cloud : public GameObject;
+	//	用途: 右から左に流れる雲の生みの親
+	//--------------------------------------------------------------------------------------
+	class Cloud : public GameObject
+	{
+	private:
+		//初期サイズ
+		Vector3 m_Scale;
+		//計算用時間
+		float m_time = 0;
+		//生成感覚
+		const float m_IntTime = 2.0f;
+		//速度(全部一定)
+		float m_Speed = 3;
+		//1秒ごとに生成される確率
+		const float m_ParSpawn = 50.0f;
+		//レイヤー
+		int m_Layer;
+		//雲たち
+		vector<shared_ptr<GameObject>> m_Clouds;
+		//生成フラグ
+		bool m_SpawnFlg = true;
+		//範囲指定めんどいので
+		int m_mode = 0;
+		//動いてるやつのフラグ
+		bool m_MoveFlg = true;
+	public:
+		Cloud(const shared_ptr<Stage>& StagePtr, Vector3 scale,float speed,int layer,int mode);
+		void OnUpdate() override;
+		void StopCloud();
+	};
+
 }
 //end basecross

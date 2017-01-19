@@ -378,6 +378,9 @@ namespace basecross {
 
 			}
 
+			//‰_’Ç‰Á
+			AddGameObject<Cloud>(Vector3(150, 100, 1), 5, 1,1);
+
 		}
 		catch (...) {
 			throw;

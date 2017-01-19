@@ -34,6 +34,12 @@ namespace basecross {
 		strTexture = DataDir + L"Frame.png";
 		App::GetApp()->RegisterTexture(L"FRAME_TX", strTexture);
 
+		//â_ÇP
+		strTexture = DataDir + L"Cloud01.png";
+		App::GetApp()->RegisterTexture(L"CLOUD1_TX", strTexture);
+		//â_ÇQ
+		strTexture = DataDir + L"Cloud02.png";
+		App::GetApp()->RegisterTexture(L"CLOUD2_TX", strTexture);
 
 	}
 
@@ -285,6 +291,8 @@ namespace basecross {
 			m_String = StringPtr;
 
 
+			//â_í«â¡
+			SetSharedGameObject(L"Cloud",AddGameObject<Cloud>(Vector3(300, 200, 1), 5, 1,0));
 		}
 		catch (...) {
 			throw;
@@ -354,6 +362,8 @@ namespace basecross {
 				{
 					m_AnimationFlg = true;
 
+					//â_í‚é~
+					GetSharedGameObject<Cloud>(L"Cloud", false)->StopCloud();
 					//SEçƒê∂
 					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectTitle");
 				}
