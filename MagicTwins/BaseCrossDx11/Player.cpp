@@ -756,8 +756,8 @@ namespace basecross {
 		//‚Â‚¢‚Å‚É”wŒi‚àˆÚ“®
 		auto obj = GetStage()->GetSharedGameObject<GameObject>(L"Back",false);
 		Vector3 PlayerPos = GetComponent<Transform>()->GetPosition();
-		PlayerPos.y += -14;
-		PlayerPos.z += 15;
+		PlayerPos.y += -40;
+		PlayerPos.z += 0;
 		obj->GetComponent<Transform>()->SetPosition(PlayerPos);
 		
 	}

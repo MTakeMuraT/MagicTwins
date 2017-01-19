@@ -1807,17 +1807,28 @@ namespace basecross{
 
 	void ScoreItem::OnCreate()
 	{
+		// モデルとトランスフォームの間の差分行列
+		float angle = (-90) * (3.14159265f / 180);
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(0.5f, 0.5f, 0.5f),
+			Vector3(0, angle, 0),
+			Vector3(0, 0, 0)
+			);
+
+
 		//影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
 		//影の形（メッシュ）を設定
-		ShadowPtr->SetMeshResource(L"DEFAULT_SPHERE");
-		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticDraw>();
-		//メッシュを設定
-		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
+		ShadowPtr->SetMeshResource(L"Coin_Model");
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
 
-		//テクスチャを設定
-		PtrDraw->SetTextureResource(L"SCOREITEM_TX");
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"Coin_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
 
 		SetAlphaActive(true);
 
