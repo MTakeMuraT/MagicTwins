@@ -1812,7 +1812,7 @@ namespace basecross{
 		Matrix4X4 SpanMat;
 		SpanMat.DefTransformation(
 			Vector3(0.5f, 0.5f, 0.5f),
-			Vector3(0, angle, 0),
+			Vector3(0, 0, 0),
 			Vector3(0, 0, 0)
 			);
 
@@ -1841,6 +1841,17 @@ namespace basecross{
 		//****‰¼	
 		//Kieru();
 		//****‰¼
+	}
+
+	void ScoreItem::OnUpdate()
+	{
+		/*
+		//‰ñ“]
+		auto Trans = GetComponent<Transform>();
+		Vector3 rot = Trans->GetRotation();
+		rot.y += 3 * (3.14159265f / 180);
+		Trans->SetRotation(rot);
+		*/
 	}
 
 	void ScoreItem::Delete()

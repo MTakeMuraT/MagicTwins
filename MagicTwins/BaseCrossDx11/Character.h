@@ -464,6 +464,7 @@ namespace basecross{
 		ScoreItem(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale);
 
 		void OnCreate() override;
+		void OnUpdate() override;
 
 		void Delete();
 
