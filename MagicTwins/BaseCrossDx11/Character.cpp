@@ -1799,7 +1799,7 @@ namespace basecross{
 	//	class ScoreItem : public GameObject;
 	//	用途:　スコアアイテム
 	//--------------------------------------------------------------------------------------
-	ScoreItem::ScoreItem(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale):
+	ScoreItem::ScoreItem(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale) :
 		GameObject(StagePtr),
 		m_InitPos(pos),
 		m_InitScale(scale)
@@ -1807,6 +1807,7 @@ namespace basecross{
 
 	void ScoreItem::OnCreate()
 	{
+
 		// モデルとトランスフォームの間の差分行列
 		float angle = (-90) * (3.14159265f / 180);
 		Matrix4X4 SpanMat;
@@ -1817,18 +1818,20 @@ namespace basecross{
 			);
 
 
-		//影をつける（シャドウマップを描画する）
+		/*影をつける（シャドウマップを描画する）
 		auto ShadowPtr = AddComponent<Shadowmap>();
-		//影の形（メッシュ）を設定
+		影の形（メッシュ）を設定
 		ShadowPtr->SetMeshResource(L"Coin_Model");
-		ShadowPtr->SetMeshToTransformMatrix(SpanMat);
+		ShadowPtr->SetMeshToTransformMatrix(SpanMat);*/
 
 
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		auto PtrDraw = AddComponent<PNTBoneModelDraw>();
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"Coin_Model");
 		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+		PtrDraw->AddAnimation(L"Coin", 0, 60, 60);
+
 
 		SetAlphaActive(true);
 
@@ -1845,13 +1848,16 @@ namespace basecross{
 
 	void ScoreItem::OnUpdate()
 	{
-		/*
+
 		//回転
-		auto Trans = GetComponent<Transform>();
+		/*auto Trans = GetComponent<Transform>();
 		Vector3 rot = Trans->GetRotation();
-		rot.y += 3 * (3.14159265f / 180);
-		Trans->SetRotation(rot);
-		*/
+		rot.y += 50 * (3.14159265f / 180);
+		Trans->SetRotation(rot);*/
+
+		float ElapsedTime = App::GetApp()->GetElapsedTime();
+		GetComponent<PNTBoneModelDraw>()->UpdateAnimation(ElapsedTime);
+
 	}
 
 	void ScoreItem::Delete()

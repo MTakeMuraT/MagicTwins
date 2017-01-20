@@ -28,9 +28,9 @@ namespace basecross
 		//ƒŠƒ\[ƒX“Ç‚Ýž‚Ý
 		wstring DataDir;
 		App::GetApp()->GetDataDirectory(DataDir);
-		wstring strTexture = DataDir + L"Tutorial/Tex1.png";
+		wstring strTexture = DataDir + L"Tutorial/Setu1.png";
 		App::GetApp()->RegisterTexture(L"TImage1", strTexture);
-		strTexture = DataDir + L"Tutorial/Tex2.png";
+		strTexture = DataDir + L"Tutorial/Setu2.png";
 		App::GetApp()->RegisterTexture(L"TImage2", strTexture);
 
 		auto obj = AddGameObject<GameObject>();
@@ -44,6 +44,9 @@ namespace basecross
 
 		obj->SetAlphaActive(true);
 		m_Image = obj;
+
+		//SE
+		SetSharedGameObject(L"SEM", AddGameObject<SEManager>());
 
 		//‚¢‚Â‚à‚Ì
 		try {
@@ -74,6 +77,7 @@ namespace basecross
 				if (CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_B ||
 					CntlVec[0].wPressedButtons & XINPUT_GAMEPAD_A)
 				{
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
 					m_TexNum++;
 					if (m_TexNum > m_MaxTexNum)
 					{

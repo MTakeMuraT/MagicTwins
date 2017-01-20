@@ -8,7 +8,7 @@ namespace basecross {
 		App::GetApp()->GetDataDirectory(DataDir);
 		wstring strTexture = DataDir + L"StageSelectLogo.png";
 		App::GetApp()->RegisterTexture(L"STAGESELECTLOGO_TX", strTexture);
-		strTexture = DataDir + L"StageSelect_Back.png";
+		strTexture = DataDir + L"TitleBack.png";
 		App::GetApp()->RegisterTexture(L"SELECTBACK_TX", strTexture);
 		//左矢印画像(仮)
 		strTexture = DataDir + L"Left.png";
@@ -36,6 +36,20 @@ namespace basecross {
 		strTexture = DataDir + L"Black.png";
 		App::GetApp()->RegisterTexture(L"BLACK_TX", strTexture);
 
+		//目の画像
+		strTexture = DataDir + L"eye_1.png";
+		App::GetApp()->RegisterTexture(L"EYE_0_TX", strTexture);
+		strTexture = DataDir + L"eye_2.png";
+		App::GetApp()->RegisterTexture(L"EYE_1_TX", strTexture);
+		strTexture = DataDir + L"eye_3.png";
+		App::GetApp()->RegisterTexture(L"EYE_2_TX", strTexture);
+		//2
+		strTexture = DataDir + L"eye2_1.png";
+		App::GetApp()->RegisterTexture(L"EYE2_0_TX", strTexture);
+		strTexture = DataDir + L"eye2_2.png";
+		App::GetApp()->RegisterTexture(L"EYE2_1_TX", strTexture);
+		strTexture = DataDir + L"eye2_3.png";
+		App::GetApp()->RegisterTexture(L"EYE2_2_TX", strTexture);
 
 	}
 
@@ -379,7 +393,11 @@ namespace basecross {
 			}
 
 			//雲追加
-			AddGameObject<Cloud>(Vector3(150, 100, 1), 5, 1,1);
+			AddGameObject<Cloud>(Vector3(300, 300, 1), 5, 1,0);
+
+			//キャラ目
+			AddGameObject<CharEye>(Vector3(-706, -158, 0), false);
+			AddGameObject<CharEye>(Vector3(684, -158, 0), true);
 
 		}
 		catch (...) {
@@ -502,5 +520,103 @@ namespace basecross {
 		}
 	}
 
+
+	//--------------------------------------------------------------------------------------
+	//	class CharEye : public GameObject;
+	//	用途: キャラの目
+	//	設定した時間ごとに瞬きするか判定しながら瞬き
+	//--------------------------------------------------------------------------------------
+	CharEye::CharEye(const shared_ptr<Stage>& StagePtr,Vector3 pos,bool flg):
+		GameObject(StagePtr),
+		m_Pos(pos),
+		m_2PlayerFlg(flg)
+	{}
+
+	void CharEye::OnCreate()
+	{
+		for (int i = 0; i <= 2; i++)
+		{
+			auto obj = GetStage()->AddGameObject<GameObject>();
+			auto Trans = obj->AddComponent<Transform>();
+			Trans->SetPosition(m_Pos);
+			Trans->SetScale(788,786,1);
+			Trans->SetRotation(0,0,0);
+			auto Draw = obj->AddComponent<PCTSpriteDraw>();
+			if (!m_2PlayerFlg)
+			{
+				wstring txt = L"EYE_";
+				txt += Util::IntToWStr(i) + L"_TX";
+				Draw->SetTextureResource(txt);
+			}
+			else
+			{
+				wstring txt = L"EYE2_";
+				txt += Util::IntToWStr(i) + L"_TX";
+				Draw->SetTextureResource(txt);
+			}
+
+			obj->SetAlphaActive(true);
+			//一個目以外消す
+			if (i >= 1)
+			{
+				obj->SetDrawActive(false);
+			}
+			obj->SetDrawLayer(2);
+			m_Eyes.push_back(obj);
+		}
+	}
+
+	void CharEye::OnUpdate()
+	{
+		if (m_EyeCloseFlg)
+		{
+			EyeClose();
+		}
+		else
+		{
+			m_CountTime += App::GetApp()->GetElapsedTime();
+			if (m_CountTime > m_IntarvalEyeTime)
+			{
+				m_CountTime = 0;
+				//確率当てる
+				if (rand() % 100 < m_Par)
+				{
+					m_EyeCloseFlg = true;
+				}
+			}
+		}
+	}
+
+	void CharEye::EyeClose()
+	{
+		m_CountTime += App::GetApp()->GetElapsedTime();
+		if (m_CountTime > m_EyeCloseTime)
+		{
+			m_CountTime = 0;
+			m_EyeCloseState++;
+			switch (m_EyeCloseState)
+			{
+				//目半閉じ
+			case 1:
+				m_Eyes[0]->SetDrawActive(false);
+				m_Eyes[1]->SetDrawActive(true);
+				break;
+				//目閉じ
+			case 2:
+				m_Eyes[1]->SetDrawActive(false);
+				m_Eyes[2]->SetDrawActive(true);
+				break;
+				//目開け
+			case 3:
+				m_Eyes[2]->SetDrawActive(false);
+				m_Eyes[0]->SetDrawActive(true);
+
+				m_EyeCloseFlg = false;
+				m_EyeCloseState = 0;
+				break;
+			}
+		}
+
+	}
 }
 

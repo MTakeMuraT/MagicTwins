@@ -54,4 +54,38 @@ namespace basecross {
 		virtual void OnUpdate()override;
 	};
 
+	//--------------------------------------------------------------------------------------
+	//	class CharEye : public GameObject;
+	//	用途: キャラの目
+	//	設定した時間ごとに瞬きするか判定しながら瞬き
+	//--------------------------------------------------------------------------------------
+
+	class CharEye : public GameObject
+	{
+	private :
+		//初期位置
+		Vector3 m_Pos;
+		//目が変わる間隔
+		const float m_EyeCloseTime = 0.05f;
+		//間隔
+		const float m_IntarvalEyeTime = 1.0f;
+		//計算用
+		float m_CountTime = 0;
+		//目閉じてるフラグ
+		bool m_EyeCloseFlg = false;
+		//確率
+		const float m_Par = 50.0f;
+		int m_EyeCloseState = 0;
+		//0開き 1目半閉じ 2目閉じ
+		vector<shared_ptr<GameObject>> m_Eyes;
+
+		//2キャラ目かどうか
+		bool m_2PlayerFlg = false;
+	public :
+		CharEye(const shared_ptr<Stage>& StagePtr,Vector3 pos,bool flg);
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void EyeClose();
+	};
 }

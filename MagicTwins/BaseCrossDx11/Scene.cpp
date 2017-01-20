@@ -43,7 +43,7 @@ namespace basecross{
 		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"IceBlock/IceBlock.bmf");
 		App::GetApp()->RegisterResource(L"IceBlock_Model", ModelMesh);
 		//スコアアイテム
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Coin/Coin.bmf");
+		ModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"Coin/Coin.bmf");
 		App::GetApp()->RegisterResource(L"Coin_Model", ModelMesh);
 
 

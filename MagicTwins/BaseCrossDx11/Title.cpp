@@ -14,10 +14,10 @@ namespace basecross {
 		strTexture = DataDir + L"PS.png";
 		App::GetApp()->RegisterTexture(L"PRESSSTART_TX", strTexture);
 		//キャラ１
-		strTexture = DataDir + L"TitleChar1.png";
+		strTexture = DataDir + L"eye_1.png";
 		App::GetApp()->RegisterTexture(L"CHAR1_TX", strTexture);
 		//キャラ２
-		strTexture = DataDir + L"TitleChar2.png";
+		strTexture = DataDir + L"eye2_1.png";
 		App::GetApp()->RegisterTexture(L"CHAR2_TX", strTexture);
 
 		//ステージセレクトロゴ
