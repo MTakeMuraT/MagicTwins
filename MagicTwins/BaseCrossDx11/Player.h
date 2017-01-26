@@ -121,6 +121,33 @@ namespace basecross{
 		void TargetMode();
 		//ターゲットモード解除
 		void TargetModeRelease();
+
+		//ライフ大小
+		bool m_LifeFlg = false;
+		//ライフステート
+		int m_LifeState = 0;
+		//何回大小するか
+		const int m_lifeConCount = 5;
+		//何回大小するか
+		int m_lifeCount = 0;
+		//ライフ元の大きさ
+		Vector3 m_lifeSize = Vector3(400, 130, 1);
+		//ライフ減るアニメーション関数
+		void LifeDelete();
+
+
+		//魔法UI切り替えフラグ
+		bool m_ChangeMagicUIFlg = false;
+		bool m_CMUUp = false;
+		bool m_CMUDown = false;
+		//計算用時間
+		float m_CMUTime = 0;
+		//でっかくなってる時間
+		const float m_CMUCTime = 1.0f;
+		//元の大きさ
+		Vector3 m_CMUInitScale = Vector3(150, 150, 0);
+		//大きくする関数
+		void ChangeMagicAnima();
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))

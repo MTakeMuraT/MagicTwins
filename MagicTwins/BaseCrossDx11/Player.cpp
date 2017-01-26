@@ -104,7 +104,7 @@ namespace basecross {
 				auto objtrans = obj->AddComponent<Transform>();
 				//1920,1080
 				//960,540
-				objtrans->SetPosition(-550, 450, 0);
+				objtrans->SetPosition(-550, 420, 0);
 				objtrans->SetRotation(0, 0, 0);
 				objtrans->SetScale(400, 130, 1);
 				obj->SetAlphaActive(true);
@@ -143,7 +143,7 @@ namespace basecross {
 				auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
 				CHUD->SetTextureResource(L"CHARA1UI_TX");
 				auto CHUT = CHU->AddComponent<Transform>();
-				CHUT->SetPosition(-850, 450, 0);
+				CHUT->SetPosition(-850, 420, 0);
 				CHUT->SetRotation(0, 0, 0);
 				CHUT->SetScale(200, 200, 0);
 				CHU->SetAlphaActive(true);
@@ -233,7 +233,7 @@ namespace basecross {
 				auto objtrans = obj->AddComponent<Transform>();
 				//1920,1080
 				//960,540
-				objtrans->SetPosition(-550, 450, 0);
+				objtrans->SetPosition(-550, 420, 0);
 				objtrans->SetRotation(0, 0, 0);
 				objtrans->SetScale(400, 130, 1);
 				obj->SetAlphaActive(true);
@@ -248,7 +248,7 @@ namespace basecross {
 				auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
 				CHUD->SetTextureResource(L"CHARA2UI_TX");
 				auto CHUT = CHU->AddComponent<Transform>();
-				CHUT->SetPosition(-850, 450, 0);
+				CHUT->SetPosition(-850, 420, 0);
 				CHUT->SetRotation(0, 0, 0);
 				CHUT->SetScale(200, 200, 0);
 				CHU->SetAlphaActive(true);
@@ -373,6 +373,14 @@ namespace basecross {
 				PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameOver");
 			}
 			return;
+		}
+		if (m_LifeFlg)
+		{
+			LifeDelete();
+		}
+		if (m_ChangeMagicUIFlg && m_myName == "Player1")
+		{
+			ChangeMagicAnima();
 		}
 		if (m_WarpFlg)
 		{
@@ -909,6 +917,19 @@ namespace basecross {
 		if (m_myName == "Player1")
 		{
 			m_Magic = MT;
+			//演出
+			if (m_ChangeMagicUIFlg)
+			{
+				m_MagicUIIn->GetComponent<Transform>()->SetScale(m_CMUInitScale);
+				//m_ChangeMagicUIFlg = true;
+				m_CMUUp = false;
+				m_CMUDown = false;
+				m_CMUTime = 0;
+			}
+			else
+			{
+				m_ChangeMagicUIFlg = true;
+			}
 			GetStage()->GetSharedGameObject<Player>(L"Player2", false)->SetMagic(MT);
 		}
 		else if (m_myName == "Player2")
@@ -948,6 +969,46 @@ namespace basecross {
 			default:
 				break;
 			}
+		}
+	}
+
+	void Player::ChangeMagicAnima()
+	{
+		//でかくなる
+		if (!m_CMUUp)
+		{
+			auto scale = m_MagicUIIn->GetComponent<Transform>()->GetScale();
+			scale *= 1.1f;
+			m_MagicUIIn->GetComponent<Transform>()->SetScale(scale);
+			if (scale.x > m_CMUInitScale.x*2)
+			{
+				m_CMUUp = true;
+			}
+		}
+		//でかくなった後一定時間計測
+		else
+		{
+			m_CMUTime += App::GetApp()->GetElapsedTime();
+			if (m_CMUTime > m_CMUCTime)
+			{
+				m_CMUDown = true;
+			}
+		}
+		//小さくする
+		if (m_CMUDown)
+		{
+			auto scale = m_MagicUIIn->GetComponent<Transform>()->GetScale();
+			scale *= 0.9f;
+			m_MagicUIIn->GetComponent<Transform>()->SetScale(scale);
+			if (scale.x < m_CMUInitScale.x)
+			{
+				m_ChangeMagicUIFlg = false;
+				m_CMUUp = false;
+				m_CMUDown = false;
+				m_MagicUIIn->GetComponent<Transform>()->SetScale(m_CMUInitScale);
+				m_CMUTime = 0;
+			}
+
 		}
 	}
 
@@ -1016,6 +1077,8 @@ namespace basecross {
 		{
 			m_InviFlg = true;
 			m_life--;
+			m_LifeFlg = true;
+
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			//移動するためアタリ消す
 			GetComponent<CollisionSphere>()->SetUpdateActive(false);
@@ -1057,6 +1120,55 @@ namespace basecross {
 		}
 	}
 
+
+	void Player::LifeDelete()
+	{
+		auto Trans = m_LifeSprite->GetComponent<Transform>();
+		switch (m_LifeState)
+		{
+		case 0:
+			if (true)
+			{
+				auto scale = Trans->GetScale();
+				scale *= 1.1f;
+				Trans->SetScale(scale);
+				if (scale.x > m_lifeSize.x * 1.5f)
+				{
+					m_LifeState = 1;
+				}
+			}
+			break;
+		case 1:
+			if (true)
+			{
+				auto scale = Trans->GetScale();
+				scale *= 0.9f;
+				Trans->SetScale(scale);
+				if (scale.x < m_lifeSize.x * 0.5f)
+				{
+					m_LifeState = 0;
+					m_lifeCount++;
+					if (m_lifeCount >= m_lifeConCount)
+					{
+						m_LifeState = 2;
+					}
+				}
+			}
+			break;
+		case 2:
+			Trans->SetScale(m_lifeSize);
+			m_LifeFlg = false;
+			m_LifeState = 0;
+			m_lifeCount = 0;
+			break;
+		default:
+			break;
+		}
+
+		
+
+	}
+
 	void Player::PlayerTerrainDamege()
 	{
 		//移動するためアタリ消す
@@ -1074,7 +1186,7 @@ namespace basecross {
 
 		//ライフ現象
 		m_life--;
-
+		m_LifeFlg = true;
 		auto ScenePtr = App::GetApp()->GetScene<Scene>();
 
 		//SE再生

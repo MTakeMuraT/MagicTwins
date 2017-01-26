@@ -694,6 +694,11 @@ namespace basecross{
 		//透明処理
 		SetAlphaActive(true);
 
+
+		//パーティクル作成
+		auto obj = GetStage()->AddGameObject<MagicParticle>();		
+		//obj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
+		m_Particle = obj;
 	}
 
 	void Enemy::OnUpdate()
@@ -716,6 +721,8 @@ namespace basecross{
 					m_deleteFlg = false;
 					GetComponent<Transform>()->SetPosition(0, -15, 0);
 					GetComponent<Transform>()->SetScale(m_Scale);
+
+					m_Particle->StopParticle();
 				}
 				return ;
 			}
@@ -729,6 +736,7 @@ namespace basecross{
 				m_speed = m_InitSpeed;
 				SetDrawActive(true);
 				GetComponent<Transform>()->SetPosition(m_InitPos);
+				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("EnemySpawn");
 			}
 			return;
 		}
@@ -862,10 +870,16 @@ namespace basecross{
 			m_speed *= 2.0f;
 
 
+			//死んだ場合
 			if (m_life <= 0)
 			{
 				m_deleteFlg = true;
 				m_ActiveFlg = false;
+
+				Vector3 pos = GetComponent<Transform>()->GetPosition();
+				//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
+				m_Particle->OnParticle(pos, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(5.0f, 5.0f, 5.0f), Vector3(2.0f, 2.0f, 2.0f), L"LIGHT_TX", false, 0.01f, 1, 1.0f);
+
 			}
 			//死んでなければ座標移動
 			else
@@ -1010,7 +1024,7 @@ namespace basecross{
 
 
 		//描画コンポーネントの設定
-		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		auto PtrDraw = AddComponent<PNTBoneModelDraw>();
 		//描画するメッシュを設定
 		PtrDraw->SetMeshResource(L"MagicBookFire_Model");
 		PtrDraw->SetMeshToTransformMatrix(SpanMat);
@@ -1031,7 +1045,10 @@ namespace basecross{
 			PtrDraw->SetMeshResource(L"MagicBookWind_Model");	
 			break;
 		}
-		
+
+		//アニメーション追加
+		PtrDraw->AddAnimation(L"Move", 0, 25, true, 30);
+
 
 		/*//モデル版
 		// モデルとトランスフォームの間の差分行列
@@ -1075,21 +1092,28 @@ namespace basecross{
 		//透明処理
 		SetAlphaActive(true);
 
-		SetUpdateActive(false);
+		//SetUpdateActive(false);
 	}
 
 	void MagicBook::OnUpdate()
 	{
-		m_ElaTime += App::GetApp()->GetElapsedTime();
-		if (m_ElaTime >= m_LimitTime)
+		if (m_MagicFlg)
 		{
-			GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
-			m_ElaTime = 0;
-			SetUpdateActive(false);
-			m_ActiveFlg = true;
-			GetComponent<Transform>()->SetScale(m_Scale);
-
+			m_ElaTime += App::GetApp()->GetElapsedTime();
+			if (m_ElaTime >= m_LimitTime)
+			{
+				//GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 1));
+				m_ElaTime = 0;
+				//SetUpdateActive(false);
+				m_MagicFlg = false;
+				m_ActiveFlg = true;
+				GetComponent<Transform>()->SetScale(m_Scale);
+			}
 		}
+
+		float Elatime = App::GetApp()->GetElapsedTime();
+		GetComponent<PNTBoneModelDraw>()->UpdateAnimation(Elatime/4);
+
 	}
 
 	//とったとき
@@ -1098,9 +1122,10 @@ namespace basecross{
 		if (m_ActiveFlg)
 		{
 			GetStage()->GetSharedGameObject<Player>(L"Player1", false)->SetMagic(m_MagicContent);
-			GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 0.1f));
-			SetUpdateActive(true);
+			//GetComponent<PNTStaticModelDraw>()->SetDiffuse(Color4(1, 1, 1, 0.1f));
+			//SetUpdateActive(true);
 			m_ActiveFlg = false;
+			m_MagicFlg = true;
 
 			//モデルにしたら透明化できなくなったから小さくする
 			Vector3 scale = m_Scale / 2;
@@ -1564,6 +1589,8 @@ namespace basecross{
 				{
 					if (inputXY.x > 0.8f)
 					{
+						GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
+
 						m_moveFlg = true;
 						m_selectnum++;
 						if (m_selectnum > 2)
@@ -1573,6 +1600,8 @@ namespace basecross{
 					}
 					if (inputXY.x < -0.8f)
 					{
+						GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
+
 						m_moveFlg = true;
 						m_selectnum--;
 						if (m_selectnum < 0)
@@ -1930,14 +1959,36 @@ namespace basecross{
 
 	}
 
+	void Gimmick1::OnUpdate()
+	{
+
+		if (m_MeltFlg)
+		{
+			auto pos = GetComponent<Transform>()->GetPosition();
+			pos.y += -0.03f;
+			auto scale = GetComponent<Transform>()->GetScale();
+			scale.x *= 0.98f;
+			scale.y *= 0.99f;
+			GetComponent<Transform>()->SetScale(scale);
+			if (pos.y < -5)
+			{
+				m_MeltFlg = false;
+				SetDrawActive(false);
+
+			}
+			GetComponent<Transform>()->SetPosition(pos);
+		}
+	}
 	void Gimmick1::Delete(MagicType MT)
 	{
 		if (MT == Fire)
 		{
-			m_ActiveFlg = false;
-			SetDrawActive(false);
+			m_MeltFlg = true;
+
+			//m_ActiveFlg = false;
+			//SetDrawActive(false);
 			GetComponent<CollisionObb>()->SetUpdateActive(false);
-			GetComponent<Transform>()->SetPosition(0, -10, 0);
+			//GetComponent<Transform>()->SetPosition(0, -10, 0);
 			//SE再生
 			GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("FireDamage");
 
@@ -1946,6 +1997,7 @@ namespace basecross{
 			{
 				v->StopParticle();
 			}
+
 		}
 	}
 
@@ -2034,6 +2086,11 @@ namespace basecross{
 				v->StopParticle();
 			}
 
+			//燃えるエフェクト出す
+			Vector3 pos = m_InitPos;
+			pos.z += -1;
+			pos.y += m_Scale.y / 2;
+			GetStage()->AddGameObject<SpaDelEf>(pos, Vector3(1, 1, 1), "Fire")->DelWind();
 		}
 
 		if (MT == Wind)
@@ -2348,9 +2405,6 @@ namespace basecross{
 		auto OPD = AddComponent<PNTStaticDraw>();
 		OPD->SetMeshResource(L"DEFAULT_CUBE");
 		OPD->SetTextureResource(L"WATER_TX");
-
-
-
 	}
 
 	//凍らす
@@ -2798,6 +2852,13 @@ namespace basecross{
 				v->StopParticle();
 			}
 
+			//エフェクト作成
+			//燃えるエフェクト出す
+			Vector3 pos = m_InitPos;
+			pos.z += -1;
+			pos.y += m_Scale.y / 2;
+			GetStage()->AddGameObject<SpaDelEf>(pos, Vector3(0.5f, 0.5f, 1), "FireEf")->DelWind();
+
 		}
 	}
 
@@ -2942,6 +3003,99 @@ namespace basecross{
 	{
 		m_SpawnFlg = false;
 		m_Speed *= 10;
+	}
+
+	//--------------------------------------------------------------------------------------
+	//	class SpaDelEf : public GameObject;
+	//	用途: 出たり消えたりのエフェクト
+	//--------------------------------------------------------------------------------------
+
+	SpaDelEf::SpaDelEf(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, string texturename):
+		GameObject(StagePtr),
+		m_Pos(pos),
+		m_Scale(scale),
+		m_TexName(texturename)
+	{}
+
+	void SpaDelEf::OnCreate()
+	{
+		//座標
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Pos);
+		Trans->SetScale(m_Scale);
+		Trans->SetRotation(0, 0, 0);
+
+		//描画
+		auto Draw = AddComponent<PNTStaticDraw>();
+		//描画するメッシュを設定
+		Draw->SetMeshResource(L"DEFAULT_SQUARE");
+		//描画するテクスチャを設定
+		Draw->SetTextureResource(L"FIREUI_TX");
+		if (m_TexName == "Fire")
+		{
+			Draw->SetTextureResource(L"FIREUI_TX");
+		}
+		if (m_TexName == "FireEf")
+		{
+			Draw->SetTextureResource(L"FIREGIMMICK5_1_TX");
+		}
+
+		SetAlphaActive(true);
+		SetDrawActive(false);
+		SetDrawLayer(1);
+
+	}
+	void SpaDelEf::OnUpdate()
+	{
+		if (m_SpaFlg)
+		{
+			switch (m_State)
+			{
+			case 0:
+				if (true)
+				{
+					auto scale = GetComponent<Transform>()->GetScale();
+					scale *= 1.3f;
+					//2倍以上の大きさになったら
+					if (scale.x > m_Scale.x * 4)
+					{
+						m_State = 1;
+					}
+					GetComponent<Transform>()->SetScale(scale);
+				}
+				break;
+			case 1:
+				if (true)
+				{
+					auto scale = GetComponent<Transform>()->GetScale();
+					scale *= 0.8f;
+					if (scale.x < m_Scale.x/2)
+					{
+						m_SpaFlg = false;
+						//一応
+						auto Trans = AddComponent<Transform>();
+						Trans->SetPosition(m_Pos);
+						Trans->SetScale(m_Scale);
+						m_State = 0;
+						SetDrawActive(false);
+					}
+					GetComponent<Transform>()->SetScale(scale);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	void SpaDelEf::DelWind()
+	{
+		m_SpaFlg = true;
+		auto Trans = AddComponent<Transform>();
+		Trans->SetPosition(m_Pos);
+		Trans->SetScale(m_Scale);
+		m_State = 0;
+		SetDrawActive(true);
 	}
 }
 //end basecross

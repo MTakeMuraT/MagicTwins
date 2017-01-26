@@ -292,6 +292,8 @@ namespace basecross
 			{
 				if (inputXY.x < -0.8f)
 				{
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
+
 					m_moveFlg = true;
 					m_selectnum--;
 					if (m_selectnum < 0)
@@ -301,6 +303,8 @@ namespace basecross
 				}
 				if (inputXY.x > 0.8f)
 				{
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
+
 					m_moveFlg = true;
 					m_selectnum++;
 					if (m_selectnum > 2)

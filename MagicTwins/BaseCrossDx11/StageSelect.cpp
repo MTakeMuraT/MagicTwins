@@ -432,6 +432,26 @@ namespace basecross {
 			}
 			//*テスト用
 
+			//*テスト用
+			if (key.m_bPressedKeyTbl[VK_RIGHT])
+			{
+				m_StageNum++;
+				//m_flag = false;
+				m_StageImageRotFlg = true;
+				GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNum(m_StageNum);
+
+			}
+
+			if (key.m_bPressedKeyTbl[VK_LEFT])
+			{
+				m_StageNum--;
+				//m_flag = false;
+				m_StageImageRotFlg = true;
+				GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNum(m_StageNum);
+
+			}
+			//*テスト用
+
 			//ステージイメージが回転してるとき以外操作可
 			if (!m_StageImageRotFlg)
 			{
@@ -465,17 +485,20 @@ namespace basecross {
 						m_StageNum++;
 						m_flag = false;
 						m_StageImageRotFlg = true;
+						GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
 					}
 					if (CntlVec[0].fThumbLX < 0 && m_flag&&m_StageNum>0)
 					{
 						m_StageNum--;
 						m_flag = false;
 						m_StageImageRotFlg = true;
+						GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
 					}
 					if (CntlVec[0].fThumbLX == 0)
 					{
 						m_flag = true;
 					}
+
 
 				}
 				if (!m_flag)

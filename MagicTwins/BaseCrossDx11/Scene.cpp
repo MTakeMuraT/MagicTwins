@@ -48,11 +48,11 @@ namespace basecross{
 
 
 		//魔導書モデル
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBooks/magicbookF00.bmf");
+		ModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"MagicbookFire/MagicbookFire.bmf");
 		App::GetApp()->RegisterResource(L"MagicBookFire_Model", ModelMesh);
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBooks/magicbookI00.bmf");
+		ModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"MagicbookIce/Magicbook.bmf");
 		App::GetApp()->RegisterResource(L"MagicBookIceFog_Model", ModelMesh);
-		ModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"MagicBooks/magicbookW00.bmf");
+		ModelMesh = MeshResource::CreateBoneModelMesh(DataDir, L"MagicbookWind/MagicbookWind.bmf");
 		App::GetApp()->RegisterResource(L"MagicBookWind_Model", ModelMesh);
 		
 		try {
@@ -113,6 +113,12 @@ namespace basecross{
 			//時間もうちょい赤枠音
 			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Alert.wav";
 			App::GetApp()->RegisterWav(L"TimeAlertSE", strMusic);
+			//エネミースポーン
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/EnemyRespawn.wav";
+			App::GetApp()->RegisterWav(L"EnemySpawnSE", strMusic);
+			//選択移動音
+			strMusic = App::GetApp()->m_wstrRelativeDataPath + L"se/Button3.wav";
+			App::GetApp()->RegisterWav(L"SelectMoveSE", strMusic);
 
 			
 			//オーディオの初期化

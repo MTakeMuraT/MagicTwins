@@ -59,6 +59,20 @@ namespace basecross {
 					m_Se[i]->Start(L"SelectSE", 0.5f);
 					flgg = true;
 				}
+				//選択移動音
+				if (name == "SelectMove")
+				{
+					m_Se[i]->AddAudioResource(L"SelectMoveSE");
+					m_Se[i]->Start(L"SelectMoveSE", 0.5f);
+					flgg = true;
+				}
+				//エネミースポーン音
+				if (name == "EnemySpawn")
+				{
+					m_Se[i]->AddAudioResource(L"EnemySpawnSE");
+					m_Se[i]->Start(L"EnemySpawnSE", 0,20.0f);
+					flgg = true;
+				}
 				//ダメージ受けた音
 				if (name == "Damege")
 				{

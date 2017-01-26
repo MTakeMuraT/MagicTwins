@@ -312,6 +312,9 @@ namespace basecross{
 		bool m_deleteFlg = false;
 		//消える処理
 		void Delete();
+
+		//エフェクト
+		shared_ptr<MagicParticle> m_Particle;
 	public :
 		Enemy(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale,int targetNum);
 		void OnCreate() override;
@@ -364,6 +367,8 @@ namespace basecross{
 		const float m_LimitTime = 3.0f;
 		//元の大きさ
 		Vector3 m_Scale = Vector3(0.5f,0.5f,0.5f);
+		//魔導書とったフラグ
+		bool m_MagicFlg = false;
 	public :
 		MagicBook(const shared_ptr<Stage>& StagePtr, Vector3 initPos,MagicType Magic);
 		void OnCreate();
@@ -564,12 +569,14 @@ namespace basecross{
 		Vector3 m_Scale;
 		//生きてるかどうか
 		bool m_ActiveFlg = true;
-
+		//溶けてる最中
+		bool m_MeltFlg = false;
 		//エフェクト:
 		vector<shared_ptr<MagicParticle>> m_Particle;
 	public :
 		Gimmick1(const shared_ptr<Stage>& StagePtr,Vector3 pos,Vector3 scale);
 		void OnCreate() override;
+		void OnUpdate() override;
 
 		void Delete(MagicType MT);
 
@@ -594,7 +601,6 @@ namespace basecross{
 		bool m_ActiveFlg = true;
 		//エフェクト
 		vector<shared_ptr<MagicParticle>> m_Particle;
-
 		//回ってるかどうか
 		bool m_RotFlg = false;
 		
@@ -851,5 +857,32 @@ namespace basecross{
 		void StopCloud();
 	};
 
+
+	//--------------------------------------------------------------------------------------
+	//	class SpaDelEf : public GameObject;
+	//	用途: 出たり消えたりのエフェクト
+	//--------------------------------------------------------------------------------------
+	class SpaDelEf : public GameObject
+	{
+	private :
+		//位置
+		Vector3 m_Pos;
+		//大きさ
+		Vector3 m_Scale;
+		//状態
+		int m_State = 0;
+		//テクスチャの名前
+		string m_TexName = "";
+		//出てくるフラグ
+		bool m_SpaFlg = false;
+
+	public :
+		SpaDelEf(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, string texturename);
+		void OnCreate() override;
+		void OnUpdate() override;
+
+		void DelWind();
+		
+	};
 }
 //end basecross

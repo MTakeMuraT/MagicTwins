@@ -1054,6 +1054,8 @@ namespace basecross {
 						//右
 						if (InputXY.x > 0.8f)
 						{
+							GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
+
 							m_SelectNum++;
 							if (m_SelectNum > 2)
 							{
@@ -1064,6 +1066,8 @@ namespace basecross {
 						}
 						if (InputXY.x < -0.8f)
 						{
+							GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
+
 							m_SelectNum--;
 							if (m_SelectNum < 0)
 							{
@@ -1262,6 +1266,18 @@ namespace basecross {
 					}
 
 				}
+				//*テスト用
+				auto key = App::GetApp()->GetInputDevice().GetKeyState();
+				if (key.m_bPressedKeyTbl[VK_SPACE])
+				{
+					StartAll();
+					m_StartFlg = true;
+					//SE再生
+					GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("Select");
+
+				}
+				//*テスト用
+
 				return;
 			}
 			else if (m_StartFlg && m_StartFlg2)
@@ -1316,7 +1332,8 @@ namespace basecross {
 			//auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			//PostEvent(0.0f, GetThis<ObjectInterface>(), ScenePtr, L"GameStage");
 
-			GetSharedGameObject<GameObject>(L"GoalObj")->SetDrawActive(true);
+			//GetSharedGameObject<GameObject>(L"GoalObj")->SetDrawActive(true);
+			//GetSharedGameObject<SpaDelEf>(L"Abeje", false)->DelWind();
 		}
 		//ポーズ
 		if (key.m_bPressedKeyTbl['Q'])
@@ -1439,6 +1456,10 @@ namespace basecross {
 			m_StartFlg = true;
 			m_StartFlg2 = false;
 			m_StartFinish = false;
+
+
+			//テスト
+			//SetSharedGameObject(L"Abeje",AddGameObject<SpaDelEf>(Vector3(0, 0.5f, 0), Vector3(1, 1, 1), "Fire"));
 		}
 		catch (...) {
 			throw;
