@@ -298,7 +298,7 @@ namespace basecross {
 
 		if (m_CameraMode)
 		{
-			m_CameraPos = Vector3(0, 10, -3);
+			m_CameraPos = Vector3(5, 5, -3);
 			m_CameraTargetVec = Vector3(0, 0, 0);
 		}
 	}
@@ -340,12 +340,12 @@ namespace basecross {
 					m_CameraTargetVec += Vector3(InputXY.x, 0, InputXY.y);
 
 				}
-		/*		if (abs(CntlVec[0].fThumbRX) > 0.1f || abs(CntlVec[0].fThumbRY) > 0.1f)
+				if (abs(CntlVec[0].fThumbRX) > 0.1f || abs(CntlVec[0].fThumbRY) > 0.1f)
 				{
 					Vector2 InputXY = Vector2(CntlVec[0].fThumbRX, CntlVec[0].fThumbRY);
 					InputXY *= 0.3f * speed;
 					m_CameraPos += Vector3(InputXY.x, 0, InputXY.y);
-				}*/
+				}
 				//十字キー上でカメラ↑行く
 				if (abs(CntlVec[0].wButtons & XINPUT_GAMEPAD_DPAD_UP))
 				{
@@ -608,8 +608,19 @@ namespace basecross {
 				if (m_TargetModeFlg)
 				{
 					TargetMode();
-				}
+					if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+					{
+					}
+					else
+					{
+						m_TargetModeFlg = false;
 
+						TargetModeRelease();
+
+					}
+				}
+				
+				
 				//L肩ボタンで位置固定
 				if (CntlVec[0].wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				{
@@ -617,12 +628,13 @@ namespace basecross {
 					//m_velocity = Vector2(0, 0);
 					m_TargetModeFlg = true;
 				}
-				if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-				{
-					m_TargetModeFlg = false;
 
-					TargetModeRelease();
-				}
+				//if (CntlVec[0].wReleasedButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+				//{
+				//	m_TargetModeFlg = false;
+
+				//	TargetModeRelease();
+				//}
 
 				//Xボタン押したら魔法発射
 				if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_A)
@@ -1236,17 +1248,27 @@ namespace basecross {
 		for (auto v : EnemyGroup)
 		{
 			auto EnemyPtr = dynamic_pointer_cast<Enemy>(v.lock());
+			Vector3 EnemyPos = EnemyPtr->GetComponent<Transform>()->GetPosition();
+
+			//上下の差
+			float defY = PlayerPos.y - EnemyPos.y;
+			
+			//差を計算
+			Vector3 DistanceVec3 = EnemyPos - PlayerPos;
+
+			//距離を計算
+			float nowDistance = (DistanceVec3.x * DistanceVec3.x) + (DistanceVec3.z + DistanceVec3.z);
+
 
 			//エネミーが生きてたら
-			if (EnemyPtr->GetActive())
+			if (EnemyPtr->GetActive() && abs(defY) < 1.5f && nowDistance < 50)
 			{
-				Vector3 EnemyPos = EnemyPtr->GetComponent<Transform>()->GetPosition();
 
-				//差を計算
-				Vector3 DistanceVec3 = EnemyPos - PlayerPos;
+				////差を計算
+				//DistanceVec3 = EnemyPos - PlayerPos;
 
-				//距離を計算
-				float nowDistance = (DistanceVec3.x * DistanceVec3.x) + (DistanceVec3.z + DistanceVec3.z);
+				////距離を計算
+				//nowDistance = (DistanceVec3.x * DistanceVec3.x) + (DistanceVec3.z + DistanceVec3.z);
 				//もし一番近かったら
 				if (nowDistance < Distance)
 				{
@@ -1326,7 +1348,7 @@ namespace basecross {
 		//メッシュを設定
 		PtrDraw->SetMeshResource(L"DEFAULT_SPHERE");
 		//テクスチャを設定
-		PtrDraw->SetTextureResource(L"MAGICBOOKFIRE_TX");
+		PtrDraw->SetTextureResource(L"MAGICFIRE_TX");
 
 		//透明化
 		SetAlphaActive(true);
@@ -1446,17 +1468,17 @@ namespace basecross {
 				return;
 				break;
 			case Fire:
-				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKFIRE_TX");
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICFIRE_TX");
 				//SE再生
 				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShotFire");
 				break;
 			case IceFog:
-				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKICEFOG_TX");
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICICE_TX");
 				//SE再生
 				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShotIce");
 				break;
 			case Wind:
-				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICBOOKWIND_TX");
+				GetComponent<PNTStaticDraw>()->SetTextureResource(L"MAGICWIND_TX");
 				//SE再生
 				GetStage()->GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("MagicShotWind");
 				break;

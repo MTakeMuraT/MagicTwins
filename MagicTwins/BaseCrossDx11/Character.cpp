@@ -803,6 +803,7 @@ namespace basecross{
 
 					//Œü‚«XV
 					angle = atan2(velo.y, velo.x);
+					angle += (3.14159265f / 180) * 90;
 					angle *= -1;
 					GetComponent<Transform>()->SetRotation(Vector3(0, angle, 0));
 

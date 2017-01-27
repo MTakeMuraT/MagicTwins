@@ -113,6 +113,14 @@ namespace basecross {
 		strTexture = DataDir + L"WindEF.png";
 		App::GetApp()->RegisterTexture(L"WINDEF_TX", strTexture);
 
+
+		strTexture = DataDir + L"MagicFire.png";
+		App::GetApp()->RegisterTexture(L"MAGICFIRE_TX", strTexture);
+		strTexture = DataDir + L"MagicIce.png";
+		App::GetApp()->RegisterTexture(L"MAGICICE_TX", strTexture);
+		strTexture = DataDir + L"MagicWind.png";
+		App::GetApp()->RegisterTexture(L"MAGICWIND_TX", strTexture);
+
 		//ポーズメニュー
 		strTexture = DataDir + L"PauseLogo.png";
 		App::GetApp()->RegisterTexture(L"PAUSELOGO_TX", strTexture);
