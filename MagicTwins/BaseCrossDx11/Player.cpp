@@ -1135,12 +1135,14 @@ namespace basecross {
 
 	void Player::LifeDelete()
 	{
-		auto Trans = m_LifeSprite->GetComponent<Transform>();
+		//auto Trans = m_LifeSprite->GetComponent<Transform>();
+		auto Draw = m_LifeSprite->GetComponent<PCTSpriteDraw>();
 		switch (m_LifeState)
 		{
 		case 0:
 			if (true)
 			{
+				/*
 				auto scale = Trans->GetScale();
 				scale *= 1.1f;
 				Trans->SetScale(scale);
@@ -1148,11 +1150,23 @@ namespace basecross {
 				{
 					m_LifeState = 1;
 				}
+				*/
+				//点滅版
+				m_LifeAlpha += -m_LifeAlphaSpeed;
+
+				Draw->SetDiffuse(Color4(1, 1, 1, m_LifeAlpha));
+
+				if (m_LifeAlpha <= 0)
+				{
+					m_LifeAlpha = 0;
+					m_LifeState = 1;
+				}
 			}
 			break;
 		case 1:
 			if (true)
 			{
+				/*
 				auto scale = Trans->GetScale();
 				scale *= 0.9f;
 				Trans->SetScale(scale);
@@ -1165,10 +1179,32 @@ namespace basecross {
 						m_LifeState = 2;
 					}
 				}
+				*/
+
+				//点滅版
+				m_LifeAlpha += m_LifeAlphaSpeed;
+
+				Draw->SetDiffuse(Color4(1, 1, 1, m_LifeAlpha));
+
+				if (m_LifeAlpha >= 1)
+				{
+					m_LifeAlpha = 1;
+					m_LifeState = 0;
+
+					//カウント
+					m_lifeCount++;
+					if (m_lifeCount >= m_lifeConCount)
+					{
+						m_LifeState = 2;
+					}
+
+				}
+
 			}
 			break;
 		case 2:
-			Trans->SetScale(m_lifeSize);
+			//Trans->SetScale(m_lifeSize);
+			Draw->SetDiffuse(Color4(1, 1, 1, 1));
 			m_LifeFlg = false;
 			m_LifeState = 0;
 			m_lifeCount = 0;

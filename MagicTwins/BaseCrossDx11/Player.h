@@ -127,13 +127,18 @@ namespace basecross{
 		//ライフステート
 		int m_LifeState = 0;
 		//何回大小するか
-		const int m_lifeConCount = 5;
+		const int m_lifeConCount = 8;
 		//何回大小するか
 		int m_lifeCount = 0;
 		//ライフ元の大きさ
 		Vector3 m_lifeSize = Vector3(400, 130, 1);
 		//ライフ減るアニメーション関数
 		void LifeDelete();
+
+		//ライフ透明度
+		float m_LifeAlpha = 1;
+		//点滅速度
+		float m_LifeAlphaSpeed = 0.4f;
 
 
 		//魔法UI切り替えフラグ
