@@ -1,7 +1,7 @@
 /*!
 @file Gravity.cpp
 @brief 重力コンポーネント実体
-@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -16,7 +16,6 @@ namespace basecross {
 		Vector3 m_DefaultGravity;		//自由落下加速度
 		Vector3 m_Gravity;				//現在の重力加速度
 		Vector3 m_GravityVelocity;		//重力加速度による現在の速度
-
 	public:
 		Impl() :
 			m_DefaultGravity(0, -9.8f, 0),

@@ -418,7 +418,7 @@ namespace basecross{
 		Draw->SetTextureResource(m_TextureName);
 		obj->SetAlphaActive(true);
 		obj->SetDrawLayer(m_Layer);
-
+		
 		//ë¨Ç≥ê›íË
 		Vector3 velo = m_Initvelocity;
 		Vector3 randvelo;

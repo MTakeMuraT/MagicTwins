@@ -1,7 +1,7 @@
 /*!
 @file GameObject.cpp
 @brief ゲームオブジェクト、ステージ実体
-@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #include "stdafx.h"
@@ -17,6 +17,8 @@ namespace basecross {
 		bool m_DrawActive;		//Drawするかどうか
 		bool m_AlphaActive;		//透明かどうか
 		int m_DrawLayer;	//描画レイヤー
+		set<wstring> m_Tag;	//タグ
+		set<int> m_NumTag;	//数字タグ
 		bool m_SpriteDraw;	//スプライトとして描画するかどうか
 
 		weak_ptr<Stage> m_Stage;	//所属ステージ
@@ -69,9 +71,19 @@ namespace basecross {
 		return dynamic_pointer_cast<CollisionSphere>(pImpl->m_Collision);
 	}
 
+	shared_ptr<CollisionCapsule> GameObject::GetCollisionCapsule()const {
+		return dynamic_pointer_cast<CollisionCapsule>(pImpl->m_Collision);
+	}
+
+
 	shared_ptr<CollisionObb> GameObject::GetCollisionObb()const {
 		return dynamic_pointer_cast<CollisionObb>(pImpl->m_Collision);
 	}
+
+	shared_ptr<CollisionTriangles> GameObject::GetCollisionTriangles()const {
+		return dynamic_pointer_cast<CollisionTriangles>(pImpl->m_Collision);
+	}
+
 
 	shared_ptr<CollisionRect> GameObject::GetCollisionRect()const {
 		return dynamic_pointer_cast<CollisionRect>(pImpl->m_Collision);
@@ -90,21 +102,6 @@ namespace basecross {
 		Ptr->AttachGameObject(GetThis<GameObject>());
 		pImpl->m_Collision = Ptr;
 	}
-	void GameObject::SetCollisionSphere(const shared_ptr<CollisionSphere>& Ptr) {
-		Ptr->AttachGameObject(GetThis<GameObject>());
-		pImpl->m_Collision = Ptr;
-	}
-
-	void GameObject::SetCollisionObb(const shared_ptr<CollisionObb>& Ptr) {
-		Ptr->AttachGameObject(GetThis<GameObject>());
-		pImpl->m_Collision = Ptr;
-	}
-
-	void GameObject::SetCollisionRect(const shared_ptr<CollisionRect>& Ptr) {
-		Ptr->AttachGameObject(GetThis<GameObject>());
-		pImpl->m_Collision = Ptr;
-	}
-
 
 	void GameObject::SetTransform(const shared_ptr<Transform>& Ptr) {
 		Ptr->AttachGameObject(GetThis<GameObject>());
@@ -173,6 +170,40 @@ namespace basecross {
 	//描画レイヤーの取得と設定
 	int GameObject::GetDrawLayer() const {return pImpl->m_DrawLayer;}
 	void  GameObject::SetDrawLayer(int l) {pImpl->m_DrawLayer = l;}
+	//タグの検証と設定
+	bool GameObject::FindTag(const wstring& tagstr) const {
+		if (pImpl->m_Tag.find(tagstr) == pImpl->m_Tag.end()) {
+			return false;
+		}
+		return true;
+	}
+	void  GameObject::AddTag(const wstring& tagstr) {
+		if (tagstr == L"") {
+			//空白なら例外
+			throw BaseException(
+				L"設定するタグが空です",
+				L"if (tagstr == L"")",
+				L"GameObject::AddTag()"
+			);
+		}
+		pImpl->m_Tag.insert(tagstr);
+	}
+	void  GameObject::RemoveTag(const wstring& tagstr) {
+		pImpl->m_Tag.erase(tagstr);
+	}
+	//数字タグの検証と設定
+	bool GameObject::FindNumTag(int numtag) const {
+		if (pImpl->m_NumTag.find(numtag) == pImpl->m_NumTag.end()) {
+			return false;
+		}
+		return true;
+	}
+	void  GameObject::AddNumTag(int numtag) {
+		pImpl->m_NumTag.insert(numtag);
+	}
+	void  GameObject::RemoveNumTag(int numtag) {
+		pImpl->m_NumTag.erase(numtag);
+	}
 
 	shared_ptr<Stage> GameObject::GetStage(bool ExceptionActive) const {
 		auto shptr = pImpl->m_Stage.lock();
@@ -235,22 +266,27 @@ namespace basecross {
 	void GameObject::CollisionReset() {
 		auto CollisionPtr = GetComponent<Collision>(false);
 		if (CollisionPtr) {
+			CollisionPtr->SetToBeforeHitObject();
 			CollisionPtr->ClearHitObject();
 		}
 	}
 
-	void GameObject::CollisionChk() {
-		auto CollisionPtr = GetComponent<Collision>(false);
-		if (CollisionPtr && CollisionPtr->IsUpdateActive()) {
-			//CollisionがあればUpdate()
-			CollisionPtr->OnUpdate();
-		}
-	}
 
 	void GameObject::ToMessageCollision() {
 		auto CollisionPtr = GetComponent<Collision>(false);
-		if (CollisionPtr && CollisionPtr->GetHitObjectVec().size() > 0) {
-			OnCollision(CollisionPtr->GetHitObjectVec());
+		if (CollisionPtr) {
+			auto& VecPtr = CollisionPtr->GetNewHitObjectVec();
+			if (!VecPtr.empty()) {
+				OnCollision(VecPtr);
+			}
+			VecPtr = CollisionPtr->GetExcuteHitObjectVec();
+			if (!VecPtr.empty()) {
+				OnCollisionExcute(VecPtr);
+			}
+			VecPtr = CollisionPtr->GetExitHitObjectVec();
+			if (!VecPtr.empty()) {
+				OnCollisionExit(VecPtr);
+			}
 		}
 	}
 
@@ -763,7 +799,103 @@ namespace basecross {
 		DrawCom->OnDraw();
 	}
 
+	struct CillisionItem {
+		shared_ptr<Collision> m_Collision;
+		SPHERE m_EnclosingSphere;
+		float m_MinX;
+		float m_MaxX;
+		float m_MinY;
+		float m_MaxY;
+		float m_MinZ;
+		float m_MaxZ;
+		bool operator==(const CillisionItem& other)const {
+			if (this == &other) {
+				return true;
+			}
+			return false;
+		}
 
+	};
+
+
+	//--------------------------------------------------------------------------------------
+	//	struct CollisionAdmin::Impl;
+	//	用途: Implイディオム
+	//--------------------------------------------------------------------------------------
+	struct CollisionAdmin::Impl {
+		vector<CillisionItem> m_ItemVec;
+		Impl()
+		{}
+		~Impl() {}
+	};
+
+
+	//--------------------------------------------------------------------------------------
+	//	衝突判定管理者
+	//--------------------------------------------------------------------------------------
+	CollisionAdmin::CollisionAdmin(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr),
+		pImpl(new Impl())
+	{}
+	CollisionAdmin::~CollisionAdmin() {}
+
+	void CollisionAdmin::OnCreate() {
+
+	}
+
+	void CollisionAdmin::CollisionSub(size_t SrcIndex) {
+		CillisionItem& Src = pImpl->m_ItemVec[SrcIndex];
+		for (auto& v : pImpl->m_ItemVec) {
+			if (Src == v) {
+				continue;
+			}
+			if (Src.m_MinX > v.m_MaxX || Src.m_MaxX < v.m_MinX) {
+				continue;
+			}
+			if (Src.m_MinY > v.m_MaxY || Src.m_MaxY < v.m_MinY) {
+				continue;
+			}
+			if (Src.m_MinZ > v.m_MaxZ || Src.m_MaxZ < v.m_MinZ) {
+				continue;
+			}
+			if (v.m_Collision->IsHitObject(Src.m_Collision->GetGameObject())) {
+				continue;
+			}
+			//衝突判定(Destに呼んでもらう。ダブルデスパッチ呼び出し)
+			v.m_Collision->CollisionCall(Src.m_Collision);
+		}
+	}
+
+
+	void CollisionAdmin::OnUpdate() {
+		pImpl->m_ItemVec.clear();
+		auto& ObjVec = GetStage()->GetGameObjectVec();
+		for (auto& v : ObjVec) {
+			if (v->IsUpdateActive()) {
+				auto Col = v->GetComponent<Collision>(false);
+				if (Col && Col->IsUpdateActive()) {
+					CillisionItem Item;
+					Item.m_Collision = Col;
+					Item.m_EnclosingSphere = Col->GetEnclosingSphere();
+					Item.m_MinX = Item.m_EnclosingSphere.m_Center.x - Item.m_EnclosingSphere.m_Radius;
+					Item.m_MaxX = Item.m_EnclosingSphere.m_Center.x + Item.m_EnclosingSphere.m_Radius;
+
+					Item.m_MinY = Item.m_EnclosingSphere.m_Center.y - Item.m_EnclosingSphere.m_Radius;
+					Item.m_MaxY = Item.m_EnclosingSphere.m_Center.y + Item.m_EnclosingSphere.m_Radius;
+
+					Item.m_MinZ = Item.m_EnclosingSphere.m_Center.z - Item.m_EnclosingSphere.m_Radius;
+					Item.m_MaxZ = Item.m_EnclosingSphere.m_Center.z + Item.m_EnclosingSphere.m_Radius;
+
+					pImpl->m_ItemVec.push_back(Item);
+				}
+			}
+		}
+		for (size_t i = 0; i < pImpl->m_ItemVec.size(); i++) {
+			if (!pImpl->m_ItemVec[i].m_Collision->IsFixed()) {
+				CollisionSub(i);
+			}
+		}
+	}
 
 
 	//--------------------------------------------------------------------------------------
@@ -775,11 +907,14 @@ namespace basecross {
 		bool m_UpdateActive;
 		//パーティクルマネージャ
 		shared_ptr<ParticleManager> m_ParticleManager;
+		//コリジョン管理者
+		shared_ptr<CollisionAdmin> m_CollisionAdmin;
 		//オブジェクトの配列
 		vector< shared_ptr<GameObject> > m_GameObjectVec;
 		//途中にオブジェクトが追加された場合、ターンの開始まで待つ配列
 		vector< shared_ptr<GameObject> > m_WaitAddObjectVec;
-
+		//途中にオブジェクトが削除された場合、ターンの開始まで待つ配列
+		vector< shared_ptr<GameObject> > m_WaitRemoveObjectVec;
 		//Spriteかそうでないかを分離する配列
 		vector< shared_ptr<GameObject> > m_SpriteVec;
 		vector< shared_ptr<GameObject> > m_Object3DVec;
@@ -809,7 +944,18 @@ namespace basecross {
 			m_IsShadowmapDraw(true)
 		{}
 		~Impl() {}
+		void RemoveTargetGameObject(const shared_ptr<GameObject>& targetobj);
 	};
+	void Stage::Impl::RemoveTargetGameObject(const shared_ptr<GameObject>& targetobj) {
+		auto it = m_GameObjectVec.begin();
+		while (it != m_GameObjectVec.end()) {
+			if (*it == targetobj) {
+				m_GameObjectVec.erase(it);
+				return;
+			}
+			it++;
+		}
+	}
 
 
 	//--------------------------------------------------------------------------------------
@@ -832,6 +978,11 @@ namespace basecross {
 			//クリエイト前
 			pImpl->m_GameObjectVec.push_back(Ptr);
 		}
+	}
+
+	//削除オブジェクトの設定
+	void Stage::RemoveBackGameObject(const shared_ptr<GameObject>& Ptr) {
+		pImpl->m_WaitRemoveObjectVec.push_back(Ptr);
 	}
 
 	shared_ptr<GameObject> Stage::GetSharedGameObjectEx(const wstring& Key, bool ExceptionActive)const {
@@ -872,9 +1023,15 @@ namespace basecross {
 
 	vector< shared_ptr<GameObject> >& Stage::GetGameObjectVec() { return pImpl->m_GameObjectVec; }
 
-	//追加待ちになってるオブジェクトを追加する
+	//追加や削除待ちになってるオブジェクトを追加・削除する
 	void Stage::SetWaitToObjectVec(){
-		if (pImpl->m_WaitAddObjectVec.size() > 0){
+		if (!pImpl->m_WaitRemoveObjectVec.empty()) {
+			for (auto Ptr : pImpl->m_WaitRemoveObjectVec) {
+				pImpl->RemoveTargetGameObject(Ptr);
+			}
+		}
+		pImpl->m_WaitRemoveObjectVec.clear();
+		if (!pImpl->m_WaitAddObjectVec.empty()){
 			for (auto Ptr : pImpl->m_WaitAddObjectVec){
 				pImpl->m_GameObjectVec.push_back(Ptr);
 			}
@@ -1000,13 +1157,15 @@ namespace basecross {
 		pImpl->m_ViewBase = v;
 	}
 
-	const shared_ptr<ViewBase>& Stage::GetView()const {
-		if (!pImpl->m_ViewBase) {
-			throw BaseException(
-				L"ステージにビューが設定されていません。",
-				L"if (!pImpl->m_ViewBase)",
-				L"Stage::GetView()"
-			);
+	const shared_ptr<ViewBase>& Stage::GetView(bool ExceptionActive)const {
+		if (ExceptionActive) {
+			if (!pImpl->m_ViewBase) {
+				throw BaseException(
+					L"ステージにビューが設定されていません。",
+					L"if (!pImpl->m_ViewBase)",
+					L"Stage::GetView()"
+				);
+			}
 		}
 		return pImpl->m_ViewBase;
 	}
@@ -1035,12 +1194,14 @@ namespace basecross {
 	void Stage::OnPreCreate() {
 		//パーティクルマネージャの作成
 		pImpl->m_ParticleManager = ObjectFactory::Create<ParticleManager>(GetThis<Stage>());
+		//コリジョン管理者の作成
+		pImpl->m_CollisionAdmin = ObjectFactory::Create<CollisionAdmin>(GetThis<Stage>());
 	}
 
 
 	//ステージ内の更新（シーンからよばれる）
 	void Stage::UpdateStage() {
-		//追加まちオブジェクトの追加
+		//追加・削除まちオブジェクトの追加と削除
 		SetWaitToObjectVec();
 		//Transformコンポーネントの値をバックアップにコピー
 		for (auto ptr : GetGameObjectVec()) {
@@ -1069,10 +1230,11 @@ namespace basecross {
 		//衝突判定の更新（ステージから呼ぶ）
 		UpdateCollision();
 		//自身のビューをアップデート
-		if (IsUpdateActive() && pImpl->m_ViewBase) {
-			pImpl->m_ViewBase->OnUpdate();
+		auto ViewPtr = GetView(false);
+		if (ViewPtr && ViewPtr->IsUpdateActive()) {
+			ViewPtr->OnUpdate();
 		}
-		//配置オブジェクトのコンポーネント更新3
+		//配置オブジェクトの最後の更新
 		for (auto ptr : GetGameObjectVec()) {
 			if (ptr->IsUpdateActive()) {
 				ptr->OnLastUpdate();
@@ -1080,7 +1242,7 @@ namespace basecross {
 		}
 		//衝突判定のメッセージ発行（ステージから呼ぶ）
 		UpdateMessageCollision();
-		//自身の更新3
+		//自身の最後の更新
 		if (IsUpdateActive()) {
 			OnLastUpdate();
 		}
@@ -1095,14 +1257,11 @@ namespace basecross {
 	}
 
 	//衝突判定の更新（ステージから呼ぶ）
+	//衝突判定をカスタマイズするためには
+	//この関数を多重定義する
 	void Stage::UpdateCollision() {
-		//衝突判定チェック
-		//配置オブジェクトの衝突チェック
-		for (auto ptr : GetGameObjectVec()) {
-			if (ptr->IsUpdateActive()) {
-				ptr->CollisionChk();
-			}
-		}
+		//衝突判定管理者のUpdate
+		pImpl->m_CollisionAdmin->OnUpdate();
 	}
 
 	void Stage::UpdateMessageCollision() {
@@ -1318,6 +1477,28 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	///	シーン親クラス
 	//--------------------------------------------------------------------------------------
+
+	void SceneBase::ConvertVertex(const vector<VertexPositionNormalTexture>& vertices,
+		vector<VertexPositionColor>& new_pc_vertices,
+		vector<VertexPositionTexture>& new_pt_vertices) {
+		new_pc_vertices.clear();
+		new_pt_vertices.clear();
+		for (size_t i = 0; i < vertices.size(); i++) {
+			VertexPositionColor new_pc_v;
+			VertexPositionTexture new_pt_v;
+			new_pc_v.position = vertices[i].position;
+			new_pc_v.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+
+			new_pt_v.position = vertices[i].position;
+			new_pt_v.textureCoordinate = vertices[i].textureCoordinate;
+
+			new_pc_vertices.push_back(new_pc_v);
+			new_pt_vertices.push_back(new_pt_v);
+
+		}
+	}
+
+
 	SceneBase::SceneBase() :
 		SceneInterface(),
 		pImpl(new Impl())
@@ -1337,40 +1518,40 @@ namespace basecross {
 			App::GetApp()->RegisterResource(L"DEFAULT_ICOSAHEDRON", MeshResource::CreateIcosahedron(1.0f));
 
 			vector<VertexPositionNormalTexture> vertices;
-			vector<VertexPositionColor> new_vertices;
+			vector<VertexPositionColor> new_pc_vertices;
+			vector<VertexPositionTexture> new_pt_vertices;
 			vector<uint16_t> indices;
+
+			MeshUtill::CreateSquare(1.0f, vertices, indices);
+			ConvertVertex(vertices, new_pc_vertices, new_pt_vertices);
+			App::GetApp()->RegisterResource(L"DEFAULT_PC_SQUARE", MeshResource::CreateMeshResource(new_pc_vertices, indices, false));
+			App::GetApp()->RegisterResource(L"DEFAULT_PT_SQUARE", MeshResource::CreateMeshResource(new_pt_vertices, indices, false));
+			vertices.clear();
+			indices.clear();
+
 			MeshUtill::CreateCube(1.0f, vertices, indices);
-			for (size_t i = 0; i < vertices.size(); i++) {
-				VertexPositionColor new_v;
-				new_v.position = vertices[i].position;
-				new_v.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
-				new_vertices.push_back(new_v);
-			}
-			App::GetApp()->RegisterResource(L"DEFAULT_PC_CUBE", MeshResource::CreateMeshResource(new_vertices, indices,false));
+			ConvertVertex(vertices, new_pc_vertices, new_pt_vertices);
+			App::GetApp()->RegisterResource(L"DEFAULT_PC_CUBE", MeshResource::CreateMeshResource(new_pc_vertices, indices, false));
+			App::GetApp()->RegisterResource(L"DEFAULT_PT_CUBE", MeshResource::CreateMeshResource(new_pt_vertices, indices, false));
 			vertices.clear();
-			new_vertices.clear();
 			indices.clear();
+
 			MeshUtill::CreateSphere(1.0f,18, vertices, indices);
-			for (size_t i = 0; i < vertices.size(); i++) {
-				VertexPositionColor new_v;
-				new_v.position = vertices[i].position;
-				new_v.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
-				new_vertices.push_back(new_v);
-			}
-			App::GetApp()->RegisterResource(L"DEFAULT_PC_SPHERE", MeshResource::CreateMeshResource(new_vertices, indices, false));
-
+			ConvertVertex(vertices, new_pc_vertices, new_pt_vertices);
+			App::GetApp()->RegisterResource(L"DEFAULT_PC_SPHERE", MeshResource::CreateMeshResource(new_pc_vertices, indices, false));
+			App::GetApp()->RegisterResource(L"DEFAULT_PT_SPHERE", MeshResource::CreateMeshResource(new_pt_vertices, indices, false));
 			vertices.clear();
-			new_vertices.clear();
 			indices.clear();
-			MeshUtill::CreateSquare(1.0f,vertices, indices);
-			for (size_t i = 0; i < vertices.size(); i++) {
-				VertexPositionColor new_v;
-				new_v.position = vertices[i].position;
-				new_v.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
-				new_vertices.push_back(new_v);
-			}
-			App::GetApp()->RegisterResource(L"DEFAULT_PC_SQUARE", MeshResource::CreateMeshResource(new_vertices, indices, false));
 
+			Vector3 PointA(0, -1.0f / 2.0f, 0);
+			Vector3 PointB(0, 1.0f / 2.0f, 0);
+			//Capsuleの作成(ヘルパー関数を利用)
+			MeshUtill::CreateCapsule(1.0f, PointA, PointB,18, vertices, indices);
+			ConvertVertex(vertices, new_pc_vertices, new_pt_vertices);
+			App::GetApp()->RegisterResource(L"DEFAULT_PC_CAPSULE", MeshResource::CreateMeshResource(new_pc_vertices, indices, false));
+			App::GetApp()->RegisterResource(L"DEFAULT_PT_CAPSULE", MeshResource::CreateMeshResource(new_pt_vertices, indices, false));
+			vertices.clear();
+			indices.clear();
 			
 
 		}
@@ -1411,12 +1592,384 @@ namespace basecross {
 		}
 	}
 
+	//--------------------------------------------------------------------------------------
+	//	struct StageCellMap::Impl;
+	//	用途: Implイディオム
+	//--------------------------------------------------------------------------------------
+	struct StageCellMap::Impl {
+		//セルのポインタの配列（2次元）
+		vector<vector<CellPiece>> m_CellVec;
+		const UINT m_MaxCellSize = 100;
+		//セルのXZ方向の数
+		UINT m_SizeX;
+		UINT m_SizeZ;
+		//セル1個のステージ上のサイズ
+		float m_PieceSize;
+		//デフォルトのコスト
+		int m_DefaultCost;
+		//ステージ上でこのセルマップを展開するAABB
+		AABB m_MapAABB;
+		//メッシュ
+		shared_ptr<MeshResource> m_LineMesh;
+		//メッシュ作成のための頂点の配列
+		vector<VertexPositionColor> m_Vertices;
+		//セル文字を描画するかどうか
+		bool m_IsCellStringActive;
+		Impl() :
+			m_IsCellStringActive(false)
+		{}
+		~Impl() {}
+		void Init(const Vector3& MiniPos,
+			float PieceSize, UINT PieceCountX, UINT PieceCountZ, int DefaultCost);
+		void Create(const shared_ptr<MultiStringSprite>& StringPtr, const shared_ptr<Stage>& StagePtr);
+	};
+	void StageCellMap::Impl::Init(const Vector3& MiniPos,
+		float PieceSize, UINT PieceCountX, UINT PieceCountZ, int DefaultCost) {
+		m_PieceSize = PieceSize;
+		m_DefaultCost = DefaultCost;
+		m_SizeX = PieceCountX;
+		if (m_SizeX <= 0) {
+			m_SizeX = 1;
+		}
+		if (m_SizeX >= m_MaxCellSize) {
+			throw BaseException(
+				L"セルのX方向が最大値を超えました",
+				L"if (m_SizeX >= m_MaxCellSize)",
+				L"StageCellMap::Impl::Init()"
+			);
+		}
+		m_SizeZ = PieceCountZ;
+		if (m_SizeZ <= 0) {
+			m_SizeZ = 1;
+		}
+		if (m_SizeZ >= m_MaxCellSize) {
+			throw BaseException(
+				L"セルのZ方向が最大値を超えました",
+				L"if (m_SizeZ >= m_MaxCellSize)",
+				L"StageCellMap::Impl::Init()"
+			);
+		}
+		m_MapAABB.m_Min = MiniPos;
+		m_MapAABB.m_Max.x = m_MapAABB.m_Min.x + m_PieceSize * (float)m_SizeX;
+		m_MapAABB.m_Max.y = m_MapAABB.m_Min.y + m_PieceSize;
+		m_MapAABB.m_Max.z = m_MapAABB.m_Min.z + m_PieceSize * (float)m_SizeZ;
+		Vector3 PieceVec(m_PieceSize, m_PieceSize, m_PieceSize);
+		//配列の初期化
+		m_CellVec.resize(m_SizeX);
+		for (UINT x = 0; x < m_SizeX; x++) {
+			m_CellVec[x].resize(m_SizeZ);
+			for (UINT z = 0; z < m_SizeZ; z++) {
+				m_CellVec[x][z].m_Index.x = x;
+				m_CellVec[x][z].m_Index.z = z;
+				m_CellVec[x][z].m_Cost = m_DefaultCost;
+				AABB Piece;
+				Piece.m_Min.x = m_MapAABB.m_Min.x + (float)x * m_PieceSize;
+				Piece.m_Min.y = m_MapAABB.m_Min.y;
+				Piece.m_Min.z = m_MapAABB.m_Min.z + (float)z * m_PieceSize;
+				Piece.m_Max = Piece.m_Min + PieceVec;
+				m_CellVec[x][z].m_PieceRange = Piece;
+			}
+		}
+	}
+
+	void StageCellMap::Impl::Create(const shared_ptr<MultiStringSprite>& StringPtr, const shared_ptr<Stage>& StagePtr) {
+		Vector3 Min = m_MapAABB.m_Min;
+		Vector3 Max = m_MapAABB.m_Max;
+		Color4 Col(1.0f, 1.0f, 1.0f, 1.0f);
+
+		Vector3 LineFrom(Min);
+		Vector3 LineTo(Min);
+		LineTo.x = Max.x;
+
+		m_Vertices.clear();
+		for (UINT z = 0; z <= m_SizeZ; z++) {
+			m_Vertices.push_back(VertexPositionColor(LineFrom, Col));
+			m_Vertices.push_back(VertexPositionColor(LineTo, Col));
+			LineFrom.z += m_PieceSize;
+			LineTo.z += m_PieceSize;
+		}
+
+		LineFrom = Min;
+		LineTo = Min;
+		LineTo.z = Max.z;
+		for (UINT x = 0; x <= m_SizeX; x++) {
+			m_Vertices.push_back(VertexPositionColor(LineFrom, Col));
+			m_Vertices.push_back(VertexPositionColor(LineTo, Col));
+			LineFrom.x += m_PieceSize;
+			LineTo.x += m_PieceSize;
+		}
+		//メッシュの作成（変更できない）
+		m_LineMesh = MeshResource::CreateMeshResource(m_Vertices, false);
+
+		//スプライト文字列の初期化
+		Matrix4X4 World, View, Proj;
+
+		//ワールド行列の決定
+		Quaternion Qt;
+		Qt.Normalize();
+		World.AffineTransformation(
+			Vector3(1.0, 1.0, 1.0),			//スケーリング
+			Vector3(0, 0, 0),		//回転の中心（重心）
+			Qt,				//回転角度
+			Vector3(0, 0.01f, 0)				//位置
+		);
+
+		auto PtrCamera = StagePtr->GetView()->GetTargetCamera();
+		View = PtrCamera->GetViewMatrix();
+		Proj = PtrCamera->GetProjMatrix();
+		auto viewport = StagePtr->GetView()->GetTargetViewport();
+		World *= View;
+		World *= Proj;
+
+		StringPtr->ClearTextBlock();
+		for (UINT x = 0; x < m_CellVec.size(); x++) {
+			for (UINT z = 0; z < m_CellVec[x].size(); z++) {
+				Vector3 Pos = m_CellVec[x][z].m_PieceRange.GetCenter();
+
+				Pos.y = m_CellVec[x][z].m_PieceRange.m_Min.y;
+				Pos.WorldToSCreen(World, viewport.Width, viewport.Height);
+				Rect2D<float> rect(Pos.x, Pos.y, Pos.x + 50, Pos.y + 20);
+
+				wstring str(L"");
+				str += Util::IntToWStr(x);
+				str += L",";
+				str += Util::IntToWStr(z);
+
+				if (Pos.z < viewport.MinDepth || Pos.z > viewport.MaxDepth) {
+					StringPtr->InsertTextBlock(rect, str, true);
+				}
+				else {
+					StringPtr->InsertTextBlock(rect, str, false);
+				}
+			}
+		}
+	}
+
+
+	//--------------------------------------------------------------------------------------
+	//	ステージのセルマップ（派生クラスを作るかインスタンスを作成する）
+	//--------------------------------------------------------------------------------------
 
 
 
+	StageCellMap::StageCellMap(const shared_ptr<Stage>& StagePtr, const Vector3& MiniPos,
+		float PieceSize, UINT PieceCountX, UINT PieceCountZ, int DefaultCost):
+		GameObject(StagePtr),
+		pImpl(new Impl())
+	{
+		pImpl->Init(MiniPos, PieceSize, PieceCountX, PieceCountZ, DefaultCost);
+	}
 
 
 
+	StageCellMap::~StageCellMap() {}
+
+	bool StageCellMap::IsCellStringActive() {
+		return pImpl->m_IsCellStringActive;
+
+	}
+	void StageCellMap::SetCellStringActive(bool b) {
+		pImpl->m_IsCellStringActive = b;
+	}
+
+	vector<vector<CellPiece>>& StageCellMap::GetCellVec() const {
+		return pImpl->m_CellVec;
+	}
+	//初期化
+	void StageCellMap::OnCreate(){
+		pImpl->Create(AddComponent<MultiStringSprite>(), GetStage());
+		SetDrawActive(false);
+	}
+
+	bool StageCellMap::FindCell(const Vector3& Pos, CellIndex& ret) {
+		for (UINT x = 0; x < pImpl->m_CellVec.size(); x++) {
+			for (UINT z = 0; z < pImpl->m_CellVec[x].size(); z++) {
+				if (pImpl->m_CellVec[x][z].m_PieceRange.PtInAABB(Pos)) {
+					ret = pImpl->m_CellVec[x][z].m_Index;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	void StageCellMap::FindNearCell(const Vector3& Pos, CellIndex& ret) {
+		if (FindCell(Pos, ret)) {
+			return;
+		}
+		float len = 0;
+		bool isset = false;
+		for (UINT x = 0; x < pImpl->m_CellVec.size(); x++) {
+			for (UINT z = 0; z < pImpl->m_CellVec[x].size(); z++) {
+				if (!isset) {
+					auto cellcenter = pImpl->m_CellVec[x][z].m_PieceRange.GetCenter();
+					len = Vector3EX::Length(Pos - cellcenter);
+					ret = pImpl->m_CellVec[x][z].m_Index;
+					isset = true;
+				}
+				else {
+					auto cellcenter = pImpl->m_CellVec[x][z].m_PieceRange.GetCenter();
+					auto templen = Vector3EX::Length(Pos - cellcenter);
+					if (len > templen) {
+						len = templen;
+						ret = pImpl->m_CellVec[x][z].m_Index;
+					}
+				}
+			}
+		}
+	}
+
+
+	bool StageCellMap::FindAABB(const CellIndex& Index, AABB& ret) {
+		for (UINT x = 0; x < pImpl->m_CellVec.size(); x++) {
+			for (UINT z = 0; z < pImpl->m_CellVec[x].size(); z++) {
+				if (pImpl->m_CellVec[x][z].m_Index == Index) {
+					ret = pImpl->m_CellVec[x][z].m_PieceRange;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	void StageCellMap::FindNearAABB(const Vector3& Pos, AABB& ret) {
+		CellIndex retcell;
+		FindNearCell(Pos, retcell);
+		ret = pImpl->m_CellVec[retcell.x][retcell.z].m_PieceRange;
+	}
+
+
+	void StageCellMap::GetMapAABB(AABB& ret) const {
+		ret =  pImpl->m_MapAABB;
+	}
+
+	void StageCellMap::RefleshCellMap(const Vector3& MiniPos,
+		float PieceSize, UINT PieceCountX, UINT PieceCountZ, int DefaultCost) {
+		pImpl->Init(MiniPos,PieceSize,PieceCountX, PieceCountZ,DefaultCost);
+		pImpl->Create(GetComponent<MultiStringSprite>(), GetStage());
+	}
+
+
+
+	void  StageCellMap::OnUpdate() {
+		if (pImpl->m_IsCellStringActive) {
+			auto StringPtr = GetComponent<MultiStringSprite>();
+			Matrix4X4 World, View, Proj;
+			World.Identity();
+			auto PtrCamera = GetStage()->GetView()->GetTargetCamera();
+			View = PtrCamera->GetViewMatrix();
+			Proj = PtrCamera->GetProjMatrix();
+			auto viewport = GetStage()->GetView()->GetTargetViewport();
+
+			World *= View;
+			World *= Proj;
+
+			size_t count = 0;
+			for (UINT x = 0; x < pImpl->m_CellVec.size(); x++) {
+				for (UINT z = 0; z < pImpl->m_CellVec[x].size(); z++) {
+					Vector3 Pos = pImpl->m_CellVec[x][z].m_PieceRange.GetCenter();
+					Pos.y = pImpl->m_CellVec[x][z].m_PieceRange.m_Min.y;
+					Pos.WorldToSCreen(World, viewport.Width, viewport.Height);
+
+					Rect2D<float> rect(Pos.x, Pos.y, Pos.x + 50, Pos.y + 50);
+
+					wstring str(L"");
+					str += Util::IntToWStr(x);
+					str += L",";
+					str += Util::IntToWStr(z);
+					str += L"\nCost: ";
+					str += Util::IntToWStr(pImpl->m_CellVec[x][z].m_Cost);
+
+					if (Pos.z < viewport.MinDepth || Pos.z > viewport.MaxDepth) {
+						StringPtr->UpdateTextBlock(count, rect, str, true);
+					}
+					else {
+						StringPtr->UpdateTextBlock(count, rect, str, false);
+					}
+					count++;
+				}
+			}
+		}
+	}
+
+
+	void StageCellMap::OnDraw() {
+		if (pImpl->m_IsCellStringActive) {
+			GameObject::OnDraw();
+		}
+
+		auto Dev = App::GetApp()->GetDeviceResources();
+		auto pD3D11DeviceContext = Dev->GetD3DDeviceContext();
+		auto RenderState = Dev->GetRenderState();
+
+		//行列の定義
+		Matrix4X4 World, View, Proj;
+		//ワールド行列の決定
+		Quaternion Qt;
+		Qt.Normalize();
+		World.AffineTransformation(
+			Vector3(1.0, 1.0, 1.0),			//スケーリング
+			Vector3(0, 0, 0),		//回転の中心（重心）
+			Qt,				//回転角度
+			Vector3(0, 0.01f, 0)				//位置
+		);
+		//転置する
+		World.Transpose();
+		//カメラを得る
+		auto CameraPtr = OnGetDrawCamera();
+		//ビューと射影行列を得る
+		View = CameraPtr->GetViewMatrix();
+		//転置する
+		View.Transpose();
+		//転置する
+		Proj = CameraPtr->GetProjMatrix();
+		Proj.Transpose();
+
+		//コンスタントバッファの準備
+		StaticConstantBuffer sb;
+		sb.World = World;
+		sb.View = View;
+		sb.Projection = Proj;
+		//エミッシブ加算は行わない。
+		sb.Emissive = Color4(0, 0, 0, 0);
+		sb.Diffuse = Color4(1, 1, 1, 1);
+		//コンスタントバッファの更新
+		pD3D11DeviceContext->UpdateSubresource(CBStatic::GetPtr()->GetBuffer(), 0, nullptr, &sb, 0, 0);
+
+		//ストライドとオフセット
+		UINT stride = sizeof(VertexPositionColor);
+		UINT offset = 0;
+		//頂点バッファのセット
+		pD3D11DeviceContext->IASetVertexBuffers(0, 1, pImpl->m_LineMesh->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+
+		//描画方法（ライン）
+		pD3D11DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+		//コンスタントバッファの設定
+		ID3D11Buffer* pConstantBuffer = CBStatic::GetPtr()->GetBuffer();
+		ID3D11Buffer* pNullConstantBuffer = nullptr;
+		//頂点シェーダに渡す
+		pD3D11DeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+		//ピクセルシェーダに渡す
+		pD3D11DeviceContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
+		//シェーダの設定
+		pD3D11DeviceContext->VSSetShader(VSPCStatic::GetPtr()->GetShader(), nullptr, 0);
+		pD3D11DeviceContext->PSSetShader(PSPCStatic::GetPtr()->GetShader(), nullptr, 0);
+		//インプットレイアウトの設定
+		pD3D11DeviceContext->IASetInputLayout(VSPCStatic::GetPtr()->GetInputLayout());
+		//ブレンドステート
+		pD3D11DeviceContext->OMSetBlendState(RenderState->GetOpaque(), nullptr, 0xffffffff);
+		//デプスステンシルステート
+		pD3D11DeviceContext->OMSetDepthStencilState(RenderState->GetDepthDefault(), 0);
+		//ラスタライザステート
+		pD3D11DeviceContext->RSSetState(RenderState->GetCullNone());
+
+		//描画
+		pD3D11DeviceContext->Draw(pImpl->m_Vertices.size(), 0);
+		//後始末
+		Dev->InitializeStates();
+
+	}
 
 
 }

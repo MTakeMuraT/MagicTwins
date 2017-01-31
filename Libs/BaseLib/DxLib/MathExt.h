@@ -1,9 +1,8 @@
-
 /*!
 @file MathExt.h
 @brief 行列、クオータニオン、カラーなどの計算クラス<br />
 XNAMATH のラッピングクラス群
-@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #pragma once
@@ -352,6 +351,17 @@ namespace basecross{
 			XMVECTOR temp = other;
 			XMStoreFloat4(this, temp);
 		}
+
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		@param[in]	other	コピー元
+		*/
+		//--------------------------------------------------------------------------------------
+		Color4(const XMVECTORF32& other) :XMFLOAT4() {
+			XMVECTOR temp = other;
+			XMStoreFloat4(this, temp);
+		}
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	コンストラクタ
@@ -445,6 +455,19 @@ namespace basecross{
 			XMStoreFloat4(this, temp);
 			return *this;
 		}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	代入
+		@param[in]	other	コピー元
+		@return	演算後の*thisの参照
+		*/
+		//--------------------------------------------------------------------------------------
+		Color4& operator=(const XMVECTORF32& other) {
+			XMVECTOR temp = other;
+			XMStoreFloat4(this, temp);
+			return *this;
+		}
+
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	追加加算
@@ -1658,6 +1681,25 @@ namespace basecross{
 		//比較
 		//--------------------------------------------------------------------------------------
 		/*!
+		@brief	thisがもう一つの行列と等しいかどうかを検証する(UINT版)
+		@param[in]	other	比較元
+		@return	等しければtrue
+		*/
+		//--------------------------------------------------------------------------------------
+		bool EqualInt(const Matrix4X4& other)const {
+			auto m = XMMATRIX(*this);
+			auto o = XMMATRIX(other);
+			for (UINT i = 0; i < 4; i++) {
+				auto v = (Vector4)XMVectorEqualInt(m.r[i], o.r[i]);
+				if (!v.x || !v.y || !v.z || !v.w) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		//--------------------------------------------------------------------------------------
+		/*!
 		@brief	thisがもう一つの行列と等しいかどうかを検証する
 		@param[in]	other	比較元
 		@return	等しければtrue
@@ -1888,6 +1930,21 @@ namespace basecross{
 			Matrix4X4 temp(*this);
 			temp /= f;
 			return temp;
+		}
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	行単位に取り出す
+		@param[in]	i	行のインデックス
+		@return	各行のVector4
+		*/
+		//--------------------------------------------------------------------------------------
+		Vector4 operator[] (int i) const {
+			Vector4 ret;
+			ret.x = m[i][0];
+			ret.y = m[i][1];
+			ret.z = m[i][2];
+			ret.w = m[i][3];
+			return ret;
 		}
 		//--------------------------------------------------------------------------------------
 		/*!

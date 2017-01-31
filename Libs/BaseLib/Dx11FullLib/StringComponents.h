@@ -1,7 +1,7 @@
 /*!
 @file StringComponents.h
 @brief 文字列描画コンポーネント
-@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 #include "stdafx.h"
@@ -9,31 +9,98 @@
 namespace basecross {
 
 	//--------------------------------------------------------------------------------------
-	//	class StringSprite : public Component;
-	//	用途: StringSpriteコンポーネント
-	//	文字列表示コンポーネント
+	///	StringSpriteコンポーネント(文字列表示)
 	//--------------------------------------------------------------------------------------
 	class StringSprite : public Component{
 	public:
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	コンストラクタ
+		@param[in]	GameObjectPtr	ゲームオブジェクト
+		*/
+		//--------------------------------------------------------------------------------------
 		explicit StringSprite(const shared_ptr<GameObject>& GameObjectPtr);
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	デストラクタ
+		*/
+		//--------------------------------------------------------------------------------------
 		virtual ~StringSprite();
-		//アクセサ
+		//--------------------------------------------------------------------------------------
+		/*!
+		@enum TextAlignment
+		*/
+		//--------------------------------------------------------------------------------------
 		enum TextAlignment{
-			m_Left,		//左合わせ
-			m_Center,	//中央合わせ
-			m_Right		//右合わせ
+			//左合わせ
+			m_Left,
+			//中央合わせ
+			m_Center,
+			//右合わせ
+			m_Right
 		};
 		//アクセサ
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	フォントを設定する
+		@param[in]	FontName フォント名
+		@param[in]	FontSize フォントサイズ
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
 		void SetFont(const wstring& FontName, float FontSize);
-
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	テキストのアラインメントを得る
+		@return	テキストのアラインメント
+		*/
+		//--------------------------------------------------------------------------------------
 		StringSprite::TextAlignment GetTextAlignment() const;
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	テキストのアラインメントを設定する
+		@param[in]	Alignment アラインメント
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
 		void SetTextAlignment(StringSprite::TextAlignment Alignment);
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	テキストを得る
+		@return	テキスト
+		*/
+		//--------------------------------------------------------------------------------------
 		const wstring& GetText() const;
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	テキストを設定する
+		@param[in]	str テキスト
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
 		void SetText(const wstring& str);
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	テキストを追加する
+		@param[in]	str テキスト
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
 		void AddText(const wstring& str);
-
-
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	フォント色を得る
+		@return	フォント色
+		*/
+		//--------------------------------------------------------------------------------------
 		const Color4& GetFontColor() const;
+		//--------------------------------------------------------------------------------------
+		/*!
+		@brief	フォント色を設定する
+		@param[in]	Col フォント色
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
 		void SetFontColor(const Color4& Col);
 		const wstring& GetFontName() const;
 		float GetFontSize() const;
@@ -68,6 +135,56 @@ namespace basecross {
 		struct Impl;
 		unique_ptr<Impl> pImpl;
 	};
+
+
+	//--------------------------------------------------------------------------------------
+	//	class MultiStringSprite : public Component;
+	//	用途: MultiStringSpriteコンポーネント
+	//	複数ブロックの文字列表示コンポーネント
+	//--------------------------------------------------------------------------------------
+	class MultiStringSprite : public Component {
+	public:
+		explicit MultiStringSprite(const shared_ptr<GameObject>& GameObjectPtr);
+		virtual ~MultiStringSprite();
+
+		//アクセサ
+		//ブロック共通
+		void SetFont(const wstring& FontName, float FontSize);
+		const Color4& GetFontColor() const;
+		void SetFontColor(const Color4& Col);
+		const wstring& GetFontName() const;
+		float GetFontSize() const;
+
+		const Color4& GetBackColor() const;
+		void SetBackColor(const Color4& Col);
+
+		Point2D<float> GetBackTextMargin() const;
+		void SetBackTextMargin(Point2D<float> p);
+		ComPtr<IDWriteTextFormat>&	GetTextFormat()const;
+		StringSprite::TextAlignment GetTextAlignment() const;
+		void SetTextAlignment(StringSprite::TextAlignment Alignment);
+
+		//ブロック単位
+		const wstring& GetText(size_t Index) const;
+		void SetText(size_t Index, const wstring& str, bool Clip = false);
+		void AddText(size_t Index, const wstring& str, bool Clip = false);
+		void InsertTextBlock(const Rect2D<float>& Block, const wstring& str, bool Clip = false);
+		void UpdateTextBlock(size_t Index, const Rect2D<float>& Block, const wstring& str, bool Clip = false);
+		void ClearTextBlock();
+		ComPtr<IDWriteTextLayout>& GetTextLayout(size_t Index)const;
+		const DWRITE_TEXT_METRICS& GetDriteTextMetrics(size_t Index) const;
+
+
+		//操作
+		virtual void OnUpdate()override;
+		virtual void OnDraw()override;
+
+	private:
+		// pImplイディオム
+		struct Impl;
+		unique_ptr<Impl> pImpl;
+	};
+
 
 
 

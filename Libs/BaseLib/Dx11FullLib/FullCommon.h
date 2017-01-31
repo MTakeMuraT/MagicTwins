@@ -1,7 +1,7 @@
 /*!
 @file FullCommon.h
 @brief Fullバージョン用ライブラリ（Dx11専用含む）用のヘッダをまとめる
-@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 
 #pragma once
@@ -20,6 +20,8 @@
 #include "../SharedLib/Rigidbody.h"
 //描画コンポーネント
 #include "DrawComponents.h"
+//拡張描画コンポーネント
+#include "DrawComponentsEx.h"
 //文字列描画コンポーネント
 #include "StringComponents.h"
 //ゲームオブジェクト、ステージなど
