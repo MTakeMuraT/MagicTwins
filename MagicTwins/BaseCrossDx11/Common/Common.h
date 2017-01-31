@@ -19,8 +19,6 @@
 #include "Rigidbody.h"
 //描画コンポーネント
 #include "DrawComponents.h"
-//拡張描画コンポーネント
-#include "DrawComponentsEx.h"
 //デバッグ文字列コンポーネント
 #include "StringComponents.h"
 //ゲームオブジェクト、ステージなど

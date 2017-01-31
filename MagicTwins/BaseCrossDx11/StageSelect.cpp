@@ -529,12 +529,6 @@ namespace basecross {
 					//左右シーン遷移(仮)
 					if (CntlVec[0].fThumbLX > 0 && m_flag&&m_StageNum < m_MaxStageNum)
 					{
-						//0から離れたら
-						if (m_StageNum == 0)
-						{
-							GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNumDraw(true);
-							GetSharedGameObject<GameObject>(L"StageLogo", false)->SetDrawActive(true);
-						}
 
 						m_StageNum++;
 						m_flag = false;
@@ -547,13 +541,6 @@ namespace basecross {
 						m_flag = false;
 						m_StageImageRotFlg = true;
 						GetSharedGameObject<SEManager>(L"SEM", false)->OnSe("SelectMove");
-						//０ならステージ番号消す
-						if (m_StageNum == 0)
-						{
-							GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNumDraw(false);
-							GetSharedGameObject<GameObject>(L"StageLogo", false)->SetDrawActive(false);
-						}
-
 					}
 					if (CntlVec[0].fThumbLX == 0)
 					{

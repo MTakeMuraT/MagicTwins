@@ -1,7 +1,7 @@
 /*!
 @file BaseHelper.h
 @brief 例外処理、ヘルパー関数等
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 #include "stdafx.h"
@@ -2301,8 +2301,7 @@ namespace basecross{
 		*/
 		//--------------------------------------------------------------------------------------
 		explicit LayeredStateMachine(const shared_ptr<T>& owner) :
-			m_Owner(owner),
-			m_MaxStack(10)
+			m_Owner(owner)
 		{}
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -2613,12 +2612,6 @@ namespace basecross{
 				}
 			}
 			return nullptr;
-		}
-		void HandleInputExcute(const shared_ptr<T>& Obj) {
-			auto ComPtr = HandleInput();
-			if (ComPtr) {
-				ComPtr->Excute(Obj);
-			}
 		}
 	};
 

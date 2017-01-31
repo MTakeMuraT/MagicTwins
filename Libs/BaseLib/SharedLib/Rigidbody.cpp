@@ -1,7 +1,7 @@
 /*!
 @file Rigidbody.h
 @brief 物理計算コンポーネント実体
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #include "stdafx.h"
 
@@ -281,7 +281,6 @@ namespace basecross {
 				pImpl->m_WanderRadius, pImpl->m_WanderDistance, pImpl->m_WanderJitter, pImpl->m_WanderTarget) * GetWeight();
 			Steering::AccumulateForce(Force, WorkForce, RigidPtr->GetMaxForce());
 			RigidPtr->SetForce(Force);
-
 		}
 	}
 
@@ -650,6 +649,7 @@ namespace basecross {
 			RigidPtr->SetForce(Force);
 		}
 	}
+
 
 	//--------------------------------------------------------------------------------------
 	//	struct Rigidbody::Impl;

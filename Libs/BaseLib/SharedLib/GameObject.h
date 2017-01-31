@@ -1,7 +1,7 @@
 /*!
 @file GameObject.h
 @brief ゲームオブジェクト、ステージ
-@copyright Copyright (c) 2017 WiZ Tamura Hiroki,Yamanoi Yasushi.
+@copyright Copyright (c) 2016 WiZ Tamura Hiroki,Yamanoi Yasushi.
 */
 #pragma once
 #include "stdafx.h"
@@ -18,15 +18,17 @@ namespace basecross {
 		shared_ptr<Gravity> GetGravity()const;
 		shared_ptr<Collision> GetCollision()const;
 		shared_ptr<CollisionSphere> GetCollisionSphere()const;
-		shared_ptr<CollisionCapsule> GetCollisionCapsule()const;
 		shared_ptr<CollisionObb> GetCollisionObb()const;
-		shared_ptr<CollisionTriangles> GetCollisionTriangles()const;
 		shared_ptr<CollisionRect> GetCollisionRect()const;
 
 		void SetRigidbody(const shared_ptr<Rigidbody>& Ptr);
 		void SetGravity(const shared_ptr<Gravity>& Ptr);
 		void SetTransform(const shared_ptr<Transform>& Ptr);
 		void SetCollision(const shared_ptr<Collision>& Ptr);
+		void SetCollisionSphere(const shared_ptr<CollisionSphere>& Ptr);
+		void SetCollisionObb(const shared_ptr<CollisionObb>& Ptr);
+		void SetCollisionRect(const shared_ptr<CollisionRect>& Ptr);
+
 		void AddMakedComponent(type_index TypeIndex, const shared_ptr<Component>& Ptr);
 		template<typename T>
 		shared_ptr<T> SearchDynamicComponent()const {
@@ -162,89 +164,12 @@ namespace basecross {
 		void  SetDrawLayer(int l);
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	指定するタグが存在するかどうかを得る
-		@param[in]	tagstr	検証するタグ
-		@return	存在すればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		bool FindTag(const wstring& tagstr) const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	指定するタグを追加する
-		@param[in]	tagstr	追加するタグ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void  AddTag(const wstring& tagstr);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	指定するタグが存在したら削除する（存在しない場合は何もしない）
-		@param[in]	tagstr	削除するタグ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void  RemoveTag(const wstring& tagstr);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	指定する数字タグが存在するかどうかを得る
-		@param[in]	numtag	検証する数字タグ
-		@return	存在すればtrue
-		*/
-		//--------------------------------------------------------------------------------------
-		bool FindNumTag(int numtag) const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	指定する数字タグを追加する
-		@param[in]	numtag	追加する数字タグ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void  AddNumTag(int numtag);
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	指定する数字タグが存在したら削除する（存在しない場合は何もしない）
-		@param[in]	numtag	削除する数字タグ
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		void  RemoveNumTag(int numtag);
-		//--------------------------------------------------------------------------------------
-		/*!
 		@brief	所属するステージを得る
 		@param[in]	ExceptionActive	対象がnullだった場合に例外処理するかどうか
 		@return	所属するステージ
 		*/
 		//--------------------------------------------------------------------------------------
 		shared_ptr<Stage> GetStage(bool ExceptionActive = true) const;
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	所属するステージを得る(型チェックあり)
-		@param[in]	ExceptionActive	対象がnullだった場合に例外処理するかどうか
-		@return	所属するステージ
-		*/
-		//--------------------------------------------------------------------------------------
-		template<typename T>
-		shared_ptr<T> GetTypeStage(bool ExceptionActive = true) const {
-			auto StagePtr = GetStage(ExceptionActive);
-			if (!StagePtr) {
-				return nullptr;
-			}
-			auto TargetPtr = dynamic_pointer_cast<T>(StagePtr);
-			if (!TargetPtr) {
-				if (ExceptionActive) {
-					throw BaseException(
-						L"ステージがありましたが、型キャストできません",
-						Util::GetWSTypeName<T>(),
-						L"GameObject::GetTypeStage<T>()"
-					);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return TargetPtr;
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	所属するステージを設定する
@@ -490,60 +415,6 @@ namespace basecross {
 			return Ptr;
 		}
 
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionCapsuleコンポーネントの取得
-		@param[in]	ExceptionActive	対象がnullだった場合に例外処理するかどうか
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template <>
-		shared_ptr<CollisionCapsule> GetComponent<CollisionCapsule>(bool ExceptionActive)const {
-			auto Ptr = GetCollisionCapsule();
-			if (!Ptr) {
-				if (ExceptionActive) {
-					throw BaseException(
-						L"コンポーネントが見つかりません",
-						L"CollisionCapsule",
-						L"GameObject::GetComponent<CollisionCapsule>()"
-					);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return Ptr;
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionCapsuleコンポーネントの派生クラスの取得
-		@tparam	T	取得する型（CollisionCapsuleに型変換できるもの）
-		@param[in]	ExceptionActive	対象がnullだった場合に例外処理するかどうか
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template <typename T>
-		shared_ptr<T> GetDynamicCollisionCapsule(bool ExceptionActive = true)const {
-			auto Ptr = dynamic_pointer_cast<T>(GetCollisionCapsule());
-			if (!Ptr) {
-				if (ExceptionActive) {
-					throw BaseException(
-						L"指定の型へはCollisionSphereからキャストできません",
-						Util::GetWSTypeName<T>(),
-						L"GameObject::GetDynamicCollisionCapsule<T>()"
-					);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return Ptr;
-		}
-
-
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	CollisionObbコンポーネントの取得
@@ -596,60 +467,6 @@ namespace basecross {
 			return Ptr;
 		}
 
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionTrianglesコンポーネントの取得
-		@param[in]	ExceptionActive	対象がnullだった場合に例外処理するかどうか
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template <>
-		shared_ptr<CollisionTriangles> GetComponent<CollisionTriangles>(bool ExceptionActive)const {
-			auto Ptr = GetCollisionTriangles();
-			if (!Ptr) {
-				if (ExceptionActive) {
-					throw BaseException(
-						L"コンポーネントが見つかりません",
-						L"CollisionTriangles",
-						L"GameObject::GetComponent<CollisionTriangles>()"
-					);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return Ptr;
-		}
-
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionTrianglesコンポーネントの派生クラスの取得
-		@tparam	T	取得する型（CollisionTrianglesに型変換できるもの）
-		@param[in]	ExceptionActive	対象がnullだった場合に例外処理するかどうか
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template <typename T>
-		shared_ptr<T> GetDynamicCollisionTriangles(bool ExceptionActive = true)const {
-			auto Ptr = dynamic_pointer_cast<T>(GetCollisionTriangles());
-			if (!Ptr) {
-				if (ExceptionActive) {
-					throw BaseException(
-						L"指定の型へはCollisionTrianglesからキャストできません",
-						Util::GetWSTypeName<T>(),
-						L"GameObject::GetDynamicCollisionTriangles<T>()"
-					);
-				}
-				else {
-					return nullptr;
-				}
-			}
-			return Ptr;
-		}
-
-
-
 
 		//--------------------------------------------------------------------------------------
 		/*!
@@ -665,7 +482,7 @@ namespace basecross {
 				if (ExceptionActive) {
 					throw BaseException(
 						L"コンポーネントが見つかりません",
-						L"CollisionRect",
+						L"CollisionObb",
 						L"GameObject::GetComponent<CollisionRect>()"
 					);
 				}
@@ -974,7 +791,7 @@ namespace basecross {
 			else {
 				//無ければ新たに制作する
 				auto CollisionSpherePtr = ObjectFactory::Create<CollisionSphere>(GetThis<GameObject>());
-				SetCollision(CollisionSpherePtr);
+				SetCollisionSphere(CollisionSpherePtr);
 				return CollisionSpherePtr;
 			}
 		}
@@ -1002,58 +819,9 @@ namespace basecross {
 					L"GameObject::AddDynamicCollisionSphere<T>()"
 				);
 			}
-			SetCollision(newPtr);
+			SetCollisionSphere(newPtr);
 			return newPtr;
 		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionCapsuleコンポーネントの追加
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template <>
-		shared_ptr<CollisionCapsule> AddComponent<CollisionCapsule>() {
-			auto Ptr = GetCollisionCapsule();
-			if (Ptr) {
-				return Ptr;
-			}
-			else {
-				//無ければ新たに制作する
-				auto CollisionCapsulePtr = ObjectFactory::Create<CollisionCapsule>(GetThis<GameObject>());
-				SetCollision(CollisionCapsulePtr);
-				return CollisionCapsulePtr;
-			}
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionCapsuleコンポーネントの派生クラスの追加
-		@tparam	T	取得する型（CollisionCapsuleに型変換できるもの）
-		@tparam	Ts	可変長変数の型
-		@param[in]	params	このコンポーネントを構築するのに使用するパラメータ。（第2パラメータ以降）
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template<typename T, typename... Ts>
-		shared_ptr<T> AddDynamicCollisionCapsule(Ts&&... params) {
-			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
-			//CollisionCapsuleにキャストしてみる
-			auto RetPtr = dynamic_pointer_cast<CollisionCapsule>(newPtr);
-			if (!RetPtr) {
-				//キャストできない
-				throw BaseException(
-					L"そのコンポーネントはCollisionCapsuleにキャストできません。",
-					Util::GetWSTypeName<T>(),
-					L"GameObject::AddDynamicCollisionCapsule<T>()"
-				);
-			}
-			SetCollision(newPtr);
-			return newPtr;
-		}
-
-
 
 
 		//--------------------------------------------------------------------------------------
@@ -1071,7 +839,7 @@ namespace basecross {
 			else {
 				//無ければ新たに制作する
 				auto CollisionObbPtr = ObjectFactory::Create<CollisionObb>(GetThis<GameObject>());
-				SetCollision(CollisionObbPtr);
+				SetCollisionObb(CollisionObbPtr);
 				return CollisionObbPtr;
 			}
 		}
@@ -1099,59 +867,9 @@ namespace basecross {
 					L"GameObject::AddDynamicCollisionObb<T>()"
 				);
 			}
-			SetCollision(newPtr);
+			SetCollisionObb(newPtr);
 			return newPtr;
 		}
-
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionTrianglesコンポーネントの追加
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template <>
-		shared_ptr<CollisionTriangles> AddComponent<CollisionTriangles>() {
-			auto Ptr = GetCollisionTriangles();
-			if (Ptr) {
-				return Ptr;
-			}
-			else {
-				//無ければ新たに制作する
-				auto CollisionTrianglesPtr = ObjectFactory::Create<CollisionTriangles>(GetThis<GameObject>());
-				SetCollision(CollisionTrianglesPtr);
-				return CollisionTrianglesPtr;
-			}
-		}
-
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	CollisionTrianglesコンポーネントの派生クラスの追加
-		@tparam	T	取得する型（CollisionTrianglesに型変換できるもの）
-		@tparam	Ts	可変長変数の型
-		@param[in]	params	このコンポーネントを構築するのに使用するパラメータ。（第2パラメータ以降）
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template<typename T, typename... Ts>
-		shared_ptr<T> AddDynamicCollisionTriangles(Ts&&... params) {
-			//現在の検索は行わず、そのままセットする
-			shared_ptr<T> newPtr = ObjectFactory::Create<T>(GetThis<GameObject>(), params...);
-			//CollisionTrianglesにキャストしてみる
-			auto RetPtr = dynamic_pointer_cast<CollisionTriangles>(newPtr);
-			if (!RetPtr) {
-				//キャストできない
-				throw BaseException(
-					L"そのコンポーネントはCollisionTrianglesにキャストできません。",
-					Util::GetWSTypeName<T>(),
-					L"GameObject::AddDynamicCollisionTriangles<T>()"
-				);
-			}
-			SetCollision(newPtr);
-			return newPtr;
-		}
-
-
 
 
 		//--------------------------------------------------------------------------------------
@@ -1169,7 +887,7 @@ namespace basecross {
 			else {
 				//無ければ新たに制作する
 				auto CollisionRectPtr = ObjectFactory::Create<CollisionRect>(GetThis<GameObject>());
-				SetCollision(CollisionRectPtr);
+				SetCollisionRect(CollisionRectPtr);
 				return CollisionRectPtr;
 			}
 		}
@@ -1197,7 +915,7 @@ namespace basecross {
 					L"GameObject::AddDynamicCollisionRect<T>()"
 				);
 			}
-			SetCollision(newPtr);
+			SetCollisionRect(newPtr);
 			return newPtr;
 		}
 
@@ -1318,6 +1036,13 @@ namespace basecross {
 		virtual void OnUpdate()override {}
 		//--------------------------------------------------------------------------------------
 		/*!
+		@brief	衝突判定チェック（ステージより呼ばれる）
+		@return	なし
+		*/
+		//--------------------------------------------------------------------------------------
+		void CollisionChk();
+		//--------------------------------------------------------------------------------------
+		/*!
 		@brief	衝突メッセージの発行（ステージより呼ばれる）。
 		@return	なし
 		*/
@@ -1325,28 +1050,12 @@ namespace basecross {
 		void ToMessageCollision();
 		//--------------------------------------------------------------------------------------
 		/*!
-		@brief	衝突発生時時のイベント（デフォルトは何もしない）
-		@param[in]	OtherVec	新しく衝突した相手の配列
+		@brief	衝突時のイベント（デフォルトは何もしない）
+		@param[in]	OtherVec	衝突した相手の配列
 		@return	なし
 		*/
 		//--------------------------------------------------------------------------------------
 		virtual void OnCollision(vector<shared_ptr<GameObject>>& OtherVec) {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	衝突し続ける相手があった場合のイベント（デフォルトは何もしない）
-		@param[in]	OtherVec	衝突し続けた相手の配列
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void OnCollisionExcute(vector<shared_ptr<GameObject>>& OtherVec) {}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	衝突を抜けた相手があった場合のイベント（デフォルトは何もしない）
-		@param[in]	OtherVec	衝突を抜けた相手の配列
-		@return	なし
-		*/
-		//--------------------------------------------------------------------------------------
-		virtual void OnCollisionExit(vector<shared_ptr<GameObject>>& OtherVec) {}
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	描画前準備（デフォルトは何もしない）
@@ -1604,68 +1313,6 @@ namespace basecross {
 		unique_ptr<Impl> pImpl;
 	};
 
-	//--------------------------------------------------------------------------------------
-	//	衝突判定管理者
-	//--------------------------------------------------------------------------------------
-	class CollisionAdmin : public GameObject {
-		void CollisionSub(size_t SrcIndex);
-	public:
-		//構築と消滅
-		explicit CollisionAdmin(const shared_ptr<Stage>& StagePtr);
-		virtual ~CollisionAdmin();
-		//初期化
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-	private:
-		//Implイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-	struct CellIndex;
-	//--------------------------------------------------------------------------------------
-	//	ステージのセルマップで使用するセル構造体
-	//--------------------------------------------------------------------------------------
-	struct CellPiece{
-		CellIndex m_Index;
-		CellIndex m_ParentIndex;
-		int m_Cost;
-		AABB m_PieceRange;
-		CellPiece(){}
-	};
-
-	//--------------------------------------------------------------------------------------
-	//	ステージのセルマップ（派生クラスを作るかインスタンスを作成する）
-	//--------------------------------------------------------------------------------------
-	class StageCellMap : public GameObject {
-	public:
-		StageCellMap(const shared_ptr<Stage>& StagePtr,const Vector3& MiniPos,
-			float PieceSize, UINT PieceCountX, UINT PieceCountZ,int DefaultCost = 1);
-		virtual ~StageCellMap();
-		bool IsCellStringActive();
-		void SetCellStringActive(bool b);
-		bool FindCell(const Vector3& Pos,CellIndex& ret);
-		void FindNearCell(const Vector3& Pos, CellIndex& ret);
-		bool FindAABB(const CellIndex& Index,AABB& ret);
-		void FindNearAABB(const Vector3& Pos, AABB& ret);
-		void GetMapAABB(AABB& ret) const;
-		vector<vector<CellPiece>>& GetCellVec() const;
-		void RefleshCellMap(const Vector3& MiniPos,
-			float PieceSize, UINT PieceCountX, UINT PieceCountZ, int DefaultCost = 1);
-		//初期化
-		virtual void OnCreate() override;
-		virtual void OnUpdate() override;
-		virtual void OnDraw() override;
-	private:
-		//Implイディオム
-		struct Impl;
-		unique_ptr<Impl> pImpl;
-	};
-
-
-
-
-
 
 	//--------------------------------------------------------------------------------------
 	//	ステージクラス
@@ -1673,7 +1320,6 @@ namespace basecross {
 	class Stage :public ObjectInterface, public ShapeInterface {
 		//プライベートサブ関数
 		void PushBackGameObject(const shared_ptr<GameObject>& Ptr);
-		void RemoveBackGameObject(const shared_ptr<GameObject>& Ptr);
 		shared_ptr<GameObject> GetSharedGameObjectEx(const wstring& Key, bool ExceptionActive) const;
 		void SetParentStage(const shared_ptr<Stage>& ParentStage);
 		void AddChileStageBase(const shared_ptr<Stage>& ChildStage);
@@ -1764,28 +1410,6 @@ namespace basecross {
 			}
 		}
 
-		template<typename T>
-		bool FindGameObject(const shared_ptr<GameObject>& Obj) {
-			auto shptr = dynamic_pointer_cast<T>(Obj);
-			if (shptr) {
-				for (auto ptr : GetGameObjectVec()) {
-					if (Obj == ptr) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
-
-		template<typename T>
-		void RemoveGameObject(const shared_ptr<GameObject>& Obj) {
-			if (FindGameObject<T>(Obj)) {
-				RemoveBackGameObject(Obj);
-			}
-		}
-
-
 		//追加待ちになってるオブジェクトを追加する
 		void SetWaitToObjectVec();
 
@@ -1844,7 +1468,7 @@ namespace basecross {
 
 
 		void SetView(const shared_ptr<ViewBase>& v);
-		const shared_ptr<ViewBase>& GetView(bool ExceptionActive = true)const;
+		const shared_ptr<ViewBase>& GetView()const;
 
 		void SetLight(const shared_ptr<LightBase>& L);
 		const shared_ptr<LightBase>& GetLight()const;
@@ -1866,10 +1490,13 @@ namespace basecross {
 			return newPtr;
 		}
 
+
 		//ステージ内の更新（シーンからよばれる）
 		virtual void UpdateStage();
 		//衝突判定の更新（ステージから呼ぶ）
 		virtual void UpdateCollision();
+		//Collisionを監査する重力のチェック（ステージから呼ぶ）
+//		virtual void UpdateCollisionGravity();
 		//衝突メッセージの発行
 		virtual void UpdateMessageCollision();
 
@@ -1920,9 +1547,6 @@ namespace basecross {
 	//--------------------------------------------------------------------------------------
 	class SceneBase :public SceneInterface {
 		void SetActiveStage(const shared_ptr<Stage>& stage);
-		void ConvertVertex(const vector<VertexPositionNormalTexture>& vertices,
-			vector<VertexPositionColor>& new_pc_vertices,
-			vector<VertexPositionTexture>& new_pt_vertices);
 	protected:
 		SceneBase();
 		virtual ~SceneBase();
@@ -1976,30 +1600,6 @@ namespace basecross {
 			SetActiveStage(StagePtr);
 			return Ptr;
 		}
-		//--------------------------------------------------------------------------------------
-		/*!
-		@brief	アクティブなステージを設定して初期化する
-		@tparam	T	取得する型（Stageに型変換できるもの）
-		@tparam	Ts	可変長変数の型
-		@param[in]	params	このステージを構築するのに使用するパラメータ。
-		@return	コンポーネント
-		*/
-		//--------------------------------------------------------------------------------------
-		template<typename T, typename... Ts>
-		shared_ptr<T> ResetActiveStageWithParam(Ts&&... params) {
-			auto Ptr = ObjectFactory::CreateWithParam<T>(params...);
-			auto StagePtr = dynamic_pointer_cast<Stage>(Ptr);
-			if (!StagePtr) {
-				throw BaseException(
-					L"以下はStageに型キャストできません。",
-					Util::GetWSTypeName<T>(),
-					L"SceneBase::ResetActiveStageWithParam<T>()"
-				);
-			}
-			SetActiveStage(StagePtr);
-			return Ptr;
-		}
-
 		//--------------------------------------------------------------------------------------
 		/*!
 		@brief	シーンを変化させる
