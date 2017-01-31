@@ -25,6 +25,9 @@ namespace basecross {
 		//ステージイメージ枠
 		strTexture = DataDir + L"Frame.png";
 		App::GetApp()->RegisterTexture(L"FRAME_TX", strTexture);
+		//ステージロゴ
+		strTexture = DataDir + L"StageLogo.png";
+		App::GetApp()->RegisterTexture(L"STAGELOGO_TX", strTexture);
 
 
 		//数字
@@ -212,7 +215,7 @@ namespace basecross {
 
 		SetSharedGameObject(L"Left", Left);
 
-		Left->SetDrawLayer(2);
+		Left->SetDrawLayer(3);
 
 		auto PtrAction = Left->AddComponent<Action>();
 		PtrAction->AddMoveBy(1.5, Vector3(100, 0, 0));
@@ -243,7 +246,7 @@ namespace basecross {
 
 		SetSharedGameObject(L"Right", Right);
 
-		Right->SetDrawLayer(2);
+		Right->SetDrawLayer(3);
 
 		auto PtrAction = Right->AddComponent<Action>();
 		PtrAction->AddMoveBy(1.5, Vector3(-100, 0, 0));
@@ -297,6 +300,30 @@ namespace basecross {
 		//アクセスできるメンバ変数に入れとく
 		m_StageImage = ImageP;
 
+
+	}
+
+	//下のステージロゴ作成
+	void StageSelect::CreateStageLogo()
+	{
+		auto obj = AddGameObject<GameObject>();
+		obj->AddComponent<Transform>();
+		auto PtrTransform = obj->GetComponent<Transform>();
+		Vector2 WindowSize = Vector2((float)App::GetApp()->GetGameWidth(), (float)App::GetApp()->GetGameHeight());
+		PtrTransform->SetPosition(-250, -400, 0);
+		PtrTransform->SetRotation(0, 0, 0);
+		PtrTransform->SetScale(300, 180, 1);
+
+		//スプライトを付ける
+		auto PtrSprite = obj->AddComponent<PCTSpriteDraw>();
+		PtrSprite->SetTextureResource(L"STAGELOGO_TX");
+
+		SetSharedGameObject(L"StageLogo", obj);
+
+		obj->SetDrawLayer(1);
+
+		//透明度反映
+		obj->SetAlphaActive(true);
 
 	}
 
@@ -358,6 +385,8 @@ namespace basecross {
 			CreateStageImageFrame();
 			//ステージイメージ作成
 			CreateStageImage();
+			//ステージロゴ作成
+			CreateStageLogo();
 			//左矢印(仮)
 			Left();
 			//右矢印(仮)
@@ -378,14 +407,21 @@ namespace basecross {
 			//Stp->SetFontColor(Color4(1, 1, 0.4f, 1));
 			//obj->SetDrawLayer(10);
 			//SetSharedGameObject(L"StringObject",obj);
+			//数字作成
 			auto NumberP = AddGameObject<NumberSprite>(0, Vector2(25, -400.0f), Vector2(128, 128), 4);
 			SetSharedGameObject(L"NumberSprite", NumberP);
+			//数字とステージロゴを非表示
+			NumberP->SetNumDraw(false);
+			GetSharedGameObject<GameObject>(L"StageLogo", false)->SetDrawActive(false);
 
 			//チュートリアルみたかどうか判定して見てたら1にする
 			auto ScenePtr = App::GetApp()->GetScene<Scene>();
 			if (ScenePtr->GetTutorialOpenFlg())
 			{
 				//数字1
+				//表示
+				NumberP->SetNumDraw(true);
+				GetSharedGameObject<GameObject>(L"StageLogo", false)->SetDrawActive(true);
 				NumberP->SetNum(1);
 				m_StageNum = 1;
 				m_StageImage->GetComponent<PCTSpriteDraw>()->SetTextureResource(L"STAGEIMAGE_1_TX");
@@ -435,6 +471,13 @@ namespace basecross {
 			//*テスト用
 			if (key.m_bPressedKeyTbl[VK_RIGHT])
 			{
+				//0から離れたら
+				if (m_StageNum == 0)
+				{
+					GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNumDraw(true);
+					GetSharedGameObject<GameObject>(L"StageLogo", false)->SetDrawActive(true);
+				}
+
 				m_StageNum++;
 				//m_flag = false;
 				m_StageImageRotFlg = true;
@@ -448,7 +491,12 @@ namespace basecross {
 				//m_flag = false;
 				m_StageImageRotFlg = true;
 				GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNum(m_StageNum);
-
+				//０ならステージ番号消す
+				if (m_StageNum == 0)
+				{
+					GetSharedGameObject<NumberSprite>(L"NumberSprite", false)->SetNumDraw(false);
+					GetSharedGameObject<GameObject>(L"StageLogo", false)->SetDrawActive(false);
+				}
 			}
 			//*テスト用
 

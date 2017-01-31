@@ -164,7 +164,7 @@ namespace basecross {
 		//透明度有効
 		ArrowPtr->SetAlphaActive(true);
 		//レイヤー設定
-		ArrowPtr->SetDrawLayer(3);
+		ArrowPtr->SetDrawLayer(4);
 		//アクセス用
 		m_ArrowL = ArrowPtr;
 
@@ -180,7 +180,7 @@ namespace basecross {
 		//透明度有効
 		ArrowPtr->SetAlphaActive(true);
 		//レイヤー設定
-		ArrowPtr->SetDrawLayer(3);
+		ArrowPtr->SetDrawLayer(4);
 		//アクセス用
 		m_ArrowR = ArrowPtr;
 

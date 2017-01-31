@@ -1339,11 +1339,9 @@ namespace basecross{
 
 	void NumberSprite::SetPositionVec2(Vector2 pos)
 	{
-		int count = 0;
 		for (auto v : m_Numbers)
 		{
 			v->GetComponent<Transform>()->SetPosition(m_pos.x,m_pos.y,0);
-			count++;
 		}
 	}
 
@@ -1425,6 +1423,16 @@ namespace basecross{
 			}
 		}
 	}
+
+	void NumberSprite::SetNumDraw(bool flg)
+	{
+		for (auto v : m_Numbers)
+		{
+			v->SetDrawActive(flg);
+		}
+
+	}
+
 
 	//--------------------------------------------------------------------------------------
 	//	class PauseMenu : public GameObject;

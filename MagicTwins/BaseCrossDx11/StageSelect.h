@@ -27,6 +27,9 @@ namespace basecross {
 		//ステージイメージ
 		void CreateStageImage();
 
+		//ステージロゴ作成
+		void CreateStageLogo();
+
 		//最大値
 		unsigned int m_MaxStageNum = 10;
 		//現在選択中の数字

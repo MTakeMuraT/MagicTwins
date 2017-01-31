@@ -415,6 +415,7 @@ namespace basecross{
 		//‘å‚«‚³’²®
 		void SetScaleVec2(Vector2 scale);
 		void SetNum(int num);
+		void SetNumDraw(bool flg);
 	};
 
 	//--------------------------------------------------------------------------------------
