@@ -54,7 +54,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //--------------------------------------------------------------------------------------
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow, bool isFullScreen, int iClientWidth, int iClientHeight)
 {
-
 	HWND hWnd = 0;
 	// ウィンドウの作成
 	if (isFullScreen) { // フルスクリーン
@@ -128,6 +127,7 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 	ZeroMemory(&WinInfo, sizeof(WinInfo));
 	//例外処理開始
 	try {
+		::ShowCursor(false);
 		//COMの初期化
 		//サウンドで使用する
 		if (FAILED(CoInitializeEx(nullptr, COINIT_MULTITHREADED))) {
@@ -208,6 +208,8 @@ int MainLoop(HINSTANCE hInstance, HWND hWnd, bool isFullScreen, int iClientWidth
 	//例外処理終了
 	//COMのリリース
 	::CoUninitialize();
+	::ShowCursor(true);
+
 	return RetCode;
 }
 
