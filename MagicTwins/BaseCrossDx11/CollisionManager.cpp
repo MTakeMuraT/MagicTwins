@@ -80,6 +80,14 @@ namespace basecross {
 					{
 						enemyPtr->ResetPos();
 					}
+					
+					//突撃エネミー
+					auto enemyPtr2 = dynamic_pointer_cast<EnemyRush>(v.lock());
+					if (enemyPtr2 && enemyPtr2->GetStopFlg())
+					{
+						enemyPtr2->ResetPos();
+					}
+					
 				}
 			}
 			//プレイヤー２が当たる
@@ -94,6 +102,13 @@ namespace basecross {
 					if (enemyPtr && !enemyPtr->GetStopFlg())
 					{
 						enemyPtr->ResetPos();
+					}
+
+					//突撃エネミー
+					auto enemyPtr2 = dynamic_pointer_cast<EnemyRush>(v.lock());
+					if (enemyPtr2 && enemyPtr2->GetStopFlg())
+					{
+						enemyPtr2->ResetPos();
 					}
 				}
 			}
@@ -347,6 +362,20 @@ namespace basecross {
 				}
 
 			}
+			//突撃エネミー
+			else if (dynamic_pointer_cast<EnemyRush>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<EnemyRush>(otherObj);
+				if (!Ptr->GetStopFlg())
+				{
+					Ptr->EnemyDamage(1);
+					HitFlg = true;
+				}
+				else
+				{
+					HitFlg = false;
+				}
+			}
 
 			if (HitFlg)
 			{
@@ -445,6 +474,21 @@ namespace basecross {
 				}
 
 			}
+			//突撃エネミー
+			else if (dynamic_pointer_cast<EnemyRush>(otherObj))
+			{
+				auto Ptr = dynamic_pointer_cast<EnemyRush>(otherObj);
+				if (!Ptr->GetStopFlg())
+				{
+					Ptr->EnemyDamage(2);
+					HitFlg = true;
+				}
+				else
+				{
+					HitFlg = false;
+				}
+			}
+
 
 			if (HitFlg)
 			{

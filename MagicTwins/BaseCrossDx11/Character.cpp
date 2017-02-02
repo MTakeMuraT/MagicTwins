@@ -901,6 +901,335 @@ namespace basecross{
 	}
 
 	//--------------------------------------------------------------------------------------
+	//	class EnemyRush : public GameObject;
+	//	用途: 敵(突撃する)
+	//--------------------------------------------------------------------------------------
+
+	EnemyRush::EnemyRush(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int targetNum):
+		GameObject(StagePtr),
+		m_InitPos(pos),
+		m_Scale(scale),
+		m_TargetPlayernum(targetNum)
+	{}
+
+	void EnemyRush::OnCreate()
+	{
+		auto Ptr = GetComponent<Transform>();
+		Ptr->SetPosition(m_InitPos);
+		Ptr->SetScale(m_Scale);
+
+		// モデルとトランスフォームの間の差分行列
+		Matrix4X4 SpanMat;
+		SpanMat.DefTransformation(
+			Vector3(0.5f, 0.5f, 0.5f),
+			Vector3(0.0f, 0.0f, 0.0f),
+			Vector3(0.0f, -0.3f, 0.0f)
+			);
+
+
+		//描画コンポーネントの設定
+		auto PtrDraw = AddComponent<PNTStaticModelDraw>();
+		//描画するメッシュを設定
+		PtrDraw->SetMeshResource(L"Enemy_Model");
+		PtrDraw->SetMeshToTransformMatrix(SpanMat);
+
+		//透明処理
+		SetAlphaActive(true);
+
+
+		//パーティクル作成
+		auto obj = GetStage()->AddGameObject<MagicParticle>();
+		//obj->OnParticle(v, Vector3(1.0f, 0, 1.0f), Vector3(0, 1.0f, 0), Vector3(1.0f, 0.5f, 1.0f), Vector3(2.0f, 2.0f, 2.0f), L"FIRELIGHT_TX", false, 0.2f, 1, 2.0f);
+		m_Particle = obj;
+	}
+
+	void EnemyRush::OnUpdate()
+	{
+		if (m_ActiveFlg)
+		{
+			auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+			auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+			//アクティブじゃなければ更新しない
+			if (m_TargetPlayernum == 1 && !P1P->GetActive())
+			{
+				return;
+			}
+			else if (m_TargetPlayernum == 2 && !P2P->GetActive())
+			{
+				return;
+			}
+	
+			switch (m_Enemystate)
+			{
+			case Stop:
+				StopState();
+				break;
+			case Target:
+				TargetState();
+				break;
+			case Attack:
+				AttackState();
+				break;
+			case Damage:
+				DamageState();
+				break;
+			case Delete:
+				DeleteState();
+				break;
+			}
+		}
+		//死んでるとき
+		else
+		{
+			RespawnState();
+		}
+	}
+
+	void EnemyRush::StopState()
+	{
+		//プレイヤーとの距離を計算して追うかどうかの判断
+		auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+		auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+		if (m_TargetPlayernum == 1)
+		{
+			Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+			Vector3 dir;
+			dir = topos - nowpos;
+			//距離が近くなれば狙う状態
+			if (dir.Length() < m_ChaceDir)
+			{
+				m_Enemystate = Target;
+				m_time = 0;
+			}
+		}
+		else if (m_TargetPlayernum == 2)
+		{
+
+			Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+			Vector3 dir;
+			dir = topos - nowpos;
+			//距離が近くなれば狙う状態
+			if (dir.Length() < m_ChaceDir)
+			{
+				m_Enemystate = Target;
+				m_time = 0;
+			}
+		}
+		
+
+		//他のエネミーとは違う演出として回転
+		float rot = GetComponent<Transform>()->GetRotation().y;
+		rot += 0.10f;
+		GetComponent<Transform>()->SetRotation(Vector3(0,rot,0));
+	}
+
+	void EnemyRush::TargetState()
+	{
+		auto P1P = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+		auto P2P = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+
+		//見つけた後溜めてる状態
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_IntervalStopTime)
+		{
+			//突撃状態
+			m_time = 0;
+			m_Enemystate = Attack;
+
+			//速度設定
+			if (m_TargetPlayernum == 1)
+			{
+				Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+				Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+				Vector3 dir;
+				dir = topos - nowpos;
+				Vector2 velo = Vector2(dir.x, dir.z);
+				float angle = atan2(velo.y, velo.x);
+				velo.x = cos(angle);
+				velo.y = sin(angle);
+
+				m_velocity = velo * m_speed;
+			}
+			else if (m_TargetPlayernum == 2)
+			{
+				Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+				Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+				Vector3 dir;
+				dir = topos - nowpos;
+				Vector2 velo = Vector2(dir.x, dir.z);
+				float angle = atan2(velo.y, velo.x);
+				velo.x = cos(angle);
+				velo.y = sin(angle);
+
+				m_velocity = velo * m_speed;
+			}
+		}
+
+		//向き更新
+
+		if (m_TargetPlayernum == 1)
+		{
+			Vector3 topos = P1P->GetComponent<Transform>()->GetPosition();
+			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+			Vector3 dir;
+			dir = topos - nowpos;
+			Vector2 velo = Vector2(dir.x, dir.z);
+			float angle = atan2(velo.y, velo.x);
+			velo.x = cos(angle);
+			velo.y = sin(angle);
+
+			//向き更新
+			angle = atan2(velo.y, velo.x);
+			angle += (3.14159265f / 180) * 90;
+			angle *= -1;
+			GetComponent<Transform>()->SetRotation(Vector3(0, angle, 0));
+		}
+
+		if (m_TargetPlayernum == 2)
+		{
+			Vector3 topos = P2P->GetComponent<Transform>()->GetPosition();
+			Vector3 nowpos = GetComponent<Transform>()->GetPosition();
+			Vector3 dir;
+			dir = topos - nowpos;
+			Vector2 velo = Vector2(dir.x, dir.z);
+			float angle = atan2(velo.y, velo.x);
+			velo.x = cos(angle);
+			velo.y = sin(angle);
+
+			//向き更新
+			angle = atan2(velo.y, velo.x);
+			angle += (3.14159265f / 180) * 90;
+			angle *= -1;
+			GetComponent<Transform>()->SetRotation(Vector3(0, angle, 0));
+		}
+
+	}
+	
+	void EnemyRush::AttackState()
+	{
+		//一定時間定められた速度で移動
+		//時間計測
+		float ElaTime = App::GetApp()->GetElapsedTime();
+		m_time += ElaTime;
+		if (m_time > m_AttackTime)
+		{
+			m_time = 0;
+			m_Enemystate = Target;
+		}
+		else
+		{
+			Vector3 pos = GetComponent<Transform>()->GetPosition();
+			pos.x += m_velocity.x * ElaTime;
+			pos.z += m_velocity.y * ElaTime;
+			GetComponent<Transform>()->SetPosition(pos);
+		}
+
+	}
+
+	void EnemyRush::DamageState()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > 0.1f)
+		{
+			m_time = 0;
+			if (GetDrawActive())
+			{
+				SetDrawActive(false);
+			}
+			else
+			{
+				SetDrawActive(true);
+				m_FlashingCount++;
+			}
+		}
+		if (m_FlashingCount > 8)
+		{
+			m_time = 0;
+			SetDrawActive(true);
+			m_Enemystate = Target;
+			m_StopFlg = false;
+		}
+	}
+
+	void EnemyRush::DeleteState()
+	{
+		Vector3 scale = GetComponent<Transform>()->GetScale();
+		scale.x *= 0.98f;
+		scale.z *= 0.98f;
+		if (scale.x <= 0.2f)
+		{
+			scale = m_Scale;
+			m_Enemystate = Stop;
+			GetComponent<Transform>()->SetPosition(Vector3(0, -10, 0));
+			SetDrawActive(false);
+			m_ActiveFlg = false;
+			m_Particle->StopParticle();
+		}
+		GetComponent<Transform>()->SetScale(scale);
+	}
+
+	void EnemyRush::RespawnState()
+	{
+		m_time += App::GetApp()->GetElapsedTime();
+		if (m_time > m_ReSponTime)
+		{
+			m_time = 0;
+			SetDrawActive(true);
+			GetComponent<Transform>()->SetPosition(m_InitPos);
+			GetComponent<Transform>()->SetScale(m_Scale);
+			m_ActiveFlg = true;
+			m_Enemystate = Stop;
+			m_StopFlg = false;
+			m_life = m_MaxLife;
+			m_speed = m_InitSpeed;
+		}
+	}
+
+	void EnemyRush::EnemyDamage(int TargetNum)
+	{
+		if (TargetNum == m_TargetPlayernum && !m_StopFlg)
+		{
+			m_Enemystate = Damage;
+			m_StopFlg = true;
+			m_life--;
+			m_time = 0;
+
+			m_speed *= 1.3f;
+
+
+			//死んだ場合
+			if (m_life <= 0)
+			{
+				//状態遷移
+				m_Enemystate = Delete;
+
+				Vector3 pos = GetComponent<Transform>()->GetPosition();
+				//Vector3 InitPos, Vector3 RandPos, Vector3 Velo, Vector3 RandVelo, Vector3 scale, wstring TextureName, bool DeleteFlg, float CreateInterval, int layer,deleteTime
+				m_Particle->OnParticle(pos, Vector3(0, 0, 0), Vector3(0, 0, 0), Vector3(5.0f, 5.0f, 5.0f), Vector3(2.0f, 2.0f, 2.0f), L"LIGHT_TX", false, 0.01f, 1, 1.0f);
+
+			}
+			//死んでなければダメージ状態
+			else
+			{
+				m_Enemystate = Damage;
+			}
+		}
+
+	}
+
+	void EnemyRush::ResetPos()
+	{
+		m_speed = m_InitSpeed;
+		m_Enemystate = Stop;
+		GetComponent<Transform>()->SetPosition(m_InitPos);
+	}
+
+
+	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	用途: 暗転用黒
 	//--------------------------------------------------------------------------------------

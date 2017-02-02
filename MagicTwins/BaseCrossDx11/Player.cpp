@@ -8,6 +8,145 @@
 
 namespace basecross {
 
+	//-------------------------------------------------------------------------------------
+	//	class MPBar : public GameObject;
+	//	用途: MPバー
+	//--------------------------------------------------------------------------------------
+
+	MPBar::MPBar(const shared_ptr<Stage>& StagePtr):
+		GameObject(StagePtr)
+	{}
+
+	void MPBar::OnCreate()
+	{
+		//メッシュ作成
+		//頂点配列
+		vector<VertexPositionNormalTexture> vertices;
+		//インデックスを作成するための配列
+		vector<uint16_t> indices;
+		//Squareの作成(ヘルパー関数を利用)
+		MeshUtill::CreateSquare(1.0f, vertices, indices);
+		//UV値の変更
+		float from = 0.0f;
+		float to = 0.5f;
+		//左上頂点
+		vertices[0].textureCoordinate = Vector2(from, 0);
+		//右上頂点
+		vertices[1].textureCoordinate = Vector2(to, 0);
+		//左下頂点
+		vertices[2].textureCoordinate = Vector2(from, 1.0f);
+		//右下頂点
+		vertices[3].textureCoordinate = Vector2(to, 1.0f);
+		//頂点の型を変えた新しい頂点を作成
+		vector<VertexPositionColorTexture> new_vertices;
+		for (auto& v : vertices) {
+			VertexPositionColorTexture nv;
+			nv.position = v.position;
+			nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+			nv.textureCoordinate = v.textureCoordinate;
+			new_vertices.push_back(nv);
+		}
+		//メッシュ設定例文
+		//DrawP->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+
+		//**注意**//
+		//作成が早いほうが下にくる性質を利用して同レイヤーで処理してるので順番は変えないように！
+		//下地、枠、バーの順
+
+		/*
+		//赤いバーの下地作成
+		auto BarBack = GetStage()->AddGameObject<GameObject>();
+		auto BBTrans = BarBack->AddComponent<Transform>();
+		BBTrans->SetPosition(-550, 380, 0);
+		BBTrans->SetScale(500, 25, 1);
+		BBTrans->SetRotation(0, 0, 0);
+
+		auto BBDraw = BarBack->AddComponent<PCTSpriteDraw>();
+		BBDraw->SetTextureResource(L"MPBARBACK_TX");
+		BarBack->SetAlphaActive(true);
+		BarBack->SetDrawLayer(4);
+
+		m_BarBack = BarBack;
+		*/
+
+		//枠作成
+		auto Frame = GetStage()->AddGameObject<GameObject>();
+		auto FTrans = Frame->AddComponent<Transform>();
+		FTrans->SetPosition(-550, 380, 0);
+		FTrans->SetScale(517, 33, 1);
+		FTrans->SetRotation(0, 0, 0);
+
+		auto FDraw = Frame->AddComponent<PCTSpriteDraw>();
+		FDraw->SetTextureResource(L"MPBARFRAME_TX");
+		Frame->SetAlphaActive(true);
+		Frame->SetDrawLayer(4);
+
+		m_Frame = Frame;
+
+		//バー本体
+		auto Bar = GetStage()->AddGameObject<GameObject>();
+		auto BTrans = Bar->AddComponent<Transform>();
+		BTrans->SetPosition(-550, 380, 0);
+		BTrans->SetScale(500, 25, 1);
+		BTrans->SetRotation(0, 0, 0);
+
+		auto BDraw = Bar->AddComponent<PCTSpriteDraw>();
+		BDraw->SetTextureResource(L"MPBAR_TX");
+		BDraw->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+		Bar->SetAlphaActive(true);
+		Bar->SetDrawLayer(4);
+
+		m_Bar = Bar;
+	}
+
+	void MPBar::SetBar(int mp)
+	{
+		int Inmp = mp;
+		if (Inmp < 0)
+		{
+			Inmp = 0;
+		}
+		if (Inmp > 100)
+		{
+			Inmp = 100;
+		}
+
+		//メッシュ作成
+		//頂点配列
+		vector<VertexPositionNormalTexture> vertices;
+		//インデックスを作成するための配列
+		vector<uint16_t> indices;
+		//Squareの作成(ヘルパー関数を利用)
+		MeshUtill::CreateSquare(1.0f, vertices, indices);
+		//UV値の変更
+		float mpver = float((100.0f - Inmp) / 100.0f / 2.0f);
+		if (Inmp != 100)
+		{
+			mpver = float((100.0f - Inmp) / 100.0f / 2.0f);
+		}
+		float from = 0.0f + mpver;
+		float to = 0.5f + mpver;
+		//左上頂点
+		vertices[0].textureCoordinate = Vector2(from, 0);
+		//右上頂点
+		vertices[1].textureCoordinate = Vector2(to, 0);
+		//左下頂点
+		vertices[2].textureCoordinate = Vector2(from, 1.0f);
+		//右下頂点
+		vertices[3].textureCoordinate = Vector2(to, 1.0f);
+		//頂点の型を変えた新しい頂点を作成
+		vector<VertexPositionColorTexture> new_vertices;
+		for (auto& v : vertices) {
+			VertexPositionColorTexture nv;
+			nv.position = v.position;
+			nv.color = Color4(1.0f, 1.0f, 1.0f, 1.0f);
+			nv.textureCoordinate = v.textureCoordinate;
+			new_vertices.push_back(nv);
+		}
+
+		m_Bar->GetComponent<PCTSpriteDraw>()->SetMeshResource(MeshResource::CreateMeshResource<VertexPositionColorTexture>(new_vertices, indices, true));
+	}
+
 	//--------------------------------------------------------------------------------------
 	//	class Player : public GameObject;
 	//	用途: プレイヤー
@@ -54,6 +193,11 @@ namespace basecross {
 
 		if (m_myName == "Player1")
 		{
+			//MP作成
+			GetStage()->SetSharedGameObject(L"MP", GetStage()->AddGameObject<MP>());
+			//MPバー作成
+			GetStage()->SetSharedGameObject(L"MPBar", GetStage()->AddGameObject<MPBar>());
+
 			// モデルとトランスフォームの間の差分行列
 			angle = -90 * (3.14159265f / 180);
 			SpanMat.DefTransformation(
@@ -108,7 +252,7 @@ namespace basecross {
 				objtrans->SetRotation(0, 0, 0);
 				objtrans->SetScale(400, 130, 1);
 				obj->SetAlphaActive(true);
-				obj->SetDrawLayer(3);
+				obj->SetDrawLayer(4);
 				m_LifeSprite = obj;
 				//ライフ表示----------------------------------------
 
@@ -147,7 +291,7 @@ namespace basecross {
 				CHUT->SetRotation(0, 0, 0);
 				CHUT->SetScale(200, 200, 0);
 				CHU->SetAlphaActive(true);
-				CHU->SetDrawLayer(3);
+				CHU->SetDrawLayer(4);
 				CHU->SetDrawActive(true);
 				m_CharaUI = CHU;
 				//キャラUI表示--------------------------------------
@@ -173,6 +317,9 @@ namespace basecross {
 		}
 		else if (m_myName == "Player2")
 		{
+			//ライフ暗くしとく
+			m_LifeFinishFlg = true;
+			m_NoudoLife = 0.5f;
 			//影をつける（シャドウマップを描画する）
 			auto ShadowPtr = AddComponent<Shadowmap>();
 			//影の形（メッシュ）を設定
@@ -229,17 +376,17 @@ namespace basecross {
 				auto obj = GetStage()->AddGameObject<GameObject>();
 				auto objDraw = obj->AddComponent<PCTSpriteDraw>();
 				objDraw->SetTextureResource(L"LIFE3_TX");
-
+				objDraw->SetDiffuse(Color4(0.5f, 0.5f, 0.5f, 1));
 				auto objtrans = obj->AddComponent<Transform>();
 				//1920,1080
 				//960,540
-				objtrans->SetPosition(-550, 420, 0);
+				objtrans->SetPosition(-520, 390, 0);
 				objtrans->SetRotation(0, 0, 0);
 				objtrans->SetScale(400, 130, 1);
 				obj->SetAlphaActive(true);
 				obj->SetDrawLayer(3);
 
-				obj->SetDrawActive(false);
+				obj->SetDrawActive(true);
 				m_LifeSprite = obj;
 				//ライフ表示----------------------------------------
 
@@ -247,13 +394,15 @@ namespace basecross {
 				auto CHU = GetStage()->AddGameObject<GameObject>();
 				auto CHUD = CHU->AddComponent<PCTSpriteDraw>();
 				CHUD->SetTextureResource(L"CHARA2UI_TX");
+				CHUD->SetDiffuse(Color4(0.5f, 0.5f, 0.5f, 1));
+
 				auto CHUT = CHU->AddComponent<Transform>();
-				CHUT->SetPosition(-850, 420, 0);
+				CHUT->SetPosition(-820, 390, 0);
 				CHUT->SetRotation(0, 0, 0);
 				CHUT->SetScale(200, 200, 0);
 				CHU->SetAlphaActive(true);
 				CHU->SetDrawLayer(3);
-				CHU->SetDrawActive(false);
+				CHU->SetDrawActive(true);
 				m_CharaUI = CHU;
 				//キャラUI表示--------------------------------------
 
@@ -374,6 +523,7 @@ namespace basecross {
 			}
 			return;
 		}
+
 		if (m_LifeFlg)
 		{
 			LifeDelete();
@@ -395,6 +545,21 @@ namespace basecross {
 			m_endFrame = false;
 			return;
 		}
+		//ライフ切り替え演出
+		if (m_LifeChangeFlg)
+		{
+			//暗くする
+			if (!m_LifeFinishFlg)
+			{
+				LifeChange();
+			}
+			//明るく
+			else if (m_LifeFinishFlg)
+			{
+				LifeChange();
+			}
+		}
+
 		//切り替えの暗転処理
 		if (m_BlackFlg)
 		{
@@ -459,6 +624,7 @@ namespace basecross {
 			CameraTarget();
 			active();
 		}
+		
 		//無敵中計算
 		if (m_InviFlg)
 		{
@@ -637,7 +803,7 @@ namespace basecross {
 				//}
 
 				//Xボタン押したら魔法発射
-				if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_A)
+				if (CntlVec[0].wPressedButtons&XINPUT_GAMEPAD_A && !m_MPEmpty)
 				{
 					if (m_Magic != None)
 					{
@@ -799,9 +965,9 @@ namespace basecross {
 				auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
 
 				//ライフ透明化＆表示 キャラUIも
-				m_LifeSprite->SetDrawActive(false);
-				m_CharaUI->SetDrawActive(false);
-				DPlayer->DispUI();
+				//m_LifeSprite->SetDrawActive(false);
+				//m_CharaUI->SetDrawActive(false);
+				//DPlayer->DispUI();
 
 				//いなかったらエラー終了
 				if (!DPlayer)
@@ -837,9 +1003,9 @@ namespace basecross {
 				auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
 
 				//ライフ透明化＆表示 キャラUIも
-				m_LifeSprite->SetDrawActive(false);
-				m_CharaUI->SetDrawActive(false);
-				DPlayer->DispUI();
+				//m_LifeSprite->SetDrawActive(false);
+				//m_CharaUI->SetDrawActive(false);
+				//DPlayer->DispUI();
 
 				//いなかったらエラー終了
 				if (!DPlayer)
@@ -868,6 +1034,8 @@ namespace basecross {
 				pos.z += -5.0f;
 
 				DPlayer->SetCamera(At, pos);
+
+
 				return;
 			}
 
@@ -882,7 +1050,20 @@ namespace basecross {
 			m_BlackFlg2 = true;
 			m_ActiveFlg = false;
 			m_velocity = Vector3(0, 0, 0);
-			GetComponent<Rigidbody>()->SetVelocity(Vector3(m_velocity.x, 0, m_velocity.y));
+			GetComponent<Rigidbody>()->SetVelocity(Vector3(0, 0, 0));
+
+			//ライフ切り替え演出開始
+			if (m_myName == "Player1")
+			{
+				auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player2", false);
+				DPlayer->StartLifeChange();
+			}
+			else if (m_myName == "Player2")
+			{
+				auto DPlayer = GetStage()->GetSharedGameObject<Player>(L"Player1", false);
+				DPlayer->StartLifeChange();
+			}
+			StartLifeChange();
 		}
 	}
 
@@ -1034,8 +1215,17 @@ namespace basecross {
 		else if (m_myName == "Player2")
 		{
 			GetStage()->GetSharedGameObject<MagicBoal>(L"MagicBoal2", false)->SetActive(true,m_Magic);
-
 		}
+
+		//mp減少
+		auto mp = GetStage()->GetSharedGameObject<MP>(L"MP", false);
+		mp->DownMP(5);
+		if (mp->GetMP() <= 0)
+		{
+			m_MPEmpty = true;
+		}
+		//ゲージ更新
+		GetStage()->GetSharedGameObject<MPBar>(L"MPBar", false)->SetBar(mp->GetMP());
 	}
 
 	//カメラ固定
@@ -1081,6 +1271,150 @@ namespace basecross {
 		}
 		GetComponent<StringSprite>()->SetText(txt);
 		*/
+	}
+
+	//暗くしたり明るくしたりする演出
+	void Player::LifeChange()
+	{
+		float ElaTime = App::GetApp()->GetElapsedTime();
+		//暗くする m_LifeFinishFlg = false
+		if (!m_LifeFinishFlg)
+		{
+			//キャラUI移動
+			Vector3 pos = m_CharaUI->GetComponent<Transform>()->GetPosition();
+			if (pos.x < -820)
+			{
+				pos.x += m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				pos.x = -820;
+			}
+			if (pos.y > 390)
+			{
+				pos.y += -m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				pos.y = 390;
+			}
+			m_CharaUI->GetComponent<Transform>()->SetPosition(pos);
+
+			
+			//ライフ移動
+			Vector3 Lifepos = m_LifeSprite->GetComponent<Transform>()->GetPosition();
+			if (Lifepos.x < -520)
+			{
+				Lifepos.x += m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				Lifepos.x = -520;
+			}
+			if (Lifepos.y > 390)
+			{
+				Lifepos.y += -m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				Lifepos.y = 390;
+			}
+			m_LifeSprite->GetComponent<Transform>()->SetPosition(Lifepos);
+
+			//濃度薄く(暗く)
+			if (m_NoudoLife > 0.5f)
+			{
+				m_NoudoLife += -0.03f;
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+				m_CharaUI->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+			}
+			else
+			{
+				m_NoudoLife = 0.5f;
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+				m_CharaUI->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+			}
+
+			
+			if ((pos.x == -820 && pos.y == 390) && (Lifepos.x == -520 && Lifepos.y == 390) && m_NoudoLife == 0.5f)
+			{
+				m_LifeChangeFlg = false;
+				m_LifeFinishFlg = true;
+
+				m_LifeSprite->SetDrawLayer(3);
+				m_CharaUI->SetDrawLayer(3);
+			}
+		}
+		//明るくする
+		else
+		{
+			//キャラUI移動
+			Vector3 pos = m_CharaUI->GetComponent<Transform>()->GetPosition();
+			if (pos.x > -850)
+			{
+				pos.x += -m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				pos.x = -850;
+			}
+			if (pos.y < 420)
+			{
+				pos.y += m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				pos.y = 420;
+			}
+			m_CharaUI->GetComponent<Transform>()->SetPosition(pos);
+
+			
+			//ライフ移動
+			Vector3 Lifepos = m_LifeSprite->GetComponent<Transform>()->GetPosition();
+			if (Lifepos.x > -550)
+			{
+				Lifepos.x += -m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				Lifepos.x = -550;
+			}
+			if (Lifepos.y < 420)
+			{
+				Lifepos.y += m_LifeChangeSpeed * ElaTime;
+			}
+			else
+			{
+				Lifepos.y = 420;
+			}
+			m_LifeSprite->GetComponent<Transform>()->SetPosition(Lifepos);
+
+			
+			//濃度濃く(明るく)
+			if (m_NoudoLife < 1.0f)
+			{
+				m_NoudoLife += 0.03f;
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+				m_CharaUI->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+			}
+			else
+			{
+				m_NoudoLife = 1.0f;
+				m_LifeSprite->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+				m_CharaUI->GetComponent<PCTSpriteDraw>()->SetDiffuse(Color4(m_NoudoLife, m_NoudoLife, m_NoudoLife, 1));
+			}
+			
+
+			if ((pos.x == -850 && pos.y == 420) && (Lifepos.x == -550 && Lifepos.y == 420) && m_NoudoLife == 1.0f)
+			{
+				m_LifeChangeFlg = false;
+				m_LifeFinishFlg = false;
+
+				m_LifeSprite->SetDrawLayer(4);
+				m_CharaUI->SetDrawLayer(4);
+
+			}
+		}
 	}
 
 	void Player::PlayerDamege()
@@ -1283,7 +1617,7 @@ namespace basecross {
 		float angle = 0;
 		for (auto v : EnemyGroup)
 		{
-			auto EnemyPtr = dynamic_pointer_cast<Enemy>(v.lock());
+			auto EnemyPtr = dynamic_pointer_cast<GameObject>(v.lock());
 			Vector3 EnemyPos = EnemyPtr->GetComponent<Transform>()->GetPosition();
 
 			//上下の差
@@ -1297,7 +1631,7 @@ namespace basecross {
 
 
 			//エネミーが生きてたら
-			if (EnemyPtr->GetActive() && abs(defY) < 1.5f && nowDistance < 50)
+			if (EnemyPtr->GetDrawActive() && abs(defY) < 1.5f && nowDistance < 50)
 			{
 
 				////差を計算
@@ -1356,6 +1690,7 @@ namespace basecross {
 			TargetAim->SetDrawActive(false);
 		}
 	}
+
 	//--------------------------------------------------------------------------------------
 	//	class MagicBoal : public GameObject;
 	//	用途: 魔法

@@ -20,6 +20,15 @@ enum MagicType
 	Wind
 };
 
+//突撃エネミー(EnemyRush)の状態
+enum EnemyState
+{
+	Stop,
+	Target,
+	Attack,
+	Damage,
+	Delete,
+};
 
 // C ランタイム ヘッダー ファイル
 #include <stdio.h>

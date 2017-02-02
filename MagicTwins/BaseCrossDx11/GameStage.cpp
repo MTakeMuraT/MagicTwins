@@ -175,6 +175,13 @@ namespace basecross {
 		strTexture = DataDir + L"Target.png";
 		App::GetApp()->RegisterTexture(L"TARGETAIM_TX", strTexture);
 
+		//MPバー
+		strTexture = DataDir + L"Bar/Bar.png";
+		App::GetApp()->RegisterTexture(L"MPBAR_TX", strTexture);
+
+		strTexture = DataDir + L"Bar/BarFrame.png";
+		App::GetApp()->RegisterTexture(L"MPBARFRAME_TX", strTexture);
+
 		//アニメーション？
 		//auto StaticModelMesh = MeshResource::CreateStaticModelMesh(DataDir, L"Chara_Rst.bmf");
 		//App::GetApp()->RegisterResource(L"Chara_Rst_MESH", StaticModelMesh);
@@ -1468,6 +1475,7 @@ namespace basecross {
 
 			//テスト
 			//SetSharedGameObject(L"Abeje",AddGameObject<SpaDelEf>(Vector3(0, 0.5f, 0), Vector3(1, 1, 1), "Fire"));
+			//AddGameObject<EnemyRush>(Vector3(2, 0.5f, 2), Vector3(1, 1, 1), 1);
 		}
 		catch (...) {
 			throw;

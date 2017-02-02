@@ -329,6 +329,83 @@ namespace basecross{
 	};
 	
 	//--------------------------------------------------------------------------------------
+	//	class EnemyRush : public GameObject;
+	//	用途: 敵(突撃する)
+	//--------------------------------------------------------------------------------------
+	class EnemyRush : public GameObject
+	{
+		//初期位置
+		Vector3 m_InitPos;
+		Vector3 m_Scale;
+		//速度
+		float m_speed = 9.0f;
+		const float m_InitSpeed = 9.0f;
+
+		//停止時間
+		const float m_StopTime = 0.5f;
+		//死んでる時間
+		const float m_ReSponTime = 10.0f;
+		//追う距離
+		const float m_ChaceDir = 3.0f;
+		//計算用
+		float m_time = 0;
+		//体力
+		int m_life = 3;
+		//初期体力
+		const int m_MaxLife = 3;
+
+		//狙ってるプレイヤー
+		int m_TargetPlayernum = 0;
+		//生きてるか死んでるか
+		bool m_ActiveFlg = true;
+
+		//エフェクト
+		shared_ptr<MagicParticle> m_Particle;
+
+		//現在の状態
+		EnemyState m_Enemystate = Stop;
+
+		//一回ごとに止まる時間
+		const float m_IntervalStopTime = 1.0f;
+
+		//移動速度
+		Vector2 m_velocity;
+		//移動してる時間
+		const float m_AttackTime = 0.5f;
+
+		//ダメージ計算用
+		int m_FlashingCount = 0;
+
+		//待ち状態
+		void StopState();
+		//狙ってる状態
+		void TargetState();
+		//攻撃(移動状態)
+		void AttackState();
+		//ダメージ状態
+		void DamageState();
+		//消える処理
+		void DeleteState();
+		//復活まで待つ状態
+		void RespawnState();
+
+
+		//処理用、ダメージ後の硬直中にtrue、それ以外false
+		bool m_StopFlg = false;
+	public:
+		EnemyRush(const shared_ptr<Stage>& StagePtr, Vector3 pos, Vector3 scale, int targetNum);
+		void OnCreate() override;
+		void OnUpdate() override;
+		void ResetPos();
+		void EnemyDamage(int TargetNum);
+
+		bool GetStopFlg() { return m_StopFlg; }
+
+		//生存確認
+		bool GetActive() { return m_ActiveFlg; }
+
+	};
+	//--------------------------------------------------------------------------------------
 	//	class Black : public GameObject;
 	//	用途: 暗転用黒背景
 	//--------------------------------------------------------------------------------------

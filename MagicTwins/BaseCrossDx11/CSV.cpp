@@ -71,7 +71,11 @@ namespace basecross
 		vector<Vector3> Enemy1Scale;
 		vector<Vector3> Enemy2pos;
 		vector<Vector3> Enemy2Scale;
-
+		//突撃エネミー
+		vector<Vector3> EnemyRush1pos;
+		vector<Vector3> EnemyRush1Scale;
+		vector<Vector3> EnemyRush2pos;
+		vector<Vector3> EnemyRush2Scale;
 		//魔導書
 		Vector3 FirePos;
 		Vector3 IceFogPos;
@@ -226,7 +230,23 @@ namespace basecross
 				Enemy2pos.push_back(pos);
 				Enemy2Scale.push_back(scale);
 			}
-
+			//突撃エネミー
+			if (StageMapVec[0] == L"EnemyRush1")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				EnemyRush1pos.push_back(pos);
+				EnemyRush1Scale.push_back(scale);
+			}
+			if (StageMapVec[0] == L"EnemRush2")
+			{
+				Flgg = true;
+				Vector3 pos = Vector3(_wtof(StageMapVec[1].c_str()), _wtof(StageMapVec[2].c_str()), _wtof(StageMapVec[3].c_str()));
+				Vector3 scale = Vector3(_wtof(StageMapVec[4].c_str()), _wtof(StageMapVec[5].c_str()), _wtof(StageMapVec[6].c_str()));
+				EnemyRush2pos.push_back(pos);
+				EnemyRush2Scale.push_back(scale);
+			}
 			//ギミック１
 			if (StageMapVec[0] == L"Gimmick1")
 			{
@@ -485,6 +505,34 @@ namespace basecross
 			count++;
 		}
 		count = 0;
+
+		//突撃エネミー作成
+		//auto EG = GetStage()->CreateSharedObjectGroup(L"Enemy");	//いらぬ
+		for (auto v : EnemyRush1pos)
+		{
+			//スケールは別で持ってくる
+			Vector3 scale = EnemyRush1Scale[count];
+			auto EPt = st->AddGameObject<EnemyRush>(v, scale, 1);
+			EG->IntoGroup(EPt);
+			MOG->IntoGroup(EPt);
+			//アップデートグループ追加
+			SUG->IntoGroup(EPt);
+			count++;
+		}
+		count = 0;
+		for (auto v : EnemyRush2pos)
+		{
+			//スケールは別で持ってくる
+			Vector3 scale = EnemyRush2Scale[count];
+			auto EPt = st->AddGameObject<EnemyRush>(v, scale, 2);
+			EG->IntoGroup(EPt);
+			MOG->IntoGroup(EPt);
+			//アップデートグループ追加
+			SUG->IntoGroup(EPt);
+			count++;
+		}
+		count = 0;
+
 
 		//ゴール作成
 		st->SetSharedGameObject(L"Goal",st->AddGameObject<Goal>(GoalPos, GoalScale));

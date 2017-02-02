@@ -7,9 +7,41 @@
 #include "stdafx.h"
 
 namespace basecross{
+	//---------/----------------------------------------------------------------------------
+	//	class MPBar : public GameObject;
+	//	用途: MPバー
+	//--------------------------------------------------------------------------------------
+	class MPBar : public GameObject
+	{
+	private :
+		//枠
+		shared_ptr<GameObject> m_Frame;
+		//青いバー
+		shared_ptr<GameObject> m_Bar;
+		//赤いバー(下地)
+		shared_ptr<GameObject> m_BarBack;
+	public :
+		MPBar(const shared_ptr<Stage>& StagePtr);
+
+		void OnCreate();
+		void SetBar(int mp);
+	};
 
 
-
+	//---------/----------------------------------------------------------------------------
+	//	class MP : public GameObject;
+	//	用途: MP
+	//--------------------------------------------------------------------------------------
+	class MP : public GameObject
+	{
+	private:
+		int m_MP = 100;
+	public:
+		MP(const shared_ptr<Stage>& StagePtr) :GameObject(StagePtr) {};
+		int GetMP() { return m_MP; }
+		void SetMP(int mp) { m_MP = mp; }
+		void DownMP(int mp) { m_MP += -mp; if (m_MP < 0) { m_MP = 0; } }
+	};
 	//--------------------------------------------------------------------------------------
 	//	class Player : public GameObject;
 	//	用途: プレイヤー
@@ -153,6 +185,23 @@ namespace basecross{
 		Vector3 m_CMUInitScale = Vector3(150, 150, 0);
 		//大きくする関数
 		void ChangeMagicAnima();
+
+		//ライフ演出関連
+		//ライフ切り替え演出フラグ
+		bool m_LifeChangeFlg = false;
+		//ライフ切り替え終わってるかフラグ
+		bool m_LifeFinishFlg = false;
+		//ライフ切り替え関数
+		void LifeChange();
+
+		//ライフ切り替え速度
+		float m_LifeChangeSpeed = 300;
+
+		//濃度
+		float m_NoudoLife = 1.0f;
+
+		//MP切れかどうか
+		bool m_MPEmpty = false;
 	public:
 		//構築と破棄
 		//引数(初期座標、操作できるか、プレイヤーの名前(Player1かPlayer2))
@@ -192,6 +241,9 @@ namespace basecross{
 
 		//ターゲットモード中か
 		bool GetTargeModeFlg() { return m_TargetModeFlg; }
+
+		//ライフ演出開始
+		void StartLifeChange() { m_LifeChangeFlg = true; }
 	};
 
 	//--------------------------------------------------------------------------------------
